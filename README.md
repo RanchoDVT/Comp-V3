@@ -40,3 +40,8 @@ When high school starts for me, I *will* be in a robotics class, and then I can 
 14. Import code updates from SD card 🔃
 15. Diagnostic mode 🔃
 16. Hot swap of Ports (V5 only) 🔃
+
+### Website todo:
+1. Blob effect around curser
+2. Update program from website
+3. Cacheing
