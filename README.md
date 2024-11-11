@@ -29,11 +29,11 @@ We are at b2; I need Vex V5 Hardware to test with. (I don't have it; it will be 
 9. Odometer 🔃 (Requires tamper protection)
 10. Maintenance reminders 🔃
 11. Custom user messages 🔃 (Requires rewrite of startup)
-12. More debugging when connected to a computer 🔃
+12. More debugging when connected to a computer (Loghandler) 🔃
 13. PID for autonomous 🔃
-14. Import code updates from SD card 🔃
-15. Diagnostic mode 🔃
-16. Hot swap of Ports (V5 only) 🔃
+14. Import code updates from SD card (Requires rewrite of startup) 🔃
+15. Diagnostic mode (Requires rewrite of startup) 🔃
+16. Hot swap of Ports (Requires rewrite of user_control) 🔃
 
 ### Website todo:
 1. Blob effect around curser
