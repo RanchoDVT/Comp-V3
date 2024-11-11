@@ -4,10 +4,8 @@
 1. Install VScode
 2. Download and install these extensions:  
 ([VEX Robotics](https://marketplace.visualstudio.com/items?itemName=VEXRobotics.vexcode), [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools), [Makefile Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.makefile-tools))  
-3. ~~Install my [Custom SDK](https://github.com/RanchoDVT/Vex-SDK)~~
-   
-*Vex has told me to remove my custom SDK. I will work on porting this back to the standard SDK, and in the meantime, I will make my own VsCode extension.*  
-Happy coding! =)
+3. Install my [Custom SDK](https://github.com/RanchoDVT/Vex-SDK)
+
 
 ## Rewrite (3.0)
 Here we go! This is a rewritten version of Comp_V2 (with some exceptions).
