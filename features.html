@@ -12,8 +12,74 @@
 <body>
 
 	<script id="navbar" src="main.js"></script>
-
-	<h3>WIP!</h3>
+	<h2>
+		All the features you would want in a beginner V5 program... and then some!</h2>
+	<h3 id="features">Features</h3>
+	<h4 id="-gyro-calibration">🌀 Gyro Calibration</h4>
+	<p><strong>Function:</strong> <code>calibrateGyro()</code><br><strong>Description:</strong> Easily calibrate the
+		gyro sensor for accurate readings.<br><strong>Example:</strong> <code>calibrateGyro();</code><br><strong>Return
+			Value:</strong> None.</p>
+	<hr>
+	<h4 id="-config-manager">📁 Config Manager</h4>
+	<p><strong>Methods:</strong> </p>
+	<ul>
+		<li>
+			<p><strong>Get Current Logging Setting:</strong><br><strong>Function:</strong>
+				<code>getLogToFile()</code><br><strong>Description:</strong> Check if logging to a file is enabled.
+				Returns <code>true</code> if enabled, <code>false</code> otherwise.
+			</p>
+		</li>
+		<li>
+			<p><strong>Set Logging Configuration:</strong><br><strong>Function:</strong>
+				<code>setLogToFile(bool logToFile)</code><br><strong>Parameters:</strong> <code>logToFile</code> (type:
+				bool) - Set to <code>true</code> to enable logging, <code>false</code> to disable.
+			</p>
+		</li>
+	</ul>
+	<hr>
+	<h4 id="-button-press-detection">🔘 Button Press Detection</h4>
+	<p><strong>Function:</strong> <code>ctrl1BttnPressed()</code><br><strong>Description:</strong> Detect pressed
+		buttons on the primary controller and retrieve the button pressed along with the
+		duration.<br><strong>Example:</strong>
+		<code>auto [button, duration] = ctrl1BttnPressed(); <br>  
+			// OR if you only want the button!  <br>
+			std::string buttonPressed = std::get<0>(ctrl1BttnPressed());</code><br><strong>Return Value:</strong> Pair of button
+		pressed and duration.
+	</p>
+	<hr>
+	<h4 id="-user-options-selection">📊 User Options Selection</h4>
+	<p><strong>Function:</strong> <code>getUserOption()</code><br><strong>Description:</strong> Prompt users for a
+		setting choice and retrieve their selection.<br><strong>Example Use:</strong> </p>
+	<pre><code><span class="hljs-keyword">int</span> <span class="hljs-keyword">value</span> = getUserOption(<span class="hljs-string">"Choose a setting"</span>, {<span class="hljs-string">"Option 1"</span>, <span class="hljs-string">"Option 2"</span>});
+</code></pre>
+	<p><strong>Return Value:</strong> User selected option. (Ex: Option 1)</p>
+	<hr>
+	<h4 id="-gif-player">🎞️ GIF Player</h4>
+	<p><strong>Function:</strong> <code>startGifPlayer()</code><br><strong>Description:</strong> Initiate the GIF player
+		for displaying animated content.<br><strong>Return Value:</strong> None.</p>
+	<hr>
+	<h4 id="-logging-system">📝 Logging System</h4>
+	<p><strong>Function:</strong> <code>loghandler()</code><br><strong>Description:</strong> Log messages with varying
+		severity levels (Trace, Info, Warn, Error, Fatal). Displays messages on the console and controller screen based on the
+		log level.<br><strong>Return Value:</strong> None.</p>
+	<hr>
+	<h4 id="-motor-monitoring">🌡️ Motor Monitoring</h4>
+	<p><strong>Function:</strong> <code>motorMonitor()</code><br><strong>Description:</strong> Monitor motor temperature
+		and position during competitions to ensure performance and safety.<br><strong>Return Value:</strong> None.</p>
+	<hr>
+	<h4 id="-sd-card-compatibility">💾 SD Card Compatibility</h4>
+	<p><strong>Requirements:</strong> </p>
+	<ul>
+		<li>SDHC type recommended, formatted in FAT32. </li>
+		<li>Max size of 16GB. </li>
+	</ul>
+	<p><strong>Structure:</strong> </p>
+	<ul>
+		<li><code>/assets</code>: Store logo images (.png, .gif) </li>
+		<li><code>/backup</code>: Latest source code backups </li>
+		<li><code>config.cfg</code>: Stores robot settings </li>
+	</ul>
+	<hr>
 	<footer>Copyright © 2024 Voidless7125</footer>
 </body>
 
