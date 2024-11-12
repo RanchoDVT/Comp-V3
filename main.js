@@ -1,5 +1,13 @@
+    fetch('navbar.html').then(res => res.text()).then(text => {
+        let oldelem = document.querySelector("script#navbar");
+        let newelem = document.createElement("div");
+        newelem.innerHTML = text;
+        oldelem.parentNode.replaceChild(newelem, oldelem); // Now that the navbar is loaded, set the active link
+        const currentPage = window.location.pathname.split("/").pop();
+        const navLinks = document.querySelectorAll("nav a.nav-link"); navLinks.forEach(link => { if (link.getAttribute("data-page") === currentPage) { link.classList.add("active"); } });
+    });
 
-marked.use({ breaks: true })
+marked.use({ breaks: true });
 async function fetchReadme() {
     try {
         const response = await fetch('https://raw.githubusercontent.com/RanchoDVT/Comp-V5/dev/README.md');
@@ -24,15 +32,6 @@ async function fetchChangelog() {
 
 // I hate js, why do I need a DOM loader check?
 document.addEventListener('DOMContentLoaded', function () {
-
-    fetch('navbar.html').then(res => res.text()).then(text => {
-        let oldelem = document.querySelector("script#navbar");
-        let newelem = document.createElement("div");
-        newelem.innerHTML = text;
-        oldelem.parentNode.replaceChild(newelem, oldelem); // Now that the navbar is loaded, set the active link
-        const currentPage = window.location.pathname.split("/").pop();
-        const navLinks = document.querySelectorAll("nav a.nav-link"); navLinks.forEach(link => { if (link.getAttribute("data-page") === currentPage) { link.classList.add("active"); } });
-    });
 
     if (document.getElementById('readme-content')) {
         fetchReadme();
