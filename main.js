@@ -1,11 +1,20 @@
-    fetch('navbar.html').then(res => res.text()).then(text => {
-        let oldelem = document.querySelector("script#navbar");
-        let newelem = document.createElement("div");
-        newelem.innerHTML = text;
-        oldelem.parentNode.replaceChild(newelem, oldelem); // Now that the navbar is loaded, set the active link
-        const currentPage = window.location.pathname.split("/").pop();
-        const navLinks = document.querySelectorAll("nav a.nav-link"); navLinks.forEach(link => { if (link.getAttribute("data-page") === currentPage) { link.classList.add("active"); } });
+fetch('navbar.html').then(res => res.text()).then(text => {
+    let oldelem = document.querySelector("script#navbar");
+    let newelem = document.createElement("div");
+    newelem.innerHTML = text;
+    oldelem.parentNode.replaceChild(newelem, oldelem);
+
+    // Get the current page name or default to "index.html" if it's empty
+    let currentPage = window.location.pathname.split("/").pop() || "index.html";
+    const navLinks = document.querySelectorAll("nav a.nav-link");
+    
+    navLinks.forEach(link => {
+        if (link.getAttribute("data-page") === currentPage) {
+            link.classList.add("active");
+        }
     });
+});
+
 
 marked.use({ breaks: true });
 async function fetchReadme() {
