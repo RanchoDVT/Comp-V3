@@ -47,9 +47,9 @@ document.addEventListener('DOMContentLoaded', function () {
         fetchChangelog();
     }
 
-    var configForm = document.getElementById('config-form');
-    var copyButton = document.getElementById('copy-button');
-    var configOutput = document.getElementById('config-output');
+    let configForm = document.getElementById('config-form');
+    let copyButton = document.getElementById('copy-button');
+    let configOutput = document.getElementById('config-output');
 
 
     if (configForm) {
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return latestTag;
             }
             const formData = new FormData(event.target);
-            config = `MOTOR_CONFIG
+            configOutput.textContent = `MOTOR_CONFIG
 {
   FRONT_LEFT_MOTOR
   {
@@ -113,11 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
   POLLINGRATE=${formData.get('polling_rate')}
   CTRLR1POLLINGRATE=${formData.get('ctrlr1_polling_rate')}
   VERSION=${await getLatestReleaseVersion()}
-}`
-            completeCheck = true;
-
-            configOutput.textContent = config;
-
+}`;
             // Show the copy button once the config is generated
             copyButton.style.display = 'inline-block';
         });
@@ -129,8 +125,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 navigator.clipboard.writeText(configOutput.textContent)
                     .then(() => {
                         console.debug('Config copied to clipboard!');
-                        const button =
-                            document.querySelector('copyButton');
                         copyButton.innerHTML = 'Copied! ✅';
                     })
                     .catch(err => {
@@ -145,15 +139,6 @@ async function getLatestRelease(repo) {
     const response = await fetch(`https://api.github.com/repos/${repo}/releases/latest`);
     const data = await response.json();
     return data.tag_name;
-}
-
-function downloadFile(url, filename) {
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
 }
 
 async function showPopup(type) {
