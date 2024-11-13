@@ -13,25 +13,23 @@ We are at b2; I need Vex V5 Hardware to test with. (I don't have it; it will be 
 
 ### 3.0b3:
 1. Make custom SDK in an extension. 🔃
-2. Automatic Emergency Braking 🔃 (Requires vision sensor or AI vision)
+2. Custom theming 🔃 (Requires rewrite of startup, and needs brain setup)
+3. Controller settings 🔃 (Requires rewrite of User_Control)
+4. AWD/FWD/RWD Switcher 🔃 (Requires rewrite of User_Control)
+5. Odometer 🔃 (Requires tamper protection)
+6. Maintenance reminders 🔃
+7. Custom user messages 🔃 (Requires rewrite of startup)
+8. Automatic Emergency Braking 🔃 (Requires vision sensor or AI vision, need hardware ❌)
    - (Requires rewrite of User_Control | Prevent acceleration when a collision is imminent)
    - Forward warning - 2 Seconds till impact
    - Caution - 1.5 Seconds till impact
    - Emergency braking - Less than 1 second till impact
-3. Read advanced motor config and triport config. ✅
-4. Scrolling on loghandler when messages are too big ✅
-5. Traction control & Stability control 🔃 (Requires rewrite of User_Control)
-6. Custom theming 🔃 (Requires rewrite of startup, and needs brain setup)
-7. Controller settings 🔃 (Requires rewrite of User_Control)
-8. AWD/FWD/RWD Switcher 🔃 (Requires rewrite of User_Control)
-9. Odometer 🔃 (Requires tamper protection)
-10. Maintenance reminders 🔃
-11. Custom user messages 🔃 (Requires rewrite of startup)
-12. More debugging when connected to a computer (Loghandler) 🔃
-13. PID for autonomous 🔃
-14. Import code updates from SD card (Requires rewrite of startup) 🔃
-15. Diagnostic mode (Requires rewrite of startup) 🔃
-16. Hot swap of Ports (Requires rewrite of user_control) 🔃
+9. Traction control & Stability control 🔃 (Requires rewrite of User_Control, need hardware ❌)
+10. More debugging when connected to a computer (Loghandler, need hardware ❌) 
+11. PID for autonomous (need hardware ❌)
+12. Import code updates from SD card (Requires rewrite of startup, need hardware ❌) 
+13. Diagnostic mode (Requires rewrite of startup, need hardware ❌) 
+14. Hot swap of Ports (Requires rewrite of user_control, need hardware ❌) 
 
 ### Website todo:
 1. Blob effect around curser 🔃
