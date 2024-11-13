@@ -31,10 +31,14 @@ We are at b2; I need Vex V5 Hardware to test with. (I don't have it; it will be 
 13. Diagnostic mode (Requires rewrite of startup, need hardware ❌) 
 14. Hot swap of Ports (Requires rewrite of user_control, need hardware ❌) 
 
+---
+
 ### Website todo:
 1. Blob effect around curser 🔃
 2. Update the program from the website 🔃
 3. Caching 🔃
+
+---
 
 ### Custom SDK todo:
 1. Use the newest version of Clang and GCC. 🔃
