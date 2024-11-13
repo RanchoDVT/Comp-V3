@@ -12,9 +12,9 @@
         <li class="dropdown">
             <a class="nav-link">Downloads</a>
             <div class="dropdown-content">
-                <a onclick="showPopup('stable')">Comp_V3 Stable</a>
-                <a onclick="showPopup('dev')">Comp_V3 Dev</a>
-                <a onclick="showPopup('sdk')">Custom SDK Stable</a>
+                <a href="#" onclick="showPopup('stable'); return false;">Comp_V3 Stable</a>
+                <a href="#" onclick="showPopup('dev'); return false;">Comp_V3 Dev</a>
+                <a href="#" onclick="showPopup('sdk'); return false;">Custom SDK Stable</a>
             </div>
         </li>
         <li><a class="nav-link" data-page="features.html" href="features.html">Features</a></li>
@@ -23,14 +23,17 @@
     </menu>
 </nav>
 
-
-<!-- Pop-Up Structure -->
+<!-- Popup Structure -->
 <div id="popup" class="popup">
-    <div class="popup-header">
-        <h2 id="popup-title">Download</h2>
+    <div class="popup-content">
+        <div class="popup-header">
+            <h2 id="popup-title">Download</h2>
+        </div>
+        <p id="popup-text"></p>
+        <div class="popup-actions">
+            <a type="button" class="cancel-btn" onclick="hidePopup()">Cancel</a>
+            <a id="download-link" class="download-btn" href="#" download>Download</a>
+        </div>
     </div>
-    <p id="popup-text"></p>
-    <button type="button" class="cancel-btn" onclick="hidePopup()">Cancel</button>
-    <a id="download-link" class="download-btn" href="#" download>Download</a>
 </div>
 <div id="overlay" class="overlay" onclick="hidePopup()"></div>
