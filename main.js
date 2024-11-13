@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (type === 'sdk') {
             const latestTag = await getLatestRelease('RanchoDVT/Vex-SDK');
             popupText = 'Thank you for downloading my custom SDK. This is unofficial and in no way affiliated, endorsed, supported, or created by VEX Robotics. <br> <br> You will need this to install my Custom SDK (This) to use my Comp_V3 Program. This modifies Vex\'s robotics extension, so PLEASE don\'t go to them if you have problems with this. Please contact me. <br> <br>There is a PowerShell script for this to make it easier: ';
-            popupText += '<a target="_blank" href="https://github.com/RanchoDVT/Vex-SDK/blob/dev/Vex-SDK.updater.ps1">Powershell download</a>';
+            popupText += '<a href="https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/RanchoDVT/Vex-SDK/blob/dev/Vex-SDK.updater.ps1">Powershell download</a>';
             document.getElementById('popup-title').innerText = 'Download Custom ' + type + ' ' + latestTag;
             downloadLink = `https://github.com/RanchoDVT/Vex-SDK/archive/refs/tags/${latestTag}.zip`;
         }
