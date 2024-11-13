@@ -1,13 +1,11 @@
 fetch('navbar.html').then(res => res.text()).then(text => {
-    let oldelem = document.querySelector("script#navbar");
-    let newelem = document.createElement("div");
-    newelem.innerHTML = text;
-    oldelem.parentNode.replaceChild(newelem, oldelem);
+    let oldelem = document.querySelector("div#navbar");
+    oldelem.innerHTML = text;
 
     // Get the current page name or default to "index.html" if it's empty
     let currentPage = window.location.pathname.split("/").pop() || "index.html";
     const navLinks = document.querySelectorAll("nav a.nav-link");
-    
+
     navLinks.forEach(link => {
         if (link.getAttribute("data-page") === currentPage) {
             link.classList.add("active");
