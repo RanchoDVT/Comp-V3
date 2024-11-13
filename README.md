@@ -34,19 +34,19 @@ We are at b2; I need Vex V5 Hardware to test with. (I don't have it; it will be 
 16. Hot swap of Ports (Requires rewrite of user_control) 🔃
 
 ### Website todo:
-1. Blob effect around curser
-2. Update the program from the website
-3. Caching
+1. Blob effect around curser 🔃
+2. Update the program from the website 🔃
+3. Caching 🔃
 
 ### Custom SDK todo:
-1. Use the newest version of Clang and GCC.
-2. Use vex's API.
-3. Support for V5, IQ2, EXP
-4. Better templates and makefiles.
-5. Pretty GUI for settings
-6. Optimize for performance
-7. Work on web versions of VsCode
-8. IntelliSense!
+1. Use the newest version of Clang and GCC. 🔃
+2. Use vex's API. 🔃
+3. Support for V5, IQ2, EXP 🔃
+4. Better templates and makefiles. 🔃
+5. Pretty GUI for settings 🔃
+6. Optimize for performance 🔃
+7. Work on web versions of VsCode 🔃
+8. IntelliSense! 🔃
 
 
 
