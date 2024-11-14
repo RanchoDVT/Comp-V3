@@ -19,12 +19,12 @@ We are at b2; I need Vex V5 Hardware to test with. (I don't have it; it will be 
 5. Odometer 🔃 (Requires tamper protection)
 6. Maintenance reminders 🔃
 7. Custom user messages 🔃 (Requires rewrite of startup)
-8. Automatic Emergency Braking 🔃 (Requires vision sensor or AI vision, need hardware ❌)
+8. Automatic Emergency Braking (Requires vision sensor or AI vision, need hardware ❌)
    - (Requires rewrite of User_Control | Prevent acceleration when a collision is imminent)
    - Forward warning - 2 Seconds till impact
    - Caution - 1.5 Seconds till impact
    - Emergency braking - Less than 1 second till impact
-9. Traction control & Stability control 🔃 (Requires rewrite of User_Control, need hardware ❌)
+9. Traction control & Stability control (Requires rewrite of User_Control, need hardware ❌)
 10. More debugging when connected to a computer (Loghandler, need hardware ❌) 
 11. PID for autonomous (need hardware ❌)
 12. Import code updates from SD card (Requires rewrite of startup, need hardware ❌) 
