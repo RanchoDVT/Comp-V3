@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    document.getElementById("year").innerHTML = new Date().getFullYear();
+
     async function fetchFile(url, targetElement) {
         try {
             const response = await fetch(url);

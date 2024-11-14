@@ -13,10 +13,35 @@
 <body>
 
     <div id="navbar"></div>
+    <!-- Contact form -->
+    <section class="contact-form">
+        <div class="form-container">
+            <h2>Support request (WIP, NOT WORKING)</h2>
+            <h3>* = Required field</h3>
 
-    <h3>Email: fuzziestdvt@duck.com</h3>
-    <h3>WIP!</h3>
-    <footer>Copyright © 2024 Voidless7125</footer>
+            <form action="#" method="POST">
+
+                <label for="name">Name*: </label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Email*: </label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="message">Your question or problem. Please provide as many details as possible. The more
+                    information you provide the more likely I can provide a solution in the first
+                    response.*
+                    : </label>
+                <textarea id="message" name="message" rows="4" required></textarea>
+                <label for="english">My support is currently offered in English only. Your message must be in English to
+                    offer fast and correct support services.*
+                    :</label>
+                <input type="checkbox" id="english" name="english">
+                <button type="submit" class="submit-button">Submit</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>© <span id="year"></span> Voidless7125</footer>
 </body>
 
 </html>
