@@ -1,39 +1,34 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const navbar = document.querySelector("div#navbar");
-    const readmeContent = document.getElementById('readme-content');
-    const changelogContent = document.getElementById('changelog-content');
-    const configForm = document.getElementById('config-form');
-    const copyButton = document.getElementById('copy-button');
-    const configOutput = document.getElementById('config-output');
-    marked.use({ breaks: true });
 
-    const fetchFile = async (url, targetElement) => {
+    async function fetchFile(url, targetElement) {
         try {
             const response = await fetch(url);
             if (!response.ok) throw new Error(`${url} not found`);
             const text = await response.text();
-            targetElement.innerHTML = marked.parse(text);
+            targetElement.innerHTML = marked.parse(text, { breaks: true });
         } catch (error) {
             console.error(`Error fetching ${url}:`, error);
         }
-    };
+    }
 
     fetch('navbar.html')
-        .then(res => res.text())
-        .then(text => {
-            navbar.innerHTML = text;
+        .then(function (res) {
+            return res.text();
+        })
+        .then(function (text) {
+            (document.querySelector("div#navbar")).innerHTML = text;
             const currentPage = window.location.pathname.split("/").pop() || "index.html";
-            navbar.querySelectorAll("nav a.nav-link").forEach(link => {
+            (document.querySelector("div#navbar")).querySelectorAll("nav a.nav-link").forEach(link => {
                 if (link.dataset.page === currentPage) {
                     link.classList.add("active");
                 }
             });
         });
 
-    if (readmeContent) fetchFile('https://raw.githubusercontent.com/RanchoDVT/Comp-V3/dev/README.md', readmeContent);
-    if (changelogContent) fetchFile('https://raw.githubusercontent.com/RanchoDVT/Comp-V3/dev/changelog.md', changelogContent);
+    if (document.getElementById('readme-content')) fetchFile('https://raw.githubusercontent.com/RanchoDVT/Comp-V3/dev/README.md', document.getElementById('readme-content'));
+    if (document.getElementById('changelog-content')) fetchFile('https://raw.githubusercontent.com/RanchoDVT/Comp-V3/dev/changelog.md', document.getElementById('changelog-content'));
 
-    const getLatestRelease = async (repo) => {
+    async function getLatestRelease(repo) {
         try {
             const response = await fetch(`https://api.github.com/repos/${repo}/releases/latest`);
             if (!response.ok) throw new Error(`Error fetching release info: ${response.status}`);
@@ -43,33 +38,46 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching latest release:', error);
             return 'Unknown';
         }
-    };
+    }
 
-    if (configForm) {
-        configForm.addEventListener('submit', async (event) => {
+    if (document.getElementById('config-form')) {
+        (document.getElementById('config-form')).addEventListener('submit', async function (event) {
             event.preventDefault();
-            const formData = new FormData(configForm);
+            const formData = new FormData((document.getElementById('config-form')));
 
-            configOutput.textContent = `
+            (document.getElementById('config-output')).textContent = `
 MOTOR_CONFIG {
-    FRONT_LEFT_MOTOR { PORT=${formData.get('front_left_port')} 
+    FRONT_LEFT_MOTOR { 
+    PORT=${formData.get('front_left_port')} 
     GEAR_RATIO=${formData.get('front_left_gear_ratio')} 
-    REVERSED=${formData.has('front_left_reversed')} }
+    REVERSED=${formData.has('front_left_reversed')} 
+    }
 
-    FRONT_RIGHT_MOTOR { PORT=${formData.get('front_right_port')} 
+    FRONT_RIGHT_MOTOR { 
+    PORT=${formData.get('front_right_port')} 
     GEAR_RATIO=${formData.get('front_right_gear_ratio')} 
-    REVERSED=${formData.has('front_right_reversed')} }
+    REVERSED=${formData.has('front_right_reversed')} 
+    }
 
-    REAR_LEFT_MOTOR { PORT=${formData.get('rear_left_port')} 
+    REAR_LEFT_MOTOR { 
+    PORT=${formData.get('rear_left_port')} 
     GEAR_RATIO=${formData.get('rear_left_gear_ratio')} 
-    REVERSED=${formData.has('rear_left_reversed')} }
+    REVERSED=${formData.has('rear_left_reversed')} 
+    }
 
-    REAR_RIGHT_MOTOR { PORT=${formData.get('rear_right_port')} 
+    REAR_RIGHT_MOTOR { 
+    PORT=${formData.get('rear_right_port')} 
     GEAR_RATIO=${formData.get('rear_right_gear_ratio')} 
-    REVERSED=${formData.has('rear_right_reversed')} }
+    REVERSED=${formData.has('rear_right_reversed')} 
+    }
 
-    INERTIAL { PORT=${formData.get('inertial_port')} }
-    Rear_Bumper { PORT=${formData.get('rear_bumper_port')} } 
+    INERTIAL { 
+    PORT=${formData.get('inertial_port')} 
+    }
+    
+    Rear_Bumper { 
+    PORT=${formData.get('rear_bumper_port')} 
+    } 
 }
 
 PRINTLOGO=${formData.has('print_logo')}
@@ -79,39 +87,40 @@ POLLINGRATE=${formData.get('polling_rate')}
 CTRLR1POLLINGRATE=${formData.get('ctrlr1_polling_rate')}
 VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
 
-            copyButton.style.display = 'inline-block';
+            (document.getElementById('copy-button')).style.display = 'inline-block';
         });
     }
 
-    if (copyButton) {
-        copyButton.addEventListener('click', () => {
-            if (configOutput.textContent) {
-                navigator.clipboard.writeText(configOutput.textContent)
+    if (document.getElementById('copy-button')) {
+        (document.getElementById('copy-button')).addEventListener('click', function () {
+            if ((document.getElementById('config-output')).textContent) {
+                navigator.clipboard.writeText((document.getElementById('config-output')).textContent)
                     .then(() => {
                         console.debug('Config copied to clipboard!');
-                        copyButton.innerHTML = 'Copied! ✅';
+                        (document.getElementById('copy-button')).innerHTML = 'Copied! ✅';
                     })
                     .catch(err => console.error('Error copying text:', err));
             }
         });
     }
 
-    const showPopup = async (type) => {
+
+    window.showPopup = async function (type) {
         let popupText = '', downloadLink = '';
 
         if (type === 'Dev') {
             popupText = 'Thank you for downloading Comp-V3 *dev*! This download link goes to the Github API. The download is the source code. <br> <br> You will need my Custom SDK to use this. Check out my other download in the navbar.';
             downloadLink = 'https://github.com/RanchoDVT/Comp-V3/archive/refs/heads/dev.zip';
-            document.getElementById('popup-title').innerText = 'Download Comp-V3 ' + type;
+            document.getElementById('popup-title').innerText = `Download Comp-V3 ${type}`;
         } else if (type === 'Stable') {
             const latestTag = await getLatestRelease('RanchoDVT/Comp-V3');
             popupText = 'Thank you for downloading Comp-V3 stable! This download link goes to the Github API. The download is the source code. <br> <br> You will need my Custom SDK to use this. Check out my other download in the navbar.';
             downloadLink = `https://github.com/RanchoDVT/Comp-V3/archive/refs/tags/${latestTag}.zip`;
-            document.getElementById('popup-title').innerText = 'Download Comp-V3 ' + type + ' | ' + latestTag;
+            document.getElementById('popup-title').innerText = `Download Comp-V3 ${type} | ${latestTag}`;
         } else if (type === 'SDK') {
             const latestTag = await getLatestRelease('RanchoDVT/Vex-SDK');
             popupText = 'Thank you for downloading my custom SDK. <strong>This is unofficial and in no way affiliated, endorsed, supported, or created by VEX Robotics. <br> <br> This modifies Vex\'s robotics extension, so PLEASE don\'t go to them if you have problems with this. Please contact me. </strong><br> <a target="_blank" href="https://github.com/RanchoDVT/Vex-SDK/releases "><br>Source code</a> <br> <br> <strong>The source code might not download correctly, you may have to use git clone.</strong> <br> The download button is the simple powershell script. ';
-            document.getElementById('popup-title').innerText = 'Download Custom ' + type + ' ' + latestTag;
+            document.getElementById('popup-title').innerText = `Download Custom ${type} | ${latestTag}`;
             downloadLink = `https://github.com/RanchoDVT/Vex-SDK/blob/dev/Vex-SDK.updater.ps1`;
         }
 
@@ -120,8 +129,6 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
         document.getElementById('popup').classList.add('active');
         document.getElementById('overlay').classList.add('active');
     };
-
-    window.showPopup = showPopup;
 
 });
 

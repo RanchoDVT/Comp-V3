@@ -88,8 +88,7 @@ footer {
     bottom: 0;
     width: 100%;
     background-color: rgb(15, 15, 20);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: 8px;
+    backdrop-filter: 12px;
     color: white;
     text-align: center;
 }
@@ -157,7 +156,6 @@ a {
 .popup-header {
     align-items: center;
     justify-content: space-between;
-    display: -ms-flexbox;
     display: flex;
     margin-bottom: 10px;
     background-color: rgb(10, 10, 13);
