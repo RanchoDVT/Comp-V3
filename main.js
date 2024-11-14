@@ -110,7 +110,7 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
             document.getElementById('popup-title').innerText = 'Download Comp-V3 ' + type + ' | ' + latestTag;
         } else if (type === 'SDK') {
             const latestTag = await getLatestRelease('RanchoDVT/Vex-SDK');
-            popupText = 'Thank you for downloading my custom SDK. <strong>This is unofficial and in no way affiliated, endorsed, supported, or created by VEX Robotics. <br> <br> This modifies Vex\'s robotics extension, so PLEASE don\'t go to them if you have problems with this. Please contact me. </strong><br> <br>The download is the simple powershell script. <a target="_blank" href="https://github.com/RanchoDVT/Vex-SDK/releases "><br>Source code</a> <br> <br> <strong>The source code might not download correctly, you may have to use git clone.</strong>';
+            popupText = 'Thank you for downloading my custom SDK. <strong>This is unofficial and in no way affiliated, endorsed, supported, or created by VEX Robotics. <br> <br> This modifies Vex\'s robotics extension, so PLEASE don\'t go to them if you have problems with this. Please contact me. </strong><br> <a target="_blank" href="https://github.com/RanchoDVT/Vex-SDK/releases "><br>Source code</a> <br> <br> <strong>The source code might not download correctly, you may have to use git clone.</strong> <br> The download button is the simple powershell script. ';
             document.getElementById('popup-title').innerText = 'Download Custom ' + type + ' ' + latestTag;
             downloadLink = `https://github.com/RanchoDVT/Vex-SDK/blob/dev/Vex-SDK.updater.ps1`;
         }
