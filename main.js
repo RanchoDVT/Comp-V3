@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById("year").innerHTML = new Date().getFullYear();
@@ -45,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('config-form')) {
         (document.getElementById('config-form')).addEventListener('submit', async function (event) {
             event.preventDefault();
+          	document.getElementById('submit').innerHTML = 'Regenerate Config';
             const formData = new FormData((document.getElementById('config-form')));
 
             (document.getElementById('config-output')).textContent = `
@@ -92,7 +94,7 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
             (document.getElementById('copy-button')).style.display = 'inline-block';
         });
     }
-document.getElementById('submit')).innerHTML = 'Regenerate Config';
+
     if (document.getElementById('copy-button')) {
         (document.getElementById('copy-button')).addEventListener('click', function () {
             if ((document.getElementById('config-output')).textContent) {
@@ -105,7 +107,7 @@ document.getElementById('submit')).innerHTML = 'Regenerate Config';
             }
         });
     }
-
+                      
 
     window.showPopup = async function (type) {
         let popupText = '', downloadLink = '';
