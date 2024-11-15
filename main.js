@@ -99,6 +99,7 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
                 navigator.clipboard.writeText((document.getElementById('config-output')).textContent)
                     .then(() => {
                         console.debug('Config copied to clipboard!');
+                        (document.getElementById('submit')).innerHTML = 'Regenerate Config'
                         (document.getElementById('copy-button')).innerHTML = 'Copied! ✅';
                     })
                     .catch(err => console.error('Error copying text:', err));
