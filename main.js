@@ -92,14 +92,13 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
             (document.getElementById('copy-button')).style.display = 'inline-block';
         });
     }
-
+document.getElementById('submit')).innerHTML = 'Regenerate Config';
     if (document.getElementById('copy-button')) {
         (document.getElementById('copy-button')).addEventListener('click', function () {
             if ((document.getElementById('config-output')).textContent) {
                 navigator.clipboard.writeText((document.getElementById('config-output')).textContent)
                     .then(() => {
                         console.debug('Config copied to clipboard!');
-                        (document.getElementById('submit')).innerHTML = 'Regenerate Config'
                         (document.getElementById('copy-button')).innerHTML = 'Copied! ✅';
                     })
                     .catch(err => console.error('Error copying text:', err));
