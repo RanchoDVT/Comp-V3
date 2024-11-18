@@ -1,4 +1,4 @@
-await delay(2000);
+delay(2000);
 console.clear();
 console.log("=====");
 
