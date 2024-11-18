@@ -1,7 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-
+    
+    function timeout(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     async function Never() {
+        await timeout(100);
         console.clear();
         console.log("=====");
 
