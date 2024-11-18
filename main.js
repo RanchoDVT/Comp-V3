@@ -1,4 +1,7 @@
-delay(2000);
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+ }
+timeout(2000);
 console.clear();
 console.log("=====");
 
