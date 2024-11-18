@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function Never() {
-        await timeout(100);
+        await timeout(75);
         console.clear();
         console.log("=====");
 
