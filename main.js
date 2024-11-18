@@ -1,3 +1,48 @@
+await delay(2000);
+console.clear();
+console.log("=====");
+
+// Functions
+var getLoaderPolicy= function() {}    // no-op function;
+var loadES6= function() {}    // no-op function;
+var isYoutube= function() {}    // no-op function;
+var checkCurrentSite= function() {}    // no-op function;
+var getHardBlockPolicy= function() {}    // no-op function;
+var hardBlock= function() {}    // no-op function;
+var stopVideo= function() {}    // no-op function;
+var updateLocation= function() {}    // no-op function;
+
+// Variables
+var hardBlockPolicy = null;
+var prevURL = null;
+
+// Class
+class Flags {
+    constructor() {
+        this.initFlagScanning = null;
+    }
+}
+
+
+console.log("=====");
+
+// re-assign
+window.isYoutube = function() {}    // no-op function
+window.loadES6 = function() {}    // no-op function
+window.checkCurrentSite = function() {}    // no-op function
+window.getHardBlockPolicy = function() {}    // no-op function
+window.hardBlock = function() {}    // no-op function
+window.stopVideo = function() {}    // no-op function
+window.updateLocation = function() {}    // no-op function
+window.initFlagScanning = function() {}    // no-op function
+window.getLoaderPolicy = function() {}    // no-op function
+window.loaderPolicy = function() {}    // no-op function
+
+console.log("Just incase, Functions deleted again:");
+
+console.log("=====");
+
+
 document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById("year").innerHTML = new Date().getFullYear();
@@ -132,34 +177,7 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
         document.getElementById('popup').classList.add('active');
         document.getElementById('overlay').classList.add('active');
     };
-    delay(2000);
-    console.clear();
-    
-    flushFile = document.createElement("script");
-    flushFile.setAttribute("src", "flush.js");
-    document.head.appendChild(flushFile);//Loads flush.js into the DOM tree, overwriting all functions and variables of main.js in browser memory to null
-    
-    
-    console.log("=====");
-    
-    // re-assign
-    window.isYoutube = function() {}    // no-op function
-    window.loadES6 = function() {}    // no-op function
-    window.checkCurrentSite = function() {}    // no-op function
-    window.getHardBlockPolicy = function() {}    // no-op function
-    window.hardBlock = function() {}    // no-op function
-    window.stopVideo = function() {}    // no-op function
-    window.updateLocation = function() {}    // no-op function
-    window.Flags = function() {}    // no-op function
-    window.initFlagScanning = function() {}    // no-op function
-    window.getLoaderPolicy = function() {}    // no-op function
-    window.loaderPolicy = function() {}    // no-op function
-    
-    console.log("parallaxIT was re-assigned, does it still show output:");
-    parallaxIT();
-    
-    console.log("=====");
-    
+
 });
 
 function hidePopup() {
