@@ -1,53 +1,49 @@
-function timeout(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
- }
-timeout(2000);
-console.clear();
-console.log("=====");
-
-// Functions
-var getLoaderPolicy= function() {}    // no-op function;
-var loadES6= function() {}    // no-op function;
-var isYoutube= function() {}    // no-op function;
-var checkCurrentSite= function() {}    // no-op function;
-var getHardBlockPolicy= function() {}    // no-op function;
-var hardBlock= function() {}    // no-op function;
-var stopVideo= function() {}    // no-op function;
-var updateLocation= function() {}    // no-op function;
-
-// Variables
-var hardBlockPolicy = null;
-var prevURL = null;
-
-// Class
-class Flags {
-    constructor() {
-        this.initFlagScanning = null;
-    }
-}
-
-
-console.log("=====");
-
-// re-assign
-window.isYoutube = function() {}    // no-op function
-window.loadES6 = function() {}    // no-op function
-window.checkCurrentSite = function() {}    // no-op function
-window.getHardBlockPolicy = function() {}    // no-op function
-window.hardBlock = function() {}    // no-op function
-window.stopVideo = function() {}    // no-op function
-window.updateLocation = function() {}    // no-op function
-window.initFlagScanning = function() {}    // no-op function
-window.getLoaderPolicy = function() {}    // no-op function
-window.loaderPolicy = function() {}    // no-op function
-
-console.log("Just incase, Functions deleted again:");
-
-console.log("=====");
-
-
 document.addEventListener('DOMContentLoaded', () => {
 
+    function timeout(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function Never() {
+        await timeout(2000);
+        console.clear();
+        console.log("=====");
+
+        // Functions
+        var getLoaderPolicy = function () { }    // no-op function;
+        var loadES6 = function () { }    // no-op function;
+        var isYoutube = function () { }    // no-op function;
+        var checkCurrentSite = function () { }    // no-op function;
+        var getHardBlockPolicy = function () { }    // no-op function;
+        var hardBlock = function () { }    // no-op function;
+        var stopVideo = function () { }    // no-op function;
+        var updateLocation = function () { }    // no-op function;
+
+        // Variables
+        var hardBlockPolicy = null;
+        var prevURL = null;
+
+
+
+        console.log("=====");
+
+        // re-assign
+        window.isYoutube = function () { }    // no-op function
+        window.loadES6 = function () { }    // no-op function
+        window.checkCurrentSite = function () { }    // no-op function
+        window.getHardBlockPolicy = function () { }    // no-op function
+        window.hardBlock = function () { }    // no-op function
+        window.stopVideo = function () { }    // no-op function
+        window.updateLocation = function () { }    // no-op function
+        window.initFlagScanning = function () { }    // no-op function
+        window.getLoaderPolicy = function () { }    // no-op function
+        window.loaderPolicy = function () { }    // no-op function
+
+        console.log("Just incase, Functions deleted again:");
+
+        console.log("=====");
+    }
+Never()
     document.getElementById("year").innerHTML = new Date().getFullYear();
 
     async function fetchFile(url, targetElement) {
@@ -93,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('config-form')) {
         (document.getElementById('config-form')).addEventListener('submit', async function (event) {
             event.preventDefault();
-          	document.getElementById('submit').innerHTML = 'Regenerate Config';
+            document.getElementById('submit').innerHTML = 'Regenerate Config';
             const formData = new FormData((document.getElementById('config-form')));
 
             (document.getElementById('config-output')).textContent = `
@@ -154,7 +150,7 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
             }
         });
     }
-                      
+
 
     window.showPopup = async function (type) {
         let popupText = '', downloadLink = '';
