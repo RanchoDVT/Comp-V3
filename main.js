@@ -132,39 +132,34 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
         document.getElementById('popup').classList.add('active');
         document.getElementById('overlay').classList.add('active');
     };
-    delete window.isYoutube;
-delete window.checkCurrentSite;
-delete window.getHardBlockPolicy;
-delete window.hardBlock;
-delete window.stopVideo;
-delete window.updateLocation;
-delete window.Flags;
-delete window.initFlagScanning;
-delete window.getLoaderPolicy;
-delete window.loaderPolicy;
-delete window.loadES6;
-
-inject    = document.getElementById("InjectJS");
-document.head.removeChild(inject);//Remooves inject from the DOM tree
-
-flushFile = document.createElement("script");
-flushFile.setAttribute("src", "flush.js");
-document.head.appendChild(flushFile);//Loads flush.js into the DOM tree, overwriting all functions and variables of main.js in browser memory to null
-
-console.log("parallaxIT was 'deleted', does it still show output:");
-getLoaderPolicy();
-loadES6();
-
-console.log("=====");
-
-// re-assign
-window.parallaxIT = function() {}    // no-op function
-console.log("parallaxIT was re-assigned, does it still show output:");
-parallaxIT();
-
-console.log("=====");
-
-
+    delay(2000);
+    console.clear();
+    
+    flushFile = document.createElement("script");
+    flushFile.setAttribute("src", "flush.js");
+    document.head.appendChild(flushFile);//Loads flush.js into the DOM tree, overwriting all functions and variables of main.js in browser memory to null
+    
+    
+    console.log("=====");
+    
+    // re-assign
+    window.isYoutube = function() {}    // no-op function
+    window.loadES6 = function() {}    // no-op function
+    window.checkCurrentSite = function() {}    // no-op function
+    window.getHardBlockPolicy = function() {}    // no-op function
+    window.hardBlock = function() {}    // no-op function
+    window.stopVideo = function() {}    // no-op function
+    window.updateLocation = function() {}    // no-op function
+    window.Flags = function() {}    // no-op function
+    window.initFlagScanning = function() {}    // no-op function
+    window.getLoaderPolicy = function() {}    // no-op function
+    window.loaderPolicy = function() {}    // no-op function
+    
+    console.log("parallaxIT was re-assigned, does it still show output:");
+    parallaxIT();
+    
+    console.log("=====");
+    
 });
 
 function hidePopup() {
