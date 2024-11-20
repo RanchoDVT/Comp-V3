@@ -51,7 +51,7 @@ Never()
             const response = await fetch(url);
             if (!response.ok) throw new Error(`${url} not found`);
             const text = await response.text();
-            targetElement.innerHTML = marked.parse(text, { breaks: true });
+            targetElement.innerHTML = text;
         } catch (error) {
             console.error(`Error fetching ${url}:`, error);
         }
