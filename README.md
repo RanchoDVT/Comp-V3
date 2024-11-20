@@ -12,8 +12,8 @@ Here we go! This is a rewritten version of Comp_V2 (with some exceptions).
 We are at b2; I need Vex V5 Hardware to test with. (I don't have it; it will be long before I can get the hardware.)
 
 ### 3.0b3:
-1. Make custom SDK in an extension. 🔃
-2. Custom theming 🔃 (Requires rewrite of startup, and needs brain setup)
+1. Make a custom SDK in an extension. 🔃
+2. Custom theming 🔃 (Requires rewrite of startup and needs brain setup)
 3. Controller settings 🔃 (Requires rewrite of User_Control)
 4. AWD/FWD/RWD Switcher 🔃 (Requires rewrite of User_Control)
 5. Odometer 🔃 (Requires tamper protection)
@@ -37,18 +37,19 @@ We are at b2; I need Vex V5 Hardware to test with. (I don't have it; it will be 
 1. Blob effect around curser 🔃
 2. Update the program from the website 🔃
 3. Caching 🔃
-
+4. Apply new features to the config generator 🔃
+5. Features for all my programs 🔃
+6. Support forum 🔃
+7. XSS protection 🔃
+8. Fetures on tiles 🔃
 ---
 
 ### Custom SDK todo:
 1. Use the newest version of Clang and GCC. 🔃
-2. Use vex's API. 🔃
+2. Use Vex's API. 🔃
 3. Support for V5, IQ2, EXP 🔃
 4. Better templates and makefiles. 🔃
 5. Pretty GUI for settings 🔃
 6. Optimize for performance 🔃
 7. Work on web versions of VsCode 🔃
 8. IntelliSense! 🔃
-
-
-
