@@ -3,13 +3,13 @@
 <p>Build size: 375KB</p>
 <h3 id="fixed-improved-">Fixed / Improved 🛠️</h3>
 <ul>
-<li>Improved <code>getuseroption</code> to support unlimited amount of options!<br>  You will be able to configure the max amount with a sd card.</li>
+<li>Improved <code>getuseroption</code> to support unlimited amount of options!<br>  You can configure the maximum amount with an SD card.</li>
 <li>Turning is now more accurate.</li>
 <li><code>StringToLong</code> has better error handling.</li>
 </ul>
 <h3 id="deprecated-">Deprecated ✖️</h3>
 <ul>
-<li><code>LOCALLOGO</code>, <code>CTRLR2ENABLE</code> and <code>VISIONENABLE</code> will be removed. Local images are no longer supported, a second controller is auto detected; and A vision sensor is auto detected.</li>
+<li><code>LOCALLOGO</code>, <code>CTRLR2ENABLE</code> and <code>VISIONENABLE</code> will be removed. Local images are no longer supported; a second controller is auto-detected, and A vision sensor is auto-detected.</li>
 </ul>
 <h3 id="try-catch-">try/catch 🪝</h3>
 <ul>
@@ -20,8 +20,8 @@
 <h3 id="new-">New 🎉</h3>
 <ul>
 <li>New <code>configManager</code> for well, configuring things!<ul>
-<li>With this we now can get a prot number for a motor, it&#39;s gear ratio, and wither it is reversed or not.</li>
-<li>maintenance warning&#39;s after a certain distance are a thing now!</li>
+<li>With this, we can now get a part number for a motor, it&#39;s gear ratio, and whetherwhether it is reversed.</li>
+<li> Maintenance warnings &#39;s after a certain distance are a thing now!</li>
 </ul>
 </li>
 <li>gifplayer is back!</li>
@@ -38,8 +38,8 @@
 <p>Build size: 339KB</p>
 <h3 id="new-">New 🎉</h3>
 <ul>
-<li>New support for reading a cfg file on a SD card is here!  </li>
-<li>New support for different gif&#39;s for each mode (Loading, Auto, Drivercontrol).  </li>
+<li>New support for reading a cfg file on an SD card is here!  </li>
+<li>New support for different gifs &#39;s for each mode (Loading, Auto, Drivercontrol).  </li>
 <li><p>Redesigned <code>getUserOption</code>, and is blazing fast!  </p>
 <ul>
 <li>Old -&gt; Print to display: 0.6S.  </li>
@@ -57,7 +57,7 @@
 <li>Modified variable initialization for improved readability and consistency.</li>
 <li>Fixed a bug in the <code>stringtobool</code> function where the logical OR operator was incorrectly used.</li>
 <li>Fixed a bug in the <code>configParser</code> function where the existence of the readme file was not properly checked.</li>
-<li>Optimized lots of functions to use by reference, and threaded.</li>
+<li>Optimized many functions to use by reference, and threaded.</li>
 <li>Fixed minor typos throughout the code.</li>
 </ul>
 <h2 id="version-2-0pr2-4-14-24">Version 2.0pr2 4/14/24</h2>
@@ -80,10 +80,10 @@
 <p>Build size: 280KB</p>
 <h3 id="new-">New: 🎉</h3>
 <ul>
-<li>Added a function <code>clear_Screen</code> to clear the controller and optionally the brain`s screen.</li>
+<li>Added a function <code>clear_Screen</code> to clear the controller and, optionally, the brain`s screen.</li>
 <li>Added a function <code>error_handler</code> to handle and display error messages with optional output to the controller`s screen and colored output to the console.</li>
 <li>Implemented autonomous and user control tasks with threading to run continuously during the respective phases of a VEX Competition.</li>
-<li>Implemented main function to set up competition callbacks for autonomous and driver control periods, start GUI startup, and handle continuous control of the drivetrain while preventing the main loop from exiting.</li>
+<li>Implemented a main function to set up competition callbacks for autonomous and driver control periods, start GUI startup, and handle continuous control of the drivetrain while preventing the main loop from exiting.</li>
 </ul>
 <h3 id="fixed-updated-">Fixed / Updated: 🛠</h3>
 <ul>
@@ -92,7 +92,7 @@
 <li>Updated <code>ctrl1_Bttn_Presd</code> function to include error handling and prevent function execution if <code>controller1Command</code> flag is set.</li>
 <li>Updated function <code>get_User_Option</code> to display options and get user input with error handling and prevention of function execution if <code>controller1Command</code> flag is set.</li>
 <li>Updated <code>controller_L1_Pressed</code>, <code>controller_L2_Pressed</code>, <code>controller_R1_Pressed</code>, and <code>controller_R2_Pressed</code> functions to include error handling, to replace the <code>rc_auto_loop_function_Controller1</code>, and prevent function execution if <code>controller1Command</code> flag is not set.</li>
-<li>Updated the <code>setup</code> function to create controller callback events, new safety checks onm startup.</li>
+<li>Updated the <code>setup</code> function to create controller callback events, and new safety checks on startup.</li>
 <li>Improved polling rate from 50Hz to 8000Hz on <code>ctrl1_Bttn_Presd</code> and the controller loop. (160X faster than the competition.)</li>
 <li>Improved Global variables and function naming.</li>
 <li>Improved comments.</li>
