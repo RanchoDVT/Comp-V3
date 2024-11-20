@@ -1,55 +1,56 @@
-# Advanced Startup Vex V5
-
-## Getting started: ▶️
-1. Install VScode
-2. Download and install these extensions:  
-([VEX Robotics](https://marketplace.visualstudio.com/items?itemName=VEXRobotics.vexcode), [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools), [Makefile Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.makefile-tools))  
-3. Install my [Custom SDK](https://github.com/RanchoDVT/Vex-SDK)
-
-
-## Rewrite (3.0)
-Here we go! This is a rewritten version of Comp_V2 (with some exceptions).  
-We are at b2; I need Vex V5 Hardware to test with. (I don't have it; it will be long before I can get the hardware.)
-
-### 3.0b3:
-1. Make a custom SDK in an extension. 🔃
-2. Custom theming 🔃 (Requires rewrite of startup and needs brain setup)
-3. Controller settings 🔃 (Requires rewrite of User_Control)
-4. AWD/FWD/RWD Switcher 🔃 (Requires rewrite of User_Control)
-5. Odometer 🔃 (Requires tamper protection)
-6. Maintenance reminders 🔃
-7. Custom user messages 🔃 (Requires rewrite of startup)
-8. Automatic Emergency Braking (Requires vision sensor or AI vision, need hardware ❌)
-   - (Requires rewrite of User_Control | Prevent acceleration when a collision is imminent)
-   - Forward warning - 2 Seconds till impact
-   - Caution - 1.5 Seconds till impact
-   - Emergency braking - Less than 1 second till impact
-9. Traction control & Stability control (Requires rewrite of User_Control, need hardware ❌)
-10. More debugging when connected to a computer (Loghandler, need hardware ❌) 
-11. PID for autonomous (need hardware ❌)
-12. Import code updates from SD card (Requires rewrite of startup, need hardware ❌) 
-13. Diagnostic mode (Requires rewrite of startup, need hardware ❌) 
-14. Hot swap of Ports (Requires rewrite of user_control, need hardware ❌) 
-
----
-
-### Website todo:
-1. Blob effect around curser 🔃
-2. Update the program from the website 🔃
-3. Caching 🔃
-4. Apply new features to the config generator 🔃
-5. Features for all my programs 🔃
-6. Support forum 🔃
-7. XSS protection 🔃
-8. Fetures on tiles 🔃
----
-
-### Custom SDK todo:
-1. Use the newest version of Clang and GCC. 🔃
-2. Use Vex's API. 🔃
-3. Support for V5, IQ2, EXP 🔃
-4. Better templates and makefiles. 🔃
-5. Pretty GUI for settings 🔃
-6. Optimize for performance 🔃
-7. Work on web versions of VsCode 🔃
-8. IntelliSense! 🔃
+<h1 id="advanced-startup-vex-v5">Advanced Startup Vex V5</h1>
+<h2 id="getting-started-">Getting started: ▶️</h2>
+<ol>
+<li>Install VScode</li>
+<li>Download and install these extensions:<br>(<a href="https://marketplace.visualstudio.com/items?itemName=VEXRobotics.vexcode">VEX Robotics</a>, <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools">C/C++</a>, <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.makefile-tools">Makefile Tools</a>)  </li>
+<li>Install my <a href="https://github.com/RanchoDVT/Vex-SDK">Custom SDK</a></li>
+</ol>
+<h2 id="rewrite-3-0-">Rewrite (3.0)</h2>
+<p>Here we go! This is a rewritten version of Comp_V2 (with some exceptions).<br>We are at b2; I need Vex V5 Hardware to test with. (I don&#39;t have it; it will be long before I can get the hardware.)</p>
+<h3 id="3-0b3-">3.0b3:</h3>
+<ol>
+<li>Make a custom SDK in an extension. 🔃</li>
+<li>Custom theming 🔃 (Requires rewrite of startup and needs brain setup)</li>
+<li>Controller settings 🔃 (Requires rewrite of User_Control)</li>
+<li>AWD/FWD/RWD Switcher 🔃 (Requires rewrite of User_Control)</li>
+<li>Odometer 🔃 (Requires tamper protection)</li>
+<li>Maintenance reminders 🔃</li>
+<li>Custom user messages 🔃 (Requires rewrite of startup)</li>
+<li>Automatic Emergency Braking (Requires vision sensor or AI vision, need hardware ❌)<ul>
+<li>(Requires rewrite of User_Control | Prevent acceleration when a collision is imminent)</li>
+<li>Forward warning - 2 Seconds till impact</li>
+<li>Caution - 1.5 Seconds till impact</li>
+<li>Emergency braking - Less than 1 second till impact</li>
+</ul>
+</li>
+<li>Traction control &amp; Stability control (Requires rewrite of User_Control, need hardware ❌)</li>
+<li>More debugging when connected to a computer (Loghandler, need hardware ❌) </li>
+<li>PID for autonomous (need hardware ❌)</li>
+<li>Import code updates from SD card (Requires rewrite of startup, need hardware ❌) </li>
+<li>Diagnostic mode (Requires rewrite of startup, need hardware ❌) </li>
+<li>Hot swap of Ports (Requires rewrite of user_control, need hardware ❌) </li>
+</ol>
+<hr>
+<h3 id="website-todo-">Website todo:</h3>
+<ol>
+<li>Blob effect around curser 🔃</li>
+<li>Update the program from the website 🔃</li>
+<li>Caching 🔃</li>
+<li>Apply new features to the config generator 🔃</li>
+<li>Features for all my programs 🔃</li>
+<li>Support forum 🔃</li>
+<li>XSS protection 🔃</li>
+<li>Fetures on tiles 🔃</li>
+</ol>
+<hr>
+<h3 id="custom-sdk-todo-">Custom SDK todo:</h3>
+<ol>
+<li>Use the newest version of Clang and GCC. 🔃</li>
+<li>Use Vex&#39;s API. 🔃</li>
+<li>Support for V5, IQ2, EXP 🔃</li>
+<li>Better templates and makefiles. 🔃</li>
+<li>Pretty GUI for settings 🔃</li>
+<li>Optimize for performance 🔃</li>
+<li>Work on web versions of VsCode 🔃</li>
+<li>IntelliSense! 🔃</li>
+</ol>
