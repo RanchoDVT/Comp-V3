@@ -82,6 +82,52 @@ nav li:last-child a {
 
 /* End of nav */
 
+.tile {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s;
+    flex: 1 1 calc(33.333% - 32px);
+    /* Adjusts the width of the tiles */
+    box-sizing: border-box;
+}
+
+.tile:hover {
+    transform: scale(1.05);
+}
+
+.tile h3 {
+    margin-top: 0;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+@media (max-width: 1200px) {
+    .tile {
+        flex: 1 1 calc(50% - 32px);
+        /* Adjusts the width of the tiles for medium screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .tile {
+        flex: 1 1 calc(100% - 32px);
+        /* Adjusts the width of the tiles for small screens */
+    }
+}
+
 footer {
     position: fixed;
     left: 0;
@@ -93,8 +139,8 @@ footer {
 }
 
 hr.rounded {
-  border-top: 4px solid #bbb;
-  border-radius: 5px;
+    border-top: 4px solid #bbb;
+    border-radius: 5px;
 }
 
 input {
