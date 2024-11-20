@@ -1,100 +1,111 @@
 <!DOCTYPE html>
 <html lang="en-us">
-
-<head>
-    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voidless - Features</title>
-    <link rel="shortcut icon" href="images/Logo.png">
-    <link rel="stylesheet" href="style.css">
-    <script src="main.js"></script>
-</head>
-
-<body>
-
-    <div id="navbar"></div>
-    <h1 id="beginner-v5-program-featu-res">Beginner V5 Program Featu`res</h1>
-<p>All the features you would want in a beginner V5 program... and then some!</p>
-<h2 id="features">Features</h2>
-<h3 id="-gyro-calibration">🌀 Gyro Calibration</h3>
-<ul>
-<li><strong>Function:</strong> <code>calibrateGyro()</code></li>
-<li><strong>Description:</strong> Easily calibrate the gyro sensor for accurate readings.</li>
-<li><strong>Example:</strong> <code>calibrateGyro();</code></li>
-<li><strong>Return Value:</strong> None.</li>
-</ul>
-<h3 id="-config-manager">📁 Config Manager</h3>
-<ul>
-<li><p><strong>Methods:</strong></p>
-<ul>
-<li><p><strong>Get Current Logging Setting:</strong></p>
-<ul>
-<li><strong>Function:</strong> <code>getLogToFile()</code></li>
-<li><strong>Description:</strong> Check if logging to a file is enabled. Returns <code>true</code> if enabled, <code>false</code> otherwise.</li>
-</ul>
-</li>
-<li><p><strong>Set Logging Configuration:</strong></p>
-<ul>
-<li><strong>Function:</strong> <code>setLogToFile(bool logToFile)</code></li>
-<li><strong>Parameters:</strong> <code>logToFile</code> (type: bool) - Set it to <code>true</code> to enable logging and <code>false</code> to disable.</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="-button-press-detection">🔘 Button Press Detection</h3>
-<ul>
-<li><strong>Function:</strong> <code>ctrl1BttnPressed()</code></li>
-<li><strong>Description:</strong> Detect pressed buttons on the primary controller and retrieve the button pressed along with the duration.</li>
-<li><strong>Example:</strong><pre><code class="lang-cpp"><span class="hljs-keyword">auto</span> [button, duration] = ctrl1BttnPressed();
+    <head>
+        <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Voidless - Features</title>
+        <link rel="shortcut icon" href="images/Logo.png">
+        <link rel="stylesheet" href="style.css">
+        <script src="main.js"></script>
+    </head>
+    <body>
+        <div id="navbar"></div>
+        <h1 id="beginner-v5-program-featu-res">Beginner V5 Program Features</h1>
+        <p>All the features you would want in a beginner V5 program... and then some!</p>
+        <h2 id="features">Features</h2>
+        <h3 id="-gyro-calibration">🌀 Gyro Calibration</h3>
+        <ul>
+            <li><strong>Function:</strong> <code>calibrateGyro()</code></li>
+            <li><strong>Description:</strong> Easily calibrate the gyro sensor for accurate readings.</li>
+            <li><strong>Example:</strong> <code>calibrateGyro();</code></li>
+            <li><strong>Return Value:</strong> None.</li>
+        </ul>
+        <hr class="rounded">
+        <h3 id="-config-manager">📁 Config Manager</h3>
+        <ul>
+            <li>
+                <p><strong>Methods:</strong></p>
+                <ul>
+                    <li>
+                        <p><strong>Get Current Logging Setting:</strong></p>
+                        <ul>
+                            <li><strong>Function:</strong> <code>getLogToFile()</code></li>
+                            <li><strong>Description:</strong> Check if logging to a file is enabled. Returns <code>true</code> if enabled, <code>false</code> otherwise.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p><strong>Set Logging Configuration:</strong></p>
+                        <ul>
+                            <li><strong>Function:</strong> <code>setLogToFile(bool logToFile)</code></li>
+                            <li><strong>Parameters:</strong> <code>logToFile</code> (type: bool) - Set it to <code>true</code> to enable logging and <code>false</code> to disable.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <hr class="rounded">
+        <h3 id="-button-press-detection">🔘 Button Press Detection</h3>
+        <ul>
+            <li><strong>Function:</strong> <code>ctrl1BttnPressed()</code></li>
+            <li><strong>Description:</strong> Detect pressed buttons on the primary controller and retrieve the button pressed along with the duration.</li>
+            <li>
+                <strong>Example:</strong>
+                <pre><code class="lang-cpp"><span class="hljs-keyword">auto</span> [button, duration] = ctrl1BttnPressed();
 <span class="hljs-comment">// OR if you only want the button!</span>
 <span class="hljs-built_in">std</span>::<span class="hljs-built_in">string</span> buttonPressed = <span class="hljs-built_in">std</span>::get&lt;<span class="hljs-number">0</span>&gt;(ctrl1BttnPressed());
 </code></pre>
-</li>
-<li><strong>Return Value:</strong> Pair of button pressed and duration.</li>
-</ul>
-<h3 id="-user-options-selection">📊 User Options Selection</h3>
-<ul>
-<li><strong>Function:</strong> <code>getUserOption()</code></li>
-<li><strong>Description:</strong> Prompt users for a setting choice and retrieve their selection.</li>
-<li><strong>Example Use:</strong><pre><code class="lang-cpp"><span class="hljs-keyword">int</span> <span class="hljs-keyword">value</span> = getUserOption(<span class="hljs-string">"Choose a setting"</span>, {<span class="hljs-string">"Option 1"</span>, <span class="hljs-string">"Option 2"</span>});
+            </li>
+            <li><strong>Return Value:</strong> Pair of button pressed and duration.</li>
+        </ul>
+        <h3 id="-user-options-selection">📊 User Options Selection</h3>
+        <ul>
+            <li><strong>Function:</strong> <code>getUserOption()</code></li>
+            <li><strong>Description:</strong> Prompt users for a setting choice and retrieve their selection.</li>
+            <li>
+                <strong>Example Use:</strong>
+                <pre><code class="lang-cpp"><span class="hljs-keyword">int</span> <span class="hljs-keyword">value</span> = getUserOption(<span class="hljs-string">"Choose a setting"</span>, {<span class="hljs-string">"Option 1"</span>, <span class="hljs-string">"Option 2"</span>});
 </code></pre>
-</li>
-<li><strong>Return Value:</strong> User-selected option. (Ex: Option 1)</li>
-</ul>
-<h3 id="-gif-player">🎞️ GIF Player</h3>
-<ul>
-<li><strong>Function:</strong> <code>startGifPlayer()</code></li>
-<li><strong>Description:</strong> Initiate the GIF player to display animated content.</li>
-<li><strong>Return Value:</strong> None.</li>
-</ul>
-<h3 id="-logging-system">📝 Logging System</h3>
-<ul>
-<li><strong>Function:</strong> <code>loghandler()</code></li>
-<li><strong>Description:</strong> Log messages with varying severity levels (Trace, Info, Warn, Error, Fatal). Displays messages on the console and controller screen based on the log level.</li>
-<li><strong>Return Value:</strong> None.</li>
-</ul>
-<h3 id="-motor-monitoring">🌡️ Motor Monitoring</h3>
-<ul>
-<li><strong>Function:</strong> <code>motorMonitor()</code></li>
-<li><strong>Description:</strong> Monitor motor temperature and position during competitions to ensure performance and safety.</li>
-<li><strong>Return Value:</strong> None.</li>
-</ul>
-<h3 id="-sd-card-compatibility">💾 SD Card Compatibility</h3>
-<ul>
-<li><p><strong>Requirements:</strong></p>
-<ul>
-<li>SDHC type recommended, formatted in FAT32.</li>
-<li>Max size of 16GB.</li>
-</ul>
-</li>
-<li><p><strong>Structure:</strong></p>
-<pre><code>/assets: Store logo images (<span class="hljs-selector-class">.png</span>, .gif)
+            </li>
+            <li><strong>Return Value:</strong> User-selected option. (Ex: Option 1)</li>
+        </ul>
+        <hr class="rounded">
+        <h3 id="-gif-player">🎞️ GIF Player</h3>
+        <ul>
+            <li><strong>Function:</strong> <code>startGifPlayer()</code></li>
+            <li><strong>Description:</strong> Initiate the GIF player to display animated content.</li>
+            <li><strong>Return Value:</strong> None.</li>
+        </ul>
+        <hr class="rounded">
+        <h3 id="-logging-system">📝 Logging System</h3>
+        <ul>
+            <li><strong>Function:</strong> <code>loghandler()</code></li>
+            <li><strong>Description:</strong> Log messages with varying severity levels (Trace, Info, Warn, Error, Fatal). Displays messages on the console and controller screen based on the log level.</li>
+            <li><strong>Return Value:</strong> None.</li>
+        </ul>
+        <hr class="rounded">
+        <h3 id="-motor-monitoring">🌡️ Motor Monitoring</h3>
+        <ul>
+            <li><strong>Function:</strong> <code>motorMonitor()</code></li>
+            <li><strong>Description:</strong> Monitor motor temperature and position during competitions to ensure performance and safety.</li>
+            <li><strong>Return Value:</strong> None.</li>
+        </ul>
+        <hr class="rounded">
+        <h3 id="-sd-card-compatibility">💾 SD Card Compatibility</h3>
+        <ul>
+            <li>
+                <p><strong>Requirements:</strong></p>
+                <ul>
+                    <li>SDHC type recommended, formatted in FAT32.</li>
+                    <li>Max size of 16GB.</li>
+                </ul>
+            </li>
+            <li>
+                <p><strong>Structure:</strong></p>
+                <pre><code>/assets: Store logo images (<span class="hljs-selector-class">.png</span>, .gif)
 /backup: Latest source <span class="hljs-selector-tag">code</span> backups
 config<span class="hljs-selector-class">.cfg</span>: Stores robot settings
-</code></pre></li>
-</ul>
-
-    <footer>© <span id="year"></span> Voidless7125</footer>
-</body>
-
+</code></pre>
+            </li>
+        </ul>
+        <footer>© <span id="year"></span> Voidless7125</footer>
+    </body>
 </html>
