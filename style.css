@@ -92,6 +92,11 @@ footer {
     text-align: center;
 }
 
+hr.rounded {
+  border-top: 8px solid #bbb;
+  border-radius: 5px;
+
+    
 input {
     background: rgb(10, 10, 13);
     color: white;
