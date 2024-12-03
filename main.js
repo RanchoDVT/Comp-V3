@@ -1,6 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
-    
-    function timeout(ms) {
+ function timeout(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
@@ -44,6 +42,10 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("=====");
     }
 Never()
+
+document.addEventListener('DOMContentLoaded', () => {
+    
+   
     document.getElementById("year").innerHTML = new Date().getFullYear();
 
     async function fetchFile(url, targetElement) {
