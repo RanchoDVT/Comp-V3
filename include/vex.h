@@ -1,5 +1,6 @@
 #include <stdlib.h>
-
+#include "mine.h"
+#include "mine.cc"
 #include "v5_cpp.h"
 
 /**

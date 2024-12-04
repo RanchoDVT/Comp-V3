@@ -37,6 +37,39 @@ vex::bumper RearBumper = vex::bumper(*bumperTriPort);
 
 vex::competition Competition;
 
+void applyTheme() {
+    std::string teamNumber = ConfigManager.getConfigValue("TEAM_NUMBER");
+    std::string colorName = ConfigManager.getConfigValue("COLOR");
+    vex::color themeColor = vex::color::white;
+
+    // Parse color
+    if (colorName == "blue") themeColor = vex::color::blue;
+    else if (colorName == "red") themeColor = vex::color::red;
+    else if (colorName == "green") themeColor = vex::color::green;
+
+    // Apply to Brain screen
+    Brain.Screen.clearScreen(themeColor);
+    Brain.Screen.setPenColor(vex::color::white);
+    Brain.Screen.setFont(vex::fontType::mono20);
+    Brain.Screen.printAt(200, 20, "Team: %s", teamNumber.c_str());
+}
+
+std::string processMessage(const std::string& message) {
+    std::string processedMessage = message;
+    processedMessage = replacePlaceholder(processedMessage, "{USER_NAME}", "Driver");
+    processedMessage = replacePlaceholder(processedMessage, "{SERVICE_INTERVAL}", std::to_string(ConfigManager.getServiceInterval()));
+    return processedMessage;
+}
+
+void displayMessages() {
+    std::ifstream file("messages.txt");
+    std::string line;
+    while (std::getline(file, line)) {
+        Brain.Screen.print(processMessage(line).c_str());
+    }
+}
+
+
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
  *

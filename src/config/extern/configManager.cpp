@@ -123,6 +123,31 @@ void configManager::readMaintenanceData()
     }
 }
 
+std::string generateKey() {
+    return "KEY" + Brain.Battery.capacity().str(); // Simple example; replace with secure derivation
+}
+
+void encryptAndSave(const std::string& data, const std::string& fileName) {
+    std::string key = generateKey();
+    std::string encryptedData = mine::encrypt(data, key);
+    std::ofstream file(fileName);
+    if (file.is_open()) {
+        file << encryptedData;
+        file.close();
+    }
+}
+
+std::string decryptFromFile(const std::string& fileName) {
+    std::ifstream file(fileName);
+    std::string encryptedData, decryptedData;
+    if (file.is_open()) {
+        std::getline(file, encryptedData);
+        file.close();
+    }
+    std::string key = generateKey();
+    return mine::decrypt(encryptedData, key);
+}
+
 void configManager::writeMaintenanceData()
 {
     std::ofstream maintenanceFile(maintenanceFileName);
