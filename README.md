@@ -11,10 +11,15 @@
 <ol>
 <li>Custom theming 🔃 (Requires rewrite of startup and needs brain setup)</li>
 <li>Controller settings 🔃 (Requires rewrite of User_Control)</li>
-<li>AWD/FWD/RWD Switcher 🔃 (Requires rewrite of User_Control)</li>
+<li>AWD/FWD/RWD Switcher ✅ (Requires rewrite of User_Control)</li>
 <li>Odometer 🔃 (Requires tamper protection)</li>
 <li>Maintenance reminders 🔃</li>
 <li>Custom user messages 🔃 (Requires rewrite of startup)</li>
+<li>Traction control &amp; Stability control ✅(Requires rewrite of User_Control)</li>
+<li>More debugging when connected to a computer (Loghandler) </li>
+<li>Import code updates from SD card (Requires rewrite of startup, need hardware ❌) </li>
+<li>Diagnostic mode (Requires rewrite of startup, need hardware ❌) </li>
+<li>Hot swap of Ports (Requires rewrite of user_control, need hardware ❌) </li>
 <li>Automatic Emergency Braking (Requires vision sensor or AI vision, need hardware ❌)<ul>
 <li>(Requires rewrite of User_Control | Prevent acceleration when a collision is imminent)</li>
 <li>Forward warning - 2 Seconds till impact</li>
@@ -22,12 +27,8 @@
 <li>Emergency braking - Less than 1 second till impact</li>
 </ul>
 </li>
-<li>Traction control &amp; Stability control (Requires rewrite of User_Control, need hardware ❌)</li>
-<li>More debugging when connected to a computer (Loghandler, need hardware ❌) </li>
 <li>PID for autonomous (need hardware ❌)</li>
-<li>Import code updates from SD card (Requires rewrite of startup, need hardware ❌) </li>
-<li>Diagnostic mode (Requires rewrite of startup, need hardware ❌) </li>
-<li>Hot swap of Ports (Requires rewrite of user_control, need hardware ❌) </li>
+
 </ol>
 <hr>
 <h3 id="website-todo-">Website todo:</h3>
