@@ -224,39 +224,31 @@ void configManager::setValuesFromConfig()
             std::string key, value;
             if (std::getline(iss, key, '=') and std::getline(iss, value))
             {
-                if (line.find("ConfigType") != std::string::npos)
+                if (key == "ConfigType")
                 {
-                    if (line.find("Brain") != std::string::npos)
-                    {
-                        configType = ConfigType::Brain;
-                    }
-                    else if (line.find("Controller") != std::string::npos)
-                    {
-                        configType = ConfigType::Controller;
-                    }
+                    configType = stringToConfigType(value);
                 }
-                else if (line.find("TeamNumber") != std::string::npos)
+                else if (key == "TeamNumber")
                 {
-                    teamNumber = line.substr(line.find("=") + 1);
+                    teamNumber = value;
                 }
-                else if (line.find("LoadingGifPath") != std::string::npos)
+                else if (key == "LoadingGifPath")
                 {
-                    loadingGifPath = line.substr(line.find("=") + 1);
+                    loadingGifPath = value;
                 }
-                else if (line.find("AutoGifPath") != std::string::npos)
+                else if (key == "AutoGifPath")
                 {
-                    autoGifPath = line.substr(line.find("=") + 1);
+                    autoGifPath = value;
                 }
-                else if (line.find("DriverGifPath") != std::string::npos)
+                else if (key == "DriverGifPath")
                 {
-                    driverGifPath = line.substr(line.find("=") + 1);
+                    driverGifPath = value;
                 }
-                else if (line.find("CustomMessage") != std::string::npos)
+                else if (key == "CustomMessage")
                 {
-                    customMessage = line.substr(line.find("=") + 1);
+                    customMessage = value;
                 }
-
-                if (key == "PRINTLOGO")
+                else if (key == "PRINTLOGO")
                 {
                     setPrintLogo(stringToBool(value));
                 }

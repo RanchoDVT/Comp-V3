@@ -156,3 +156,24 @@ void configManager::checkServiceInterval()
         logHandler("Service", message.str(), Log::Level::Warn, 5);
     }
 }
+
+configManager::ConfigType configManager::stringToConfigType(const std::string &str)
+{
+    if (str == "Brain")
+    {
+        return ConfigType::Brain;
+    }
+    else if (str == "Controller")
+    {
+        return ConfigType::Controller;
+    }
+    else
+    {
+        throw std::invalid_argument("Invalid config type");
+    }
+}
+
+std::string configManager::getTeamNumber() const
+{
+    return teamNumber;
+}

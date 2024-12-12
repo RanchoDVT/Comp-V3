@@ -10,10 +10,7 @@
 			"${vex_sdkPath}/gcc/include",
 			"${vex_sdkPath}/include/**",
 			"${workspaceFolder}/include/**",
-			"${workspaceFolder}/src/**",
-			"${vex_sdkPath}/clang/19/include/**",
-			"${vex_gcc}/arm-none-eabi/thumb/v7-a+fp/softfp",
-			"${vex_sdkPath}/gcc/include/**"
+			"${workspaceFolder}/src/**"
 		]
 	},
 	"configurations": [
@@ -25,8 +22,7 @@
 			"compilerPath": "${vex_compilerPath}",
 			"cStandard": "gnu99",
 			"cppStandard": "gnu++11",
-			"intelliSenseMode": "windows-clang-x86",
-			"configurationProvider": "ms-vscode.makefile-tools"
+			"intelliSenseMode": "windows-clang-x86"
 		},
 		{
 			"name": "Mac",

@@ -42,11 +42,14 @@ public:
     int getMotorPort(const std::string &motorName) const;
     vex::triport::port *getTriPort(const std::string &portName) const;
 
+    std::string getTeamNumber() const;
     int getOdometer() const { return odometer; }
     int getLastService() const { return lastService; }
     int getServiceInterval() const { return serviceInterval; }
     void updateOdometer(const int &averagePosition);
     void checkServiceInterval();
+
+    ConfigType stringToConfigType(const std::string &str);
 
 private:
     std::map<std::string, int> motorPorts;
