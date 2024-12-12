@@ -32,7 +32,9 @@ vex::triport::port *configManager::getTriPort(const std::string &portName) const
 // Setters with validation
 void configManager::setMaxOptionSize(const size_t &value)
 {
-    maxOptionSize = stringToLong(std::to_string(value));
+    std::ostringstream oss;
+    oss << value;
+    maxOptionSize = stringToLong(oss.str());
 }
 
 void configManager::setLogToFile(const bool &value)
@@ -42,7 +44,9 @@ void configManager::setLogToFile(const bool &value)
 
 void configManager::setPollingRate(const size_t &value)
 {
-    POLLINGRATE = stringToLong(std::to_string(value));
+    std::ostringstream oss;
+    oss << value;
+    POLLINGRATE = stringToLong(oss.str());
 }
 
 void configManager::setPrintLogo(const bool &value)
@@ -52,11 +56,13 @@ void configManager::setPrintLogo(const bool &value)
 
 void configManager::setCtrlr1PollingRate(const std::size_t &value)
 {
-    logToFile = stringToLong(std::to_string(value));;
+    std::ostringstream oss;
+    oss << value;
+    logToFile = stringToLong(oss.str());
 }
 
 int configManager::getMotorPort(const std::string &motorName) const
-{ 
+{
     auto it = motorPorts.find(motorName);
     return (it != motorPorts.end()) ? it->second : -1; // Default invalid port
 }
@@ -121,31 +127,6 @@ void configManager::readMaintenanceData()
         }
         maintenanceFile.close();
     }
-}
-
-std::string generateKey() {
-    return "KEY" + Brain.Battery.capacity().str(); // Simple example; replace with secure derivation
-}
-
-void encryptAndSave(const std::string& data, const std::string& fileName) {
-    std::string key = generateKey();
-    std::string encryptedData = mine::encrypt(data, key);
-    std::ofstream file(fileName);
-    if (file.is_open()) {
-        file << encryptedData;
-        file.close();
-    }
-}
-
-std::string decryptFromFile(const std::string& fileName) {
-    std::ifstream file(fileName);
-    std::string encryptedData, decryptedData;
-    if (file.is_open()) {
-        std::getline(file, encryptedData);
-        file.close();
-    }
-    std::string key = generateKey();
-    return mine::decrypt(encryptedData, key);
 }
 
 void configManager::writeMaintenanceData()

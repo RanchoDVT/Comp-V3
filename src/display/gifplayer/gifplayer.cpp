@@ -236,7 +236,9 @@ read_ext(gd_GIF *gif)
         read_application_ext(gif);
         break;
     default:
-        logHandler("gd_open_gif (Extern)", "Unknown Gif extention: %02X" + std::to_string(label), Log::Level::Error, 3);
+        std::ostringstream oss;
+        oss << "Unknown Gif extention: %02X" << label;
+        logHandler("gd_open_gif (Extern)", oss.str(), Log::Level::Error, 3);
     }
 }
 

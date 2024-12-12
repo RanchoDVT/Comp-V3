@@ -1,6 +1,19 @@
 #include <stdlib.h>
-#include "mine.h"
-#include "mine.cc"
+
+#include <string>  ///< Required for using string objects
+#include <fstream> ///< Requried for using std::getline, and making and reading files.
+#include <vector>
+#include <cmath>	 ///< Required for using std::abs with an int
+#include <algorithm> ///< Requried for using ::isdigit and std::any_of
+#include <sstream>
+#include <inttypes.h>
+
+#include <stdlib.h>	 ///< Required for standard library definitions
+#include <stdbool.h> ///< Required for standard boolean definitions
+#include <math.h>	 ///< Required for mathematical functions
+#include <string.h>	 ///< Required for string manipulation functions
+#include <stdio.h>	 ///< Required for standard input/output definitions
+
 #include "v5_cpp.h"
 
 /**

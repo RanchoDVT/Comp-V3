@@ -159,7 +159,9 @@ std::pair<std::string, int> ctrl1BttnPressed()
 		vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
 	}
 
-	std::string message = "Selected button: " + buttonPressed + ", Duration: " + std::to_string(pressDuration) + " ms";
+	std::ostringstream oss;
+	oss << "Selected button: " << buttonPressed << ", Duration: " << pressDuration << " ms";
+	std::string message = oss.str();
 	logHandler("ctrl1BttnPressed", message, Log::Level::Debug);
 	return std::make_pair(buttonPressed, pressDuration);
 }

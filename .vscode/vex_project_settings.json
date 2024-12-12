@@ -1,16 +1,16 @@
 {
 	"extension": {
-		"version": "0.5.0",
+		"version": "0.6.1",
 		"json": 2
 	},
 	"project": {
 		"name": "Comp_V3",
 		"description": "Advanced Startup, Offical V3. [DEV]",
-		"creationDate": "1/1/24",
+		"creationDate": "Thu, 12 Dec 2024 01:51:39 GMT",
 		"platform": "V5",
 		"language": "cpp",
 		"slot": 1,
-		"sdkVersion": "V5_20240223_11_00_00",
+		"sdkVersion": "V5_20240802_15_00_00",
 		"cpp": {
 			"includePath": [],
 			"printf_float": true

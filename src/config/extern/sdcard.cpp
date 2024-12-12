@@ -35,7 +35,7 @@ bool configManager::stringToBool(const std::string &str)
 {
     try
     {
-        bool boolval = std::stoi(str);
+        bool boolval = std::atoi(str.c_str());
         return boolval;
     }
     catch (const std::invalid_argument &e)
@@ -52,7 +52,7 @@ long configManager::stringToLong(const std::string &str)
 {
     try
     {
-        long num = std::stol(str);
+        long num = std::atol(str.c_str());
         return num;
     }
     catch (const std::invalid_argument &e)
@@ -124,7 +124,7 @@ void configManager::setValuesFromConfig()
                     }
                 }
 
-                motorPorts[motorName] = std::stoi(motorPort);
+                motorPorts[motorName] = std::atoi(motorPort.c_str());
                 motorGearRatios[motorName] = motorGearRatio;
                 motorReversed[motorName] = stringToBool(motorReversedStr);
             }

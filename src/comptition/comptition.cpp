@@ -16,28 +16,12 @@ bool tractionControlEnabled = true;
 bool stabilityControlEnabled = true;
 bool absEnabled = true;
 
-// Function to display system states on the Brain Screen
-void displaySystemStates()
-{
-    Brain.Screen.clearScreen();
-    Brain.Screen.setCursor(1, 1);
-    Brain.Screen.print("Traction Control: %s", tractionControlEnabled ? "ON" : "OFF");
-    Brain.Screen.newLine();
-    Brain.Screen.print("Stability Control: %s", stabilityControlEnabled ? "ON" : "OFF");
-    Brain.Screen.newLine();
-    Brain.Screen.print("ABS: %s", absEnabled ? "ON" : "OFF");
-}
-
 /**
  * @author @DVT7125
  * @date 4/10/24
  * @brief User control task.
  * @return 0
  */
-// Drive system flags
-bool tractionControlEnabled = true;
-bool stabilityControlEnabled = true;
-bool absEnabled = true;
 
 // Function to display system states on the Brain Screen
 void displaySystemStates()
@@ -52,7 +36,7 @@ void displaySystemStates()
 }
 
 // Function to apply stability control based on wheel RPM
-void applyStabilityControl()
+void applyStabilityControl(double &forwardVolts)
 {
     // Get the current RPM of the left and right motors
     double leftRPM = LeftDriveSmart.velocity(vex::velocityUnits::rpm);
@@ -89,7 +73,7 @@ void applyStabilityControl()
 }
 
 // Function to apply traction control
-void applyTractionControl()
+void applyTractionControl(double &forwardVolts)
 {
     // Get the current RPM of the left and right motors
     double frontLeftMotorRPM = frontLeftMotor.velocity(vex::velocityUnits::rpm);
@@ -97,14 +81,15 @@ void applyTractionControl()
     double frontRightMotorRPM = frontRightMotor.velocity(vex::velocityUnits::rpm);
     double rearRightMotorRPM = rearRightMotor.velocity(vex::velocityUnits::rpm);
 
-    // Compare the RPMs, if the difference exceeds a threshold, reduce power
-    double minSpeed = std::min(std::abs(frontLeftMotorRPM), std::abs(rearLeftMotorRPM), std::abs(frontRightMotorRPM), std::abs(rearRightMotorRPM));
+    // Find the minimum RPM among all motors
+    double minSpeed = std::min({std::abs(frontLeftMotorRPM), std::abs(rearLeftMotorRPM), std::abs(frontRightMotorRPM), std::abs(rearRightMotorRPM)});
 
-    // If the difference is too high, apply traction control (limit power)
-    if (rpmDifference > 5)
-    { // Example threshold, adjust as needed
-        // Limit the forward voltage to prevent wheel slip
-        forwardVolts *= 0.8; // Reduce power by 20% (this can be adjusted)
+    // Check if any motor's RPM difference exceeds the threshold
+    if (std::abs(frontLeftMotorRPM - minSpeed) > 5 || std::abs(rearLeftMotorRPM - minSpeed) > 5 ||
+        std::abs(frontRightMotorRPM - minSpeed) > 5 || std::abs(rearRightMotorRPM - minSpeed) > 5)
+    {
+        // Reduce the forward voltage to match the slowest motor's speed
+        forwardVolts = minSpeed * 0.7; // Adjust 0.7 if needed
     }
 }
 
@@ -176,13 +161,13 @@ void userControl()
         // Apply traction control if enabled
         if (tractionControlEnabled)
         {
-            applyTractionControl();
+            applyTractionControl(forwardVolts);
         }
 
         // Apply stability control if enabled
         if (stabilityControlEnabled)
         {
-            applyStabilityControl();
+            applyStabilityControl(forwardVolts);
         }
 
         // Motor control logic

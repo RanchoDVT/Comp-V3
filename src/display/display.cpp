@@ -110,30 +110,40 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
             if (buttonIndex < displayedOptions)
             {
                 Index = buttonIndex + offset;
-                logHandler("getUserOption", "[Valid Selection] Index = " + std::to_string(Index) + " | Offset = " + std::to_string(offset), Log::Level::Debug);
+                std::ostringstream oss;
+                oss << "[Valid Selection] Index = " << Index << " | Offset = " << offset;
+                logHandler("getUserOption", oss.str(), Log::Level::Debug);
                 break;
             }
         }
         else if (buttonPressed == "DOWN" && (offset + displayedOptions < static_cast<int>(options.size())))
         {
             ++offset;
-            logHandler("getUserOption", "[Scroll DOWN] Offset = " + std::to_string(offset), Log::Level::Debug);
+            std::ostringstream oss;
+            oss << "[Scroll DOWN] Offset = " << offset;
+            logHandler("getUserOption", oss.str(), Log::Level::Debug);
         }
         else if (buttonPressed == "UP" && offset > 0)
         {
             --offset;
-            logHandler("getUserOption", "[Scroll UP] Offset = " + std::to_string(offset), Log::Level::Debug);
+            std::ostringstream oss;
+            oss << "[Scroll UP] Offset = " << offset;
+            logHandler("getUserOption", oss.str(), Log::Level::Debug);
         }
         else
         {
-            logHandler("getUserOption", "[Invalid Selection] Index = " + std::to_string(Index) + " | Offset = " + std::to_string(offset), Log::Level::Debug);
+            std::ostringstream oss;
+            oss << "[Invalid Selection] Index = " << Index << " | Offset = " << offset;
+            logHandler("getUserOption", oss.str(), Log::Level::Debug);
             // Display message
             if (wrongAttemptCount < maxWrongAttempts)
             {
                 clearScreen(false, true, true);
                 primaryController.Screen.print(wrongMessages[wrongAttemptCount].c_str());
                 ++wrongAttemptCount; // Increment wrong attempt count
-                logHandler("getUserOption", "wrongAttemptCount: " + std::to_string(wrongAttemptCount), Log::Level::Debug);
+                std::ostringstream oss;
+                oss << "wrongAttemptCount: " << wrongAttemptCount;
+                logHandler("getUserOption", oss.str(), Log::Level::Debug);
                 vex::this_thread::sleep_for(2000);
             }
             else
