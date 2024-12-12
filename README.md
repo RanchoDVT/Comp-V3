@@ -2,8 +2,7 @@
 <h2 id="getting-started-">Getting started: ▶️</h2>
 <ol>
 <li>Install VScode</li>
-<li>Download and install these extensions:<br>(<a href="https://marketplace.visualstudio.com/items?itemName=VEXRobotics.vexcode">VEX Robotics</a>, <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools">C/C++</a>, <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.makefile-tools">Makefile Tools</a>)  </li>
-<li>Install my <a href="https://github.com/RanchoDVT/Vex-SDK">Custom SDK</a></li>
+<li>Download and install these extensions:<br>([VEX Robotics](https://marketplace.visualstudio.com/items?itemName=VEXRobotics.vexcode), [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools), [Makefile Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.makefile-tools))  </li>
 </ol>
 <h2 id="rewrite-3-0-">Rewrite (3.0)</h2>
 <p>Here we go! This is a rewritten version of Comp_V2 (with some exceptions).<br>We are at b2; I need Vex V5 Hardware to test with. (I don&#39;t have it; it will be long before I can get the hardware.)</p>

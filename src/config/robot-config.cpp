@@ -60,31 +60,46 @@ void vexCodeInit(void)
 
     vex::competition::bStopAllTasksBetweenModes = false;
 
-    message << "Battery is at: " << Brain.Battery.capacity() << "%%";
-    if (Brain.Battery.capacity() < 90)
+    // Check the configuration type and initialize accordingly
+    if (ConfigManager.configType == configManager::ConfigType::Brain)
     {
-        logHandler("startup", message.str(), Log::Level::Warn, 3);
-    }
-    else
-    {
-        logHandler("startup", message.str(), Log::Level::Info, 3);
-    }
-    message.str(std::string());
+        // Display team number at the top right
+        std::string teamNumber = ConfigManager.getTeamNumber();
+        Brain.Screen.setCursor(1, 20);
+        Brain.Screen.print("Team #%s", teamNumber.c_str());
 
-    std::string autorun = getUserOption("Run Autonomous?", {"Yes", "No"});
-    if (autorun == "Yes")
-    {
-        logHandler("startup", "Starting autonomous from setup.", Log::Level::Trace);
-        primaryController.Screen.print("Running autonomous.");
-        autonomous();
-        logHandler("startup", "Finished autonomous.", Log::Level::Trace);
+        // Start the GIF player
+        gifplayer();
     }
-    else if (autorun == "No")
+    else if (ConfigManager.configType == configManager::ConfigType::Controller)
     {
-        primaryController.Screen.print("Skipped autonomous.");
-        logHandler("startup", "Skipped autonomous.", Log::Level::Trace);
-        vex::this_thread::sleep_for(1000);
+        message << "Battery is at: " << Brain.Battery.capacity() << "%%";
+        if (Brain.Battery.capacity() < 90)
+        {
+            logHandler("startup", message.str(), Log::Level::Warn, 3);
+        }
+        else
+        {
+            logHandler("startup", message.str(), Log::Level::Info, 3);
+        }
+        message.str(std::string());
+
+        std::string autorun = getUserOption("Run Autonomous?", {"Yes", "No"});
+        if (autorun == "Yes")
+        {
+            logHandler("startup", "Starting autonomous from setup.", Log::Level::Trace);
+            primaryController.Screen.print("Running autonomous.");
+            autonomous();
+            logHandler("startup", "Finished autonomous.", Log::Level::Trace);
+        }
+        else if (autorun == "No")
+        {
+            primaryController.Screen.print("Skipped autonomous.");
+            logHandler("startup", "Skipped autonomous.", Log::Level::Trace);
+            vex::this_thread::sleep_for(1000);
+        }
     }
+
     clearScreen(false, true, true);
     return;
 }

@@ -10,6 +10,20 @@ public:
     void setValuesFromConfig();
     void parseConfig();
 
+    enum class ConfigType
+    {
+        Brain,
+        Controller
+    };
+
+    ConfigType configType;
+
+    std::string teamNumber;
+    std::string loadingGifPath;
+    std::string autoGifPath;
+    std::string driverGifPath;
+    std::string customMessage;
+
     std::size_t getMaxOptionSize() const { return maxOptionSize; }
     bool getLogToFile() const { return logToFile; }
     std::size_t getPollingRate() const { return POLLINGRATE; }

@@ -224,6 +224,38 @@ void configManager::setValuesFromConfig()
             std::string key, value;
             if (std::getline(iss, key, '=') and std::getline(iss, value))
             {
+                if (line.find("ConfigType") != std::string::npos)
+                {
+                    if (line.find("Brain") != std::string::npos)
+                    {
+                        configType = ConfigType::Brain;
+                    }
+                    else if (line.find("Controller") != std::string::npos)
+                    {
+                        configType = ConfigType::Controller;
+                    }
+                }
+                else if (line.find("TeamNumber") != std::string::npos)
+                {
+                    teamNumber = line.substr(line.find("=") + 1);
+                }
+                else if (line.find("LoadingGifPath") != std::string::npos)
+                {
+                    loadingGifPath = line.substr(line.find("=") + 1);
+                }
+                else if (line.find("AutoGifPath") != std::string::npos)
+                {
+                    autoGifPath = line.substr(line.find("=") + 1);
+                }
+                else if (line.find("DriverGifPath") != std::string::npos)
+                {
+                    driverGifPath = line.substr(line.find("=") + 1);
+                }
+                else if (line.find("CustomMessage") != std::string::npos)
+                {
+                    customMessage = line.substr(line.find("=") + 1);
+                }
+
                 if (key == "PRINTLOGO")
                 {
                     setPrintLogo(stringToBool(value));
