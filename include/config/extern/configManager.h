@@ -29,12 +29,14 @@ public:
     std::size_t getPollingRate() const { return POLLINGRATE; }
     bool getPrintLogo() const { return PRINTLOGO; }
     std::size_t getCtrlr1PollingRate() const { return CTRLR1POLLINGRATE; }
+    Log::Level getLogLevel() const { return logLevel; }
 
     void setMaxOptionSize(const size_t &value);
     void setLogToFile(const bool &value);
     void setPollingRate(const std::size_t &value);
     void setPrintLogo(const bool &value);
     void setCtrlr1PollingRate(const std::size_t &value);
+    void setLogLevel(const Log::Level &level);
 
     std::string getGearRatio(const std::string &motorName) const;
     bool getMotorReversed(const std::string &motorName) const;
@@ -50,6 +52,7 @@ public:
     void checkServiceInterval();
 
     ConfigType stringToConfigType(const std::string &str);
+    Log::Level stringToLogLevel(const std::string &str);
 
 private:
     std::map<std::string, int> motorPorts;
@@ -64,6 +67,7 @@ private:
     std::size_t POLLINGRATE;
     bool PRINTLOGO;
     std::size_t CTRLR1POLLINGRATE;
+    Log::Level logLevel;
 
     int odometer;
     int lastService;

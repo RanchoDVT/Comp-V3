@@ -24,6 +24,7 @@ void configManager::resetOrInitializeConfig(const std::string &message)
         configFile << "LOGTOFILE=true\n";
         configFile << "MAXOPTIONSSIZE=4\n";
         configFile << "CTRLR1POLLINGRATE=25\n";
+        configFile << "LOGLEVEL=Info\n";
         configFile << "VERSION=" << Version << "\n";
         configFile.close();
     }
@@ -267,6 +268,10 @@ void configManager::setValuesFromConfig()
                 else if (key == "CTRLR1POLLINGRATE")
                 {
                     setCtrlr1PollingRate(stringToLong(value));
+                }
+                else if (key == "LOGLEVEL")
+                {
+                    setLogLevel(stringToLogLevel(value));
                 }
                 else if (key == "VERSION")
                 {

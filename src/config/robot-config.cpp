@@ -60,7 +60,6 @@ void vexCodeInit(void)
 
     vex::competition::bStopAllTasksBetweenModes = false;
 
-    // Check the configuration type and initialize accordingly
     if (ConfigManager.configType == configManager::ConfigType::Brain)
     {
         // Display team number at the top right
@@ -70,7 +69,59 @@ void vexCodeInit(void)
 
         // Start the GIF player
         gifplayer();
+
+        // Add the autonomous prompt
+        Brain.Screen.clearScreen();
+        Brain.Screen.setCursor(3, 5);
+        Brain.Screen.print("Run Autonomous?");
+        Brain.Screen.setCursor(5, 5);
+        Brain.Screen.print("Yes");
+
+        Brain.Screen.setCursor(5, 15);
+        Brain.Screen.print("No");
+
+        bool optionSelected = false;
+        bool runAutonomous = false;
+
+        while (!optionSelected)
+        {
+            if (Brain.Screen.pressing())
+            {
+                int x = Brain.Screen.xPosition();
+                int y = Brain.Screen.yPosition();
+
+                // Check if 'Yes' button is clicked
+                if (x > 40 && x < 100 && y > 100 && y < 140) // Adjust positions based on screen layout
+                {
+                    logHandler("startup", "Starting autonomous from Brain screen.", Log::Level::Trace);
+                    Brain.Screen.clearScreen();
+                    Brain.Screen.setCursor(3, 5);
+                    Brain.Screen.print("Running Autonomous...");
+                    runAutonomous = true;
+                    optionSelected = true;
+                }
+                // Check if 'No' button is clicked
+                else if (x > 140 && x < 200 && y > 100 && y < 140) // Adjust positions
+                {
+                    logHandler("startup", "Skipped autonomous from Brain screen.", Log::Level::Trace);
+                    Brain.Screen.clearScreen();
+                    Brain.Screen.setCursor(3, 5);
+                    Brain.Screen.print("Skipped Autonomous.");
+                    runAutonomous = false;
+                    optionSelected = true;
+                }
+            }
+            vex::this_thread::sleep_for(50); // Avoid high CPU usage
+        }
+
+        if (runAutonomous)
+        {
+            autonomous();
+            logHandler("startup", "Finished autonomous from Brain screen.", Log::Level::Trace);
+        }
+        vex::this_thread::sleep_for(1000);
     }
+
     else if (ConfigManager.configType == configManager::ConfigType::Controller)
     {
         message << "Battery is at: " << Brain.Battery.capacity() << "%%";

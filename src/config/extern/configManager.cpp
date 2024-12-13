@@ -8,7 +8,7 @@ configManager ConfigManager("config.cfg", "maintenance.txt");
 // Constructor
 configManager::configManager(const std::string &configFileName, const std::string &maintenanceFileName)
     : configFileName(configFileName), maintenanceFileName(maintenanceFileName), maxOptionSize(4), logToFile(true),
-      POLLINGRATE(5), PRINTLOGO(true), CTRLR1POLLINGRATE(25), odometer(0), lastService(0), serviceInterval(1000)
+      POLLINGRATE(5), PRINTLOGO(true), CTRLR1POLLINGRATE(25), logLevel(Log::Level::Info), odometer(0), lastService(0), serviceInterval(1000)
 {
     readMaintenanceData();
 
@@ -171,6 +171,29 @@ configManager::ConfigType configManager::stringToConfigType(const std::string &s
     {
         throw std::invalid_argument("Invalid config type");
     }
+}
+
+void configManager::setLogLevel(const Log::Level &level)
+{
+    logLevel = level;
+}
+
+Log::Level configManager::stringToLogLevel(const std::string &str)
+{
+    if (str == "Trace")
+        return Log::Level::Trace;
+    else if (str == "Debug")
+        return Log::Level::Debug;
+    else if (str == "Info")
+        return Log::Level::Info;
+    else if (str == "Warn")
+        return Log::Level::Warn;
+    else if (str == "Error")
+        return Log::Level::Error;
+    else if (str == "Fatal")
+        return Log::Level::Fatal;
+    else
+        throw std::invalid_argument("Invalid log level");
 }
 
 std::string configManager::getTeamNumber() const
