@@ -9,7 +9,7 @@
 <p>Here we go! This is a rewritten version of Comp_V2 (with some exceptions).<br>We are at b2; I need Vex V5 Hardware to test with. (I don&#39;t have it; it will be long before I can get the hardware.)</p>
 <h3 id="3-0">3.0:</h3>
 <ol>
-<li>Custom theming 🔃 (Requires rewrite of startup and needs brain setup)</li>
+<li>Custom theming ✅</li>
 <li>Controller settings 🔃 (Requires rewrite of User_Control)</li>
 <li>AWD/FWD/RWD Switcher ✅ (Requires rewrite of User_Control)</li>
 <li>Odometer 🔃 (Requires tamper protection)</li>
@@ -49,8 +49,4 @@
 <li>Use Vex&#39;s API. 🔃</li>
 <li>Support for V5, IQ2, EXP 🔃</li>
 <li>Better templates and makefiles. 🔃</li>
-<li>Pretty GUI for settings 🔃</li>
-<li>Optimize for performance 🔃</li>
-<li>Work on web versions of VsCode 🔃</li>
-<li>IntelliSense! 🔃</li>
 </ol>

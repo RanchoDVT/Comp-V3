@@ -11,7 +11,7 @@ BUILD     = build
 
 # version for clang headers
 ifneq ("$(origin HEADERS)", "command line")
-HEADERS = 8.0.0
+HEADERS = 19
 endif
 
 # Project name passed from app
@@ -27,7 +27,7 @@ $(error Project name cannot contain whitespace: $(PROJECT))
 endif
 
 # SDK path passed from app
-# if not set then environmental variabled used
+# if not set then environmental variable used
 ifeq ("$(origin T)", "command line")
 VEX_SDK_PATH = $(T)
 endif
@@ -85,17 +85,17 @@ CLEAN = $(RMDIR) $(BUILD) 2> /dev/null || :
 endif
 
 # toolchain include and lib locations
-TOOL_INC  = -I"$(VEX_SDK_PATH)/$(PLATFORM)/clang/$(HEADERS)/include" -I"$(VEX_SDK_PATH)/$(PLATFORM)/gcc/include/c++/4.9.3"  -I"$(VEX_SDK_PATH)/$(PLATFORM)/gcc/include/c++/4.9.3/arm-none-eabi/armv7-ar/thumb" -I"$(VEX_SDK_PATH)/$(PLATFORM)/gcc/include"
+TOOL_INC  = -I"$(VEX_SDK_PATH)/$(PLATFORM)/clang/$(HEADERS)/include" -I"$(VEX_SDK_PATH)/$(PLATFORM)/gcc/include/c++/14.2.1"  -I"$(VEX_SDK_PATH)/$(PLATFORM)/gcc/include/c++/14.2.1/arm-none-eabi/thumb/v7-a+fp/softfp" -I"$(VEX_SDK_PATH)/$(PLATFORM)/gcc/include"
 TOOL_LIB  = -L"$(VEX_SDK_PATH)/$(PLATFORM)/gcc/libs"
 
 # compiler flags
 CFLAGS_CL = -target thumbv7-none-eabi -fshort-enums -Wno-unknown-attributes -U__INT32_TYPE__ -U__UINT32_TYPE__ -D__INT32_TYPE__=long -D__UINT32_TYPE__='unsigned long' 
 CFLAGS_V7 = -march=armv7-a -mfpu=neon -mfloat-abi=softfp
-CFLAGS    = ${CFLAGS_CL} ${CFLAGS_V7} -Os -Wall -Werror=return-type -ansi -std=gnu99 $(DEFINES)
-CXX_FLAGS = ${CFLAGS_CL} ${CFLAGS_V7} -Os -Wall -Werror=return-type -fno-rtti -fno-threadsafe-statics  -std=gnu++11 -ffunction-sections -fdata-sections $(DEFINES)
+CFLAGS    = ${CFLAGS_CL} ${CFLAGS_V7} -Os -Wall -Wextra -Werror=return-type -ansi -std=3 $(DEFINES)
+CXX_FLAGS = ${CFLAGS_CL} ${CFLAGS_V7} -Os -Wall -Wextra -Wno-cast-function-type-mismatch -Wno-unused-parameter -Werror=return-type -fno-rtti -fno-threadsafe-statics  -std=gnu++26 -ffunction-sections -fdata-sections $(DEFINES)
 
 # linker flags
-LNK_FLAGS = -nostdlib -T "$(VEX_SDK_PATH)/$(PLATFORM)/lscript.ld" -R "$(VEX_SDK_PATH)/$(PLATFORM)/stdlib_0.lib" -Map="$(BUILD)/$(PROJECT).map" --gc-section -L"$(VEX_SDK_PATH)/$(PLATFORM)" ${TOOL_LIB}
+LNK_FLAGS = --no-warn-rwx-segments --no-warn-execstack -nostdlib -T "$(VEX_SDK_PATH)/$(PLATFORM)/lscript.ld" -R "$(VEX_SDK_PATH)/$(PLATFORM)/stdlib_0.lib" -Map="$(BUILD)/$(PROJECT).map" --gc-section -L"$(VEX_SDK_PATH)/$(PLATFORM)" ${TOOL_LIB}
 
 # future statuc library
 PROJECTLIB = lib$(PROJECT)

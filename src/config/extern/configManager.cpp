@@ -30,23 +30,19 @@ vex::triport::port *configManager::getTriPort(const std::string &portName) const
 }
 
 // Setters with validation
-void configManager::setMaxOptionSize(const size_t &value)
+void configManager::setMaxOptionSize(const std::size_t &value)
 {
-    std::ostringstream oss;
-    oss << value;
-    maxOptionSize = stringToLong(oss.str());
+    maxOptionSize = value;
 }
 
 void configManager::setLogToFile(const bool &value)
 {
-    logToFile = (value);
+    logToFile = value;
 }
 
-void configManager::setPollingRate(const size_t &value)
+void configManager::setPollingRate(const std::size_t &value)
 {
-    std::ostringstream oss;
-    oss << value;
-    POLLINGRATE = stringToLong(oss.str());
+    POLLINGRATE = value;
 }
 
 void configManager::setPrintLogo(const bool &value)
@@ -56,9 +52,37 @@ void configManager::setPrintLogo(const bool &value)
 
 void configManager::setCtrlr1PollingRate(const std::size_t &value)
 {
-    std::ostringstream oss;
-    oss << value;
-    logToFile = stringToLong(oss.str());
+    CTRLR1POLLINGRATE = value;
+}
+
+void configManager::setLogLevel(const Log::Level &value)
+{
+    logLevel = value;
+}
+
+void configManager::setTeamNumber(const std::string &value)
+{
+    teamNumber = value;
+}
+
+void configManager::setLoadingGifPath(const std::string &value)
+{
+    loadingGifPath = value;
+}
+
+void configManager::setAutoGifPath(const std::string &value)
+{
+    autoGifPath = value;
+}
+
+void configManager::setDriverGifPath(const std::string &value)
+{
+    driverGifPath = value;
+}
+
+void configManager::setCustomMessage(const std::string &value)
+{
+    customMessage = value;
 }
 
 int configManager::getMotorPort(const std::string &motorName) const
@@ -151,9 +175,7 @@ void configManager::checkServiceInterval()
 {
     if (odometer - lastService >= serviceInterval)
     {
-        std::ostringstream message;
-        message << "Service needed! Distance: " << odometer;
-        logHandler("Service", message.str(), Log::Level::Warn, 5);
+        logHandler("Service", "Service needed! Distance: " + std::to_string(odometer), Log::Level::Warn, 5);
     }
 }
 
@@ -171,11 +193,6 @@ configManager::ConfigType configManager::stringToConfigType(const std::string &s
     {
         throw std::invalid_argument("Invalid config type");
     }
-}
-
-void configManager::setLogLevel(const Log::Level &level)
-{
-    logLevel = level;
 }
 
 Log::Level configManager::stringToLogLevel(const std::string &str)

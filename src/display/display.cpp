@@ -1,5 +1,6 @@
 #include "vex.h"
 
+#include <algorithm>
 void clearScreen(const bool &brainClear, const bool &primaryControllerClear, const bool &partnerControllerClear)
 {
     if (brainClear)
@@ -34,19 +35,17 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
         return "DEFAULT";
     }
 
-    std::ostringstream optmessage;
-    optmessage << "Options: ";
+    std::string optmessage = "Options: ";
     for (auto optionIterator = options.begin(); optionIterator != options.end(); ++optionIterator)
     {
         if (optionIterator != options.begin())
         {
-            optmessage << ", "; // Separate options with a comma and space (except for the first option)
+            optmessage += ", "; // Separate options with a comma and space (except for the first option)
         }
-        optmessage << *optionIterator;
+        optmessage += *optionIterator;
     }
 
-    logHandler("getUserOption", optmessage.str(), Log::Level::Debug);
-    optmessage.str(std::string());
+    logHandler("getUserOption", optmessage, Log::Level::Debug);
 
     std::size_t wrongAttemptCount = 0;
     const std::size_t maxWrongAttempts = 3;
@@ -97,9 +96,8 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
             }
         }
 
-        optmessage << "Available buttons for current visible options: " << buttonString; // Append button string to message.
-        logHandler("getUserOption", optmessage.str(), Log::Level::Debug);
-        optmessage.str(std::string());
+        optmessage = "Available buttons for current visible options: " + buttonString; // Append button string to message.
+        logHandler("getUserOption", optmessage, Log::Level::Debug);
 
         const std::string &buttonPressed = std::get<0>(ctrl1BttnPressed());
 
@@ -110,40 +108,30 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
             if (buttonIndex < displayedOptions)
             {
                 Index = buttonIndex + offset;
-                std::ostringstream oss;
-                oss << "[Valid Selection] Index = " << Index << " | Offset = " << offset;
-                logHandler("getUserOption", oss.str(), Log::Level::Debug);
+                logHandler("getUserOption", "[Valid Selection] Index = " + std::to_string(Index) + " | Offset = " + std::to_string(offset), Log::Level::Debug);
                 break;
             }
         }
         else if (buttonPressed == "DOWN" && (offset + displayedOptions < static_cast<int>(options.size())))
         {
             ++offset;
-            std::ostringstream oss;
-            oss << "[Scroll DOWN] Offset = " << offset;
-            logHandler("getUserOption", oss.str(), Log::Level::Debug);
+            logHandler("getUserOption", "[Scroll DOWN] Offset = " + std::to_string(offset), Log::Level::Debug);
         }
         else if (buttonPressed == "UP" && offset > 0)
         {
             --offset;
-            std::ostringstream oss;
-            oss << "[Scroll UP] Offset = " << offset;
-            logHandler("getUserOption", oss.str(), Log::Level::Debug);
+            logHandler("getUserOption", "[Scroll UP] Offset = " + std::to_string(offset), Log::Level::Debug);
         }
         else
         {
-            std::ostringstream oss;
-            oss << "[Invalid Selection] Index = " << Index << " | Offset = " << offset;
-            logHandler("getUserOption", oss.str(), Log::Level::Debug);
+            logHandler("getUserOption", "[Invalid Selection] Index = " + std::to_string(Index) + " | Offset = " + std::to_string(offset), Log::Level::Debug);
             // Display message
             if (wrongAttemptCount < maxWrongAttempts)
             {
                 clearScreen(false, true, true);
                 primaryController.Screen.print(wrongMessages[wrongAttemptCount].c_str());
                 ++wrongAttemptCount; // Increment wrong attempt count
-                std::ostringstream oss;
-                oss << "wrongAttemptCount: " << wrongAttemptCount;
-                logHandler("getUserOption", oss.str(), Log::Level::Debug);
+                logHandler("getUserOption", "wrongAttemptCount: " + std::to_string(wrongAttemptCount), Log::Level::Debug);
                 vex::this_thread::sleep_for(2000);
             }
             else
@@ -151,7 +139,6 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
                 logHandler("getUserOption", "Your half arsed.", Log::Level::Fatal);
             }
         }
-        optmessage.str(std::string());
     }
     clearScreen(false, true, true);
     return options[Index];

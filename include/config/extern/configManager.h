@@ -1,4 +1,5 @@
 #include <map>
+#include <string>
 
 class configManager
 {
@@ -9,6 +10,7 @@ public:
     long stringToLong(const std::string &str);
     void setValuesFromConfig();
     void parseConfig();
+    void parseComplexConfig(std::ifstream &configFile, const std::string &section);
 
     enum class ConfigType
     {
@@ -31,12 +33,18 @@ public:
     std::size_t getCtrlr1PollingRate() const { return CTRLR1POLLINGRATE; }
     Log::Level getLogLevel() const { return logLevel; }
 
-    void setMaxOptionSize(const size_t &value);
+    void setMaxOptionSize(const std::size_t &value);
     void setLogToFile(const bool &value);
     void setPollingRate(const std::size_t &value);
     void setPrintLogo(const bool &value);
     void setCtrlr1PollingRate(const std::size_t &value);
-    void setLogLevel(const Log::Level &level);
+    void setLogLevel(const Log::Level &value);
+
+    void setTeamNumber(const std::string &value);
+    void setLoadingGifPath(const std::string &value);
+    void setAutoGifPath(const std::string &value);
+    void setDriverGifPath(const std::string &value);
+    void setCustomMessage(const std::string &value);
 
     std::string getGearRatio(const std::string &motorName) const;
     bool getMotorReversed(const std::string &motorName) const;
@@ -59,6 +67,7 @@ private:
     std::map<std::string, std::string> motorGearRatios;
     std::map<std::string, bool> motorReversed;
     std::map<std::string, vex::triport::port *> triPorts;
+    std::map<std::string, int> inertialPorts;
 
     std::string configFileName;
     std::string maintenanceFileName;

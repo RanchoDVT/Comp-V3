@@ -1,6 +1,7 @@
 #include "vex.h"
 
 #include <fstream>
+#include <sstream>
 
 // Method to reset or initialize the config file
 void configManager::resetOrInitializeConfig(const std::string &message)
@@ -34,18 +35,7 @@ void configManager::resetOrInitializeConfig(const std::string &message)
 // Method to convert a string to boolean
 bool configManager::stringToBool(const std::string &str)
 {
-    try
-    {
-        bool boolval = std::atoi(str.c_str());
-        return boolval;
-    }
-    catch (const std::invalid_argument &e)
-    {
-        std::ostringstream message;
-        message << "Expected bool value. Received: " << str;
-        resetOrInitializeConfig(message.str());
-        return false;
-    }
+    return (str == "true" || str == "1");
 }
 
 // Method to convert a string to long
@@ -53,22 +43,17 @@ long configManager::stringToLong(const std::string &str)
 {
     try
     {
-        long num = std::atol(str.c_str());
-        return num;
+        return std::stol(str);
     }
     catch (const std::invalid_argument &e)
     {
-        std::ostringstream message;
-        message << "Long val has invalid chars! Received: " << str;
-        resetOrInitializeConfig(message.str());
-        return 1;
+        logHandler("stringToLong", "Invalid argument: " + str, Log::Level::Error);
+        return 0;
     }
     catch (const std::out_of_range &e)
     {
-        std::ostringstream message;
-        message << "Val is too large to fit in long! Received: " << str;
-        resetOrInitializeConfig(message.str());
-        return 1;
+        logHandler("stringToLong", "Out of range: " + str, Log::Level::Error);
+        return 0;
     }
 }
 
@@ -85,227 +70,145 @@ void configManager::setValuesFromConfig()
     std::string configLine;
     while (std::getline(configFile, configLine))
     {
-        if (configLine.empty() or configLine[0] == ';' or configLine[0] == '#')
+        if (configLine.empty() || configLine[0] == ';' || configLine[0] == '#')
         {
             continue; // Skip empty lines and comments
         }
 
-        if (configLine == "MOTOR_CONFIG")
+        std::istringstream iss(configLine);
+        std::string key, value;
+        if (std::getline(iss, key, '=') && std::getline(iss, value))
         {
-            std::getline(configFile, configLine); // Skip the opening brace
-            while (std::getline(configFile, configLine) and configLine != "}")
+            if (key == "ConfigType")
             {
-                if (configLine.empty() or configLine[0] == ';' or configLine[0] == '#')
-                {
-                    continue; // Skip empty lines and comments
-                }
-
-                std::string motorName = configLine;
-                std::getline(configFile, configLine); // Skip the opening brace
-
-                std::string motorPort, motorGearRatio, motorReversedStr;
-                while (std::getline(configFile, configLine) and configLine != "}")
-                {
-                    std::istringstream iss(configLine);
-                    std::string configKey, configValue;
-                    if (std::getline(iss, configKey, '=') and std::getline(iss, configValue))
-                    {
-                        if (configKey == "PORT")
-                        {
-                            motorPort = configValue;
-                        }
-                        else if (configKey == "GEAR_RATIO")
-                        {
-                            motorGearRatio = configValue;
-                        }
-                        else if (configKey == "REVERSED")
-                        {
-                            motorReversedStr = configValue;
-                        }
-                    }
-                }
-
-                motorPorts[motorName] = std::atoi(motorPort.c_str());
-                motorGearRatios[motorName] = motorGearRatio;
-                motorReversed[motorName] = stringToBool(motorReversedStr);
+                configType = stringToConfigType(value);
             }
-        }
-        else if (configLine == "INERTIAL")
-        {
-            std::getline(configFile, configLine); // Skip the opening brace
-            while (std::getline(configFile, configLine) and configLine != "}")
+            else if (key == "TeamNumber")
             {
-                if (configLine.empty() or configLine[0] == ';' or configLine[0] == '#')
-                {
-                    continue; // Skip empty lines and comments
-                }
-
-                std::string triportName = configLine;
-                std::getline(configFile, configLine); // Skip the opening brace
-
-                std::string triportPort;
-                while (std::getline(configFile, configLine) and configLine != "}")
-                {
-                    std::istringstream iss(configLine);
-                    std::string configKey, configValue;
-                    if (std::getline(iss, configKey, '=') and std::getline(iss, configValue))
-                    {
-                        if (configKey == "PORT")
-                        {
-                            triportPort = configValue;
-                        }
-                    }
-                }
+                setTeamNumber(value);
             }
-        }
-        else if (configLine == "TRIPORT_CONFIG")
-        {
-            std::getline(configFile, configLine); // Skip the opening brace
-            while (std::getline(configFile, configLine) and configLine != "}")
+            else if (key == "LoadingGifPath")
             {
-                if (configLine.empty() or configLine[0] == ';' or configLine[0] == '#')
-                {
-                    continue; // Skip empty lines and comments
-                }
-
-                std::string triportName = configLine;
-                std::getline(configFile, configLine); // Skip the opening brace
-
-                std::string triportPort;
-                while (std::getline(configFile, configLine) and configLine != "}")
-                {
-                    std::istringstream iss(configLine);
-                    std::string configKey, configValue;
-                    if (std::getline(iss, configKey, '=') and std::getline(iss, configValue))
-                    {
-                        if (configKey == "PORT")
-                        {
-                            triportPort = configValue;
-                        }
-                    }
-                }
-
-                if (triportPort == "A")
-                {
-                    triPorts[triportName] = &Brain.ThreeWirePort.A;
-                }
-                else if (triportPort == "B")
-                {
-                    triPorts[triportName] = &Brain.ThreeWirePort.B;
-                }
-                else if (triportPort == "C")
-                {
-                    triPorts[triportName] = &Brain.ThreeWirePort.C;
-                }
-                else if (triportPort == "D")
-                {
-                    triPorts[triportName] = &Brain.ThreeWirePort.D;
-                }
-                else if (triportPort == "E")
-                {
-                    triPorts[triportName] = &Brain.ThreeWirePort.E;
-                }
-                else if (triportPort == "F")
-                {
-                    triPorts[triportName] = &Brain.ThreeWirePort.F;
-                }
-                else if (triportPort == "G")
-                {
-                    triPorts[triportName] = &Brain.ThreeWirePort.G;
-                }
-                else if (triportPort == "H")
-                {
-                    triPorts[triportName] = &Brain.ThreeWirePort.H;
-                }
+                setLoadingGifPath(value);
             }
-        }
-        else
-        {
-            std::istringstream iss(configLine);
-            std::string key, value;
-            if (std::getline(iss, key, '=') and std::getline(iss, value))
+            else if (key == "AutoGifPath")
             {
-                if (key == "ConfigType")
+                setAutoGifPath(value);
+            }
+            else if (key == "DriverGifPath")
+            {
+                setDriverGifPath(value);
+            }
+            else if (key == "CustomMessage")
+            {
+                setCustomMessage(value);
+            }
+            else if (key == "PRINTLOGO")
+            {
+                setPrintLogo(stringToBool(value));
+            }
+            else if (key == "LOGTOFILE")
+            {
+                setLogToFile(stringToBool(value));
+            }
+            else if (key == "MAXOPTIONSSIZE")
+            {
+                setMaxOptionSize(stringToLong(value));
+            }
+            else if (key == "POLLINGRATE")
+            {
+                setPollingRate(stringToLong(value));
+            }
+            else if (key == "CTRLR1POLLINGRATE")
+            {
+                setCtrlr1PollingRate(stringToLong(value));
+            }
+            else if (key == "LOGLEVEL")
+            {
+                setLogLevel(stringToLogLevel(value));
+            }
+            else if (key == "VERSION")
+            {
+                if (value != Version)
                 {
-                    configType = stringToConfigType(value);
-                }
-                else if (key == "TeamNumber")
-                {
-                    teamNumber = value;
-                }
-                else if (key == "LoadingGifPath")
-                {
-                    loadingGifPath = value;
-                }
-                else if (key == "AutoGifPath")
-                {
-                    autoGifPath = value;
-                }
-                else if (key == "DriverGifPath")
-                {
-                    driverGifPath = value;
-                }
-                else if (key == "CustomMessage")
-                {
-                    customMessage = value;
-                }
-                else if (key == "PRINTLOGO")
-                {
-                    setPrintLogo(stringToBool(value));
-                }
-                else if (key == "LOGTOFILE")
-                {
-                    setLogToFile(stringToBool(value));
-                }
-                else if (key == "MAXOPTIONSSIZE")
-                {
-                    setMaxOptionSize(stringToLong(value));
-                }
-                else if (key == "POLLINGRATE")
-                {
-                    setPollingRate(stringToLong(value));
-                }
-                else if (key == "CTRLR1POLLINGRATE")
-                {
-                    setCtrlr1PollingRate(stringToLong(value));
-                }
-                else if (key == "LOGLEVEL")
-                {
-                    setLogLevel(stringToLogLevel(value));
-                }
-                else if (key == "VERSION")
-                {
-                    if (value != Version)
-                    {
-                        std::ostringstream message;
-                        message << "Version mismatch with Config file (" << value << ") and code version (" << Version << "). Do you want to reset the config file?";
-                        resetOrInitializeConfig(message.str());
-                    }
-                }
-                else
-                {
-                    std::ostringstream message;
-                    message << "Unknown key in config file: " << key << ". Do you want to reset the config?";
-                    resetOrInitializeConfig(message.str());
+                    resetOrInitializeConfig("Version mismatch with Config file (" + value + ") and code version (" + Version + "). Do you want to reset the config file?");
                 }
             }
             else
             {
-                std::ostringstream message;
-                message << "Invalid line in config file: " << configLine << ". Do you want to reset the config?";
-                resetOrInitializeConfig(message.str());
+                resetOrInitializeConfig("Unknown key in config file: " + key + ". Do you want to reset the config?");
             }
+        }
+        else if (key == "MOTOR_CONFIG" || key == "INERTIAL" || key == "TRIPORT_CONFIG")
+        {
+            parseComplexConfig(configFile, key);
+        }
+        else
+        {
+            resetOrInitializeConfig("Invalid line in config file: " + configLine + ". Do you want to reset the config?");
         }
     }
     configFile.close();
 }
 
+// Method to parse complex config sections
+void configManager::parseComplexConfig(std::ifstream &configFile, const std::string &section)
+{
+    std::string configLine;
+    while (std::getline(configFile, configLine) && configLine != "}")
+    {
+        if (configLine.empty() || configLine[0] == ';' || configLine[0] == '#')
+        {
+            continue; // Skip empty lines and comments
+        }
+
+        std::string name = configLine;
+        std::getline(configFile, configLine); // Skip the opening brace
+
+        std::string port, gearRatio, reversedStr;
+        while (std::getline(configFile, configLine) && configLine != "}")
+        {
+            std::istringstream iss(configLine);
+            std::string configKey, configValue;
+            if (std::getline(iss, configKey, '=') && std::getline(iss, configValue))
+            {
+                if (configKey == "PORT")
+                {
+                    port = configValue;
+                }
+                else if (configKey == "GEAR_RATIO")
+                {
+                    gearRatio = configValue;
+                }
+                else if (configKey == "REVERSED")
+                {
+                    reversedStr = configValue;
+                }
+            }
+        }
+
+        if (section == "MOTOR_CONFIG")
+        {
+            motorPorts[name] = std::stoi(port);
+            motorGearRatios[name] = gearRatio;
+            motorReversed[name] = stringToBool(reversedStr);
+        }
+        else if (section == "INERTIAL")
+        {
+            inertialPorts[name] = std::stoi(port);
+        }
+        else if (section == "TRIPORT_CONFIG")
+        {
+            triPorts[name] = getTriPort(port);
+        }
+    }
+}
+
 // Method to parse the config file
 void configManager::parseConfig()
 {
-    std::ostringstream message;
-    message << "Version: " << Version << " | Build date: " << BuildDate;
-    logHandler("main", message.str(), Log::Level::Info);
+    std::string message = "Version: " + Version + " | Build date: " + BuildDate;
+    logHandler("main", message, Log::Level::Info);
     primaryController.Screen.print("Starting up...");
 
     if (Brain.SDcard.isInserted())

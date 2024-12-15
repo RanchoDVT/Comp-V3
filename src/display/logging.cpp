@@ -154,4 +154,4 @@ void logHandler(const std::string &functionName, const std::string &message, con
         vex::thread::interruptAll(); // Scary! 👾
         vexSystemExitRequest();      // Exit program
     }
-} 
+}

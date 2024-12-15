@@ -159,9 +159,7 @@ std::pair<std::string, int> ctrl1BttnPressed()
 		vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
 	}
 
-	std::ostringstream oss;
-	oss << "Selected button: " << buttonPressed << ", Duration: " << pressDuration << " ms";
-	std::string message = oss.str();
+	std::string message = "Selected button: " + buttonPressed + ", Duration: " + std::to_string(pressDuration) + " ms";
 	logHandler("ctrl1BttnPressed", message, Log::Level::Debug);
 	return std::make_pair(buttonPressed, pressDuration);
 }
@@ -169,14 +167,9 @@ std::pair<std::string, int> ctrl1BttnPressed()
 void motorMonitor()
 {
 	logHandler("motorMonitor", "motorMonitor is starting up...", Log::Level::Trace);
-	std::ostringstream motorTemps;
-	std::ostringstream dataBuffer;
 
 	while (Competition.isEnabled())
 	{
-		motorTemps.str(std::string());
-		dataBuffer.str(std::string());
-
 		int frontLeftTemp = frontLeftMotor.temperature(vex::temperatureUnits::celsius);
 		int frontRightTemp = frontRightMotor.temperature(vex::temperatureUnits::celsius);
 		int rearLeftTemp = rearLeftMotor.temperature(vex::temperatureUnits::celsius);
@@ -189,27 +182,19 @@ void motorMonitor()
 		// Check for overheat conditions for each motor
 		if (frontLeftTemp >= 55)
 		{
-			motorTemps << "FLM overheat: " << frontLeftTemp << "°";
-			logHandler("motorMonitor", motorTemps.str(), Log::Level::Warn, 3);
-			motorTemps.str(std::string());
+			logHandler("motorMonitor", "FLM overheat: " + std::to_string(frontLeftTemp) + "°", Log::Level::Warn, 3);
 		}
 		if (frontRightTemp >= 55)
 		{
-			motorTemps << "FRM overheat: " << frontRightTemp << "°";
-			logHandler("motorMonitor", motorTemps.str(), Log::Level::Warn, 3);
-			motorTemps.str(std::string());
+			logHandler("motorMonitor", "FRM overheat: " + std::to_string(frontRightTemp) + "°", Log::Level::Warn, 3);
 		}
 		if (rearLeftTemp >= 55)
 		{
-			motorTemps << "RLM overheat: " << rearLeftTemp << "°";
-			logHandler("motorMonitor", motorTemps.str(), Log::Level::Warn, 3);
-			motorTemps.str(std::string());
+			logHandler("motorMonitor", "RLM overheat: " + std::to_string(rearLeftTemp) + "°", Log::Level::Warn, 3);
 		}
 		if (rearRightTemp >= 55)
 		{
-			motorTemps << "RRM overheat: " << rearRightTemp << "°";
-			logHandler("motorMonitor", motorTemps.str(), Log::Level::Warn, 3);
-			motorTemps.str(std::string());
+			logHandler("motorMonitor", "RRM overheat: " + std::to_string(rearRightTemp) + "°", Log::Level::Warn, 3);
 		}
 		if (Brain.Battery.voltage() < 12)
 		{
@@ -222,10 +207,10 @@ void motorMonitor()
 		ConfigManager.updateOdometer(averagePosition);
 
 		// Log motor temperatures
-		motorTemps << "\n | LeftTemp: " << frontLeftTemp << "°\n | RightTemp: " << frontRightTemp << "°\n | RearLeftTemp: " << rearLeftTemp << "°\n | RearRightTemp: " << rearRightTemp << "°\n | Battery Voltage: " << Brain.Battery.voltage() << "V\n";
-		logHandler("motorMonitor", motorTemps.str(), Log::Level::Info);
-		dataBuffer << "\nX Axis: " << InertialGyro.pitch(vex::rotationUnits::deg) << "\nY Axis: " << InertialGyro.roll(vex::rotationUnits::deg) << "\nZ Axis: " << InertialGyro.yaw(vex::rotationUnits::deg);
-		logHandler("motorMonitor", dataBuffer.str(), Log::Level::Info);
+		std::string motorTemps = "\n | LeftTemp: " + std::to_string(frontLeftTemp) + "°\n | RightTemp: " + std::to_string(frontRightTemp) + "°\n | RearLeftTemp: " + std::to_string(rearLeftTemp) + "°\n | RearRightTemp: " + std::to_string(rearRightTemp) + "°\n | Battery Voltage: " + std::to_string(Brain.Battery.voltage()) + "V\n";
+		logHandler("motorMonitor", motorTemps, Log::Level::Info);
+		std::string dataBuffer = "\nX Axis: " + std::to_string(InertialGyro.pitch(vex::rotationUnits::deg)) + "\nY Axis: " + std::to_string(InertialGyro.roll(vex::rotationUnits::deg)) + "\nZ Axis: " + std::to_string(InertialGyro.yaw(vex::rotationUnits::deg));
+		logHandler("motorMonitor", dataBuffer, Log::Level::Info);
 		clearScreen(false, true, true);
 		primaryController.Screen.print("FLM: %d° | FRM: %d°", frontLeftTemp, frontRightTemp);
 		primaryController.Screen.newLine();

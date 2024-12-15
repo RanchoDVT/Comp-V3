@@ -36,7 +36,7 @@ void displaySystemStates()
 }
 
 // Function to apply stability control based on wheel RPM
-void applyStabilityControl(double &forwardVolts)
+void applyStabilityControl(const double &forwardVolts)
 {
     // Get the current RPM of the left and right motors
     double leftRPM = LeftDriveSmart.velocity(vex::velocityUnits::rpm);
@@ -82,7 +82,7 @@ void applyTractionControl(double &forwardVolts)
     double rearRightMotorRPM = rearRightMotor.velocity(vex::velocityUnits::rpm);
 
     // Find the minimum RPM among all motors
-    double minSpeed = std::min({std::abs(frontLeftMotorRPM), std::abs(rearLeftMotorRPM), std::abs(frontRightMotorRPM), std::abs(rearRightMotorRPM)});
+    double minSpeed = std::min(std::min(std::abs(frontLeftMotorRPM), std::abs(rearLeftMotorRPM)), std::min(std::abs(frontRightMotorRPM), std::abs(rearRightMotorRPM)));
 
     // Check if any motor's RPM difference exceeds the threshold
     if (std::abs(frontLeftMotorRPM - minSpeed) > 5 || std::abs(rearLeftMotorRPM - minSpeed) > 5 ||

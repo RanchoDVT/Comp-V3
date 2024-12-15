@@ -46,8 +46,6 @@ void vexCodeInit(void)
 {
     clearScreen(true, true, true);
 
-    std::ostringstream message;
-
     primaryController.Screen.print("Starting up...");
     logHandler("startup", "Starting GUI startup...", Log::Level::Info);
 
@@ -124,16 +122,15 @@ void vexCodeInit(void)
 
     else if (ConfigManager.configType == configManager::ConfigType::Controller)
     {
-        message << "Battery is at: " << Brain.Battery.capacity() << "%%";
+        std::string message = "Battery is at: " + std::to_string(Brain.Battery.capacity()) + "%%";
         if (Brain.Battery.capacity() < 90)
         {
-            logHandler("startup", message.str(), Log::Level::Warn, 3);
+            logHandler("startup", message, Log::Level::Warn, 3);
         }
         else
         {
-            logHandler("startup", message.str(), Log::Level::Info, 3);
+            logHandler("startup", message, Log::Level::Info, 3);
         }
-        message.str(std::string());
 
         std::string autorun = getUserOption("Run Autonomous?", {"Yes", "No"});
         if (autorun == "Yes")

@@ -1,5 +1,87 @@
 #include "vex.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+#ifdef USE_ALLOCATED_SPACE
+uint8_t *emu_memory;
+size_t emu_offset;
+size_t emu_size;
+
+int emu_open(const char *path, int) {
+    emu_memory = NULL;
+    emu_offset = 0;
+    emu_size = 0;
+
+    FILE *f = fopen(path, "rb");
+    fseek(f, 0, SEEK_END);
+    emu_size = ftell(f);
+    fseek(f, 0, SEEK_SET);  /* same as rewind(f); */
+
+    emu_memory = (uint8_t *)malloc(emu_size + 1);
+    if(!emu_memory) {
+        return -1;
+    }
+
+    fread(emu_memory, emu_size, 1, f);
+    fclose(f);
+
+    return 1;
+}
+
+int emu_close(int) {
+    if(emu_memory) {
+        free(emu_memory);
+    }
+    return 0;
+}
+
+int emu_read(int, void *buffer, size_t len) {
+    if(!emu_memory) {
+        return -1;
+    }
+
+    size_t read_length = ((emu_size - 1) < emu_offset + len) ? emu_size - emu_offset : len;
+    memcpy(buffer, emu_memory + emu_offset, read_length);
+    emu_offset += read_length;
+    return read_length;
+}
+
+int emu_lseek(int, size_t value, int type) {
+    size_t last_offset = emu_offset;
+
+    switch(type) {
+    case SEEK_SET:
+        emu_offset = value;
+        break;
+    case SEEK_CUR:
+        emu_offset += value;
+        break;
+    case SEEK_END:
+        emu_offset = emu_size - 1;
+        break;
+    }
+
+    if(emu_offset >= emu_size) {
+        emu_offset = last_offset;
+        return -1;
+    }
+
+    return emu_offset;
+}
+
+#define read emu_read
+#define lseek emu_lseek
+#define open emu_open
+#define close emu_close
+#endif 
+
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #define MAX(A, B) ((A) > (B) ? (A) : (B))
 
@@ -33,27 +115,30 @@ gd_open_gif(const char *fname)
     uint8_t sigver[3];
     uint16_t width, height, depth;
     uint8_t fdsz, bgidx, aspect;
-    int i;
-    const uint8_t *bgcolor;
+    size_t i;
+    uint8_t *bgcolor;
     int gct_sz;
-    gd_GIF *gif;
+    gd_GIF *gif = NULL;
 
     fd = open(fname, O_RDONLY);
     if (fd == -1)
-        return nullptr;
+        return NULL;
+
     /* Header */
     read(fd, sigver, 3);
     if (memcmp(sigver, "GIF", 3) != 0)
     {
-        logHandler("gd_open_gif (Extern)", "Invalid gif signature.", Log::Level::Error, 3);
-        goto fail;
+        logHandler("gd_open_gif", "invalid signature", Log::Level::Error, 3);
+        close(fd);
+        return NULL;
     }
     /* Version */
     read(fd, sigver, 3);
     if (memcmp(sigver, "89a", 3) != 0)
     {
-        logHandler("gd_open_gif (Extern)", "Invalid gif version.", Log::Level::Error, 3);
-        goto fail;
+        logHandler("gd_open_gif", "invalid version", Log::Level::Error, 3);
+        close(fd);
+        return NULL;
     }
     /* Width x Height */
     width = read_num(fd);
@@ -63,8 +148,9 @@ gd_open_gif(const char *fname)
     /* Presence of GCT */
     if (!(fdsz & 0x80))
     {
-        logHandler("gd_open_gif (Extern)", "No color table for gif file detected.", Log::Level::Error, 5);
-        goto fail;
+        logHandler("gd_open_gif", "no global color table", Log::Level::Error, 3);
+        close(fd);
+        return NULL;
     }
     /* Color Space's Depth */
     depth = ((fdsz >> 4) & 7) + 1;
@@ -76,9 +162,12 @@ gd_open_gif(const char *fname)
     /* Aspect Ratio */
     read(fd, &aspect, 1);
     /* Create gd_GIF Structure. */
-    gif = static_cast<gd_GIF *>(calloc(1, sizeof(*gif)));
+    gif = (gd_GIF *)calloc(1, sizeof(*gif));
     if (!gif)
-        goto fail;
+    {
+        close(fd);
+        return NULL;
+    }
     gif->fd = fd;
     gif->width = width;
     gif->height = height;
@@ -88,11 +177,12 @@ gd_open_gif(const char *fname)
     read(fd, gif->gct.colors, 3 * gif->gct.size);
     gif->palette = &gif->gct;
     gif->bgindex = bgidx;
-    gif->frame = static_cast<uint8_t *>(calloc(4, width * height));
+    gif->frame = (uint8_t *)calloc(4, width * height);
     if (!gif->frame)
     {
         free(gif);
-        goto fail;
+        close(fd);
+        return NULL;
     }
     gif->canvas = &gif->frame[width * height];
     if (gif->bgindex)
@@ -102,23 +192,24 @@ gd_open_gif(const char *fname)
         for (i = 0; i < gif->width * gif->height; i++)
             memcpy(&gif->canvas[i * 3], bgcolor, 3);
     gif->anim_start = lseek(fd, 0, SEEK_CUR);
-    goto ok;
-fail:
-    close(fd);
-    return 0;
-ok:
     return gif;
 }
 
 static void
 discard_sub_blocks(gd_GIF *gif)
 {
+    uint8_t first_try = 1;
+    uint8_t seek_pos;
     uint8_t size;
 
     do
     {
         read(gif->fd, &size, 1);
+        if (!first_try && size == seek_pos) // To prevent infinite loop
+            break;
         lseek(gif->fd, size, SEEK_CUR);
+        seek_pos = size;
+        first_try = 0;
     } while (size);
 }
 
@@ -220,7 +311,9 @@ read_ext(gd_GIF *gif)
 {
     uint8_t label;
 
-    read(gif->fd, &label, 1);
+    if (read(gif->fd, &label, 1) < 1)
+        return;
+
     switch (label)
     {
     case 0x01:
@@ -236,24 +329,23 @@ read_ext(gd_GIF *gif)
         read_application_ext(gif);
         break;
     default:
-        std::ostringstream oss;
-        oss << "Unknown Gif extention: %02X" << label;
-        logHandler("gd_open_gif (Extern)", oss.str(), Log::Level::Error, 3);
+        logHandler("read_ext", "unknown extension: " + std::to_string(label), Log::Level::Warn, 3);
     }
 }
 
 static Table *
 new_table(int key_size)
 {
+    u_int8_t key;
     int init_bulk = MAX(1 << (key_size + 1), 0x100);
-    Table *table = static_cast<Table *>(malloc(sizeof(*table) + sizeof(Entry) * init_bulk));
+    Table *table = (Table *)malloc(sizeof(*table) + sizeof(Entry) * init_bulk);
     if (table)
     {
         table->bulk = init_bulk;
         table->nentries = (1 << key_size) + 2;
-        table->entries = reinterpret_cast<Entry *>(&table[1]);
-        for (int key = 0; key < (1 << key_size); key++)
-            table->entries[key] = (Entry){1, 0xFFF, static_cast<uint8_t>(key)};
+        table->entries = (Entry *)&table[1];
+        for (key = 0; key < (1 << key_size); key++)
+            table->entries[key] = (Entry){1, 0xFFF, key};
     }
     return table;
 }
@@ -269,13 +361,12 @@ add_entry(Table **tablep, uint16_t length, uint16_t prefix, uint8_t suffix)
     if (table->nentries == table->bulk)
     {
         table->bulk *= 2;
-        table = static_cast<Table *>(realloc(table, sizeof(*table) + sizeof(Entry) * table->bulk));
+        table = (Table *)realloc(table, sizeof(*table) + sizeof(Entry) * table->bulk);
         if (!table)
             return -1;
-        table->entries = reinterpret_cast<Entry *>(&table[1]);
+        table->entries = (Entry *)&table[1];
         *tablep = table;
     }
-    table->entries = reinterpret_cast<Entry *>(&table[1]);
     table->entries[table->nentries] = (Entry){length, prefix, suffix};
     table->nentries++;
     if ((table->nentries & (table->nentries - 1)) == 0)
@@ -344,12 +435,12 @@ static int
 read_image_data(gd_GIF *gif, int interlace)
 {
     uint8_t sub_len, shift, byte;
-    int init_key_size, key_size, table_is_full;
-    int frm_off, frm_size, str_len, i, p, x, y;
+    int init_key_size, key_size, table_is_full = 0;
+    int frm_off, frm_size, str_len = 0, i, p, x, y;
     uint16_t key, clear, stop;
     int ret;
     Table *table;
-    Entry entry;
+    Entry entry = {0, 0, 0};
     off_t start, end;
 
     read(gif->fd, &byte, 1);
@@ -398,6 +489,8 @@ read_image_data(gd_GIF *gif, int interlace)
             continue;
         if (key == stop || key == 0x1000)
             break;
+        if (key >= table->nentries)
+            break;
         if (ret == 1)
             key_size++;
         entry = table->entries[key];
@@ -410,7 +503,7 @@ read_image_data(gd_GIF *gif, int interlace)
             if (interlace)
                 y = interlaced_line_index((int)gif->fh, y);
             gif->frame[(gif->fy + y) * gif->width + gif->fx + x] = entry.suffix;
-            if (entry.prefix == 0xFFF)
+            if (entry.prefix == 0xFFF || entry.prefix >= table->nentries)
                 break;
             else
                 entry = table->entries[entry.prefix];
@@ -468,8 +561,7 @@ static void
 render_frame_rect(gd_GIF *gif, uint8_t *buffer)
 {
     int i, j, k;
-    uint8_t index;
-    const uint8_t *color;
+    uint8_t index, *color;
     i = gif->fy * gif->width + gif->fx;
     for (j = 0; j < gif->fh; j++)
     {
@@ -488,7 +580,7 @@ static void
 dispose(gd_GIF *gif)
 {
     int i, j, k;
-    const uint8_t *bgcolor;
+    uint8_t *bgcolor;
     switch (gif->gce.disposal)
     {
     case 2: /* Restore to background color. */
@@ -524,7 +616,8 @@ int gd_get_frame(gd_GIF *gif)
             read_ext(gif);
         else
             return -1;
-        read(gif->fd, &sep, 1);
+        if (read(gif->fd, &sep, 1) < 1)
+            return -1;
     }
     if (read_image(gif) == -1)
         return -1;
@@ -537,7 +630,7 @@ void gd_render_frame(gd_GIF *gif, uint8_t *buffer)
     render_frame_rect(gif, buffer);
 }
 
-int gd_is_bgcolor(const gd_GIF *gif, const uint8_t color[3])
+int gd_is_bgcolor(gd_GIF *gif, uint8_t color[3])
 {
     return !memcmp(&gif->palette->colors[gif->bgindex * 3], color, 3);
 }
@@ -564,7 +657,7 @@ void gd_close_gif(gd_GIF *gif)
 //
 int vex::Gif::render_task(void *arg)
 {
-    if (arg == nullptr)
+    if (arg == NULL)
         return (0);
 
     Gif *instance = static_cast<Gif *>(arg);
@@ -579,9 +672,9 @@ int vex::Gif::render_task(void *arg)
 
         while ((err = gd_get_frame(gif)) > 0)
         {
-            gd_render_frame(gif, static_cast<uint8_t *>(instance->_buffer));
+            gd_render_frame(gif, (uint8_t *)instance->_buffer);
 
-            instance->_lcd.drawImageFromBuffer(static_cast<uint32_t *>(instance->_buffer), instance->_sx, instance->_sy, gif->width, gif->height);
+            instance->_lcd.drawImageFromBuffer((uint32_t *)instance->_buffer, instance->_sx, instance->_sy, gif->width, gif->height);
             instance->_frame++;
 
             // how long to get, render and draw to screen
@@ -600,7 +693,7 @@ int vex::Gif::render_task(void *arg)
         }
         if (err == -1)
         {
-            logHandler("vex::Gif::render_task (Extern)", "Unknown gif Error.", Log::Level::Error, 3);
+            logHandler("Gif::render_task", "Gif: error", Log::Level::Error, 3);
             break;
         }
         // done ?
@@ -621,43 +714,50 @@ vex::Gif::Gif(const char *fname, int sx, int sy, bool bMemoryBuffer)
 {
     _sx = sx;
     _sy = sy;
-    int fd = open(fname, O_RDONLY);
+    FILE *fp = fopen(fname, "rb");
 
-    if (fd != -1)
+    if (fp != NULL)
     {
         // get file length
-        struct stat st;
-        fstat(fd, &st);
+        fseek(fp, 0, SEEK_END);
+        size_t len = ftell(fp);
+        fseek(fp, 0, SEEK_SET);
 
         // optimize by reading into memory buffer ?
-        // using memory, then reopen file
         if (bMemoryBuffer)
         {
-            size_t len = st.st_size;
             _gifmem = malloc(len);
-            if (_gifmem != nullptr)
+            if (_gifmem != NULL)
             {
-                read(fd, _gifmem, len);
-                close(fd);
-                fd = open(fname, O_RDONLY);
+                int nRead = fread(_gifmem, 1, len, fp);
+                (void)nRead;
             }
+            fclose(fp);
+            fp = NULL;
+        }
+
+        // using memory, then reopen file
+        if (_gifmem != NULL)
+        {
+            // create a FILE from memory buffer
+            fp = fmemopen(_gifmem, len, "rb");
         }
 
         // good file ?
-        if (fd != -1)
+        if (fp != NULL)
         {
             // open gif file
             // will allocate memory for background and one animation
             // frame.
             _gif = gd_open_gif(fname);
-            if (_gif == nullptr)
+            if (_gif == NULL)
             {
                 return;
             }
 
             // memory for rendering frame
-            _buffer = static_cast<uint32_t *>(malloc(_gif->width * _gif->height * sizeof(uint32_t)));
-            if (_buffer == nullptr)
+            _buffer = (uint32_t *)malloc(_gif->width * _gif->height * sizeof(uint32_t));
+            if (_buffer == NULL)
             {
                 // out of memory
                 gd_close_gif(_gif);
@@ -680,7 +780,7 @@ vex::Gif::~Gif()
     cleanup();
 };
 
-// cleanup memory when gif finishes
+// cleanup memory when gif finishs
 //
 
 void vex::Gif::cleanup()
@@ -691,19 +791,19 @@ void vex::Gif::cleanup()
     if (_buffer)
     {
         free(_buffer);
-        _buffer = nullptr;
+        _buffer = NULL;
     }
 
     if (_gif)
     {
         gd_close_gif(_gif);
-        _gif = nullptr;
+        _gif = NULL;
     }
 
     if (_gifmem)
     {
         free(_gifmem);
-        _gifmem = nullptr;
+        _gifmem = NULL;
     }
 }
 
