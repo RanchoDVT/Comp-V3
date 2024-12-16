@@ -61,11 +61,13 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const user of users) {
             const repos = await fetchRepositories(user);
             repos.forEach(repo => {
-                const repoLink = document.createElement('a');
-                repoLink.href = repo.html_url;
-                repoLink.target = '_blank';
-                repoLink.textContent = repo.name;
-                projectsDropdown.appendChild(repoLink);
+                if (repo.name !== '.github') { // Exclude .github repository
+                    const repoLink = document.createElement('a');
+                    repoLink.href = repo.html_url;
+                    repoLink.target = '_blank';
+                    repoLink.textContent = repo.name;
+                    projectsDropdown.appendChild(repoLink);
+                }
             });
         }
     }
