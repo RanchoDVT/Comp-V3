@@ -2,50 +2,32 @@ function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function Never() {
-    await timeout(75);
-    console.clear();
-    console.log("=====");
+async function neutralizeInjectedScripts() {
+    // SCREW YOU LIGHT SPEED, IT'S WAR!
+    const startTime = Date.now();
+    const noOp = () => { };
 
-    // Functions
-    var getLoaderPolicy = function () { }    // no-op function;
-    var loadES6 = function () { }    // no-op function;
-    var isYoutube = function () { }    // no-op function;
-    var checkCurrentSite = function () { }    // no-op function;
-    var getHardBlockPolicy = function () { }    // no-op function;
-    var hardBlock = function () { }    // no-op function;
-    var stopVideo = function () { }    // no-op function;
-    var updateLocation = function () { }    // no-op function;
+    const functionsToNeutralize = [
+        'getLoaderPolicy', 'loadES6', 'isYoutube', 'checkCurrentSite',
+        'getHardBlockPolicy', 'hardBlock', 'stopVideo', 'updateLocation',
+        'initFlagScanning', 'loaderPolicy'
+    ];
 
-    // Variables
-    var hardBlockPolicy = null;
-    var prevURL = null;
+    while (Date.now() - startTime < 1000) {
+        console.clear();
+        console.log("Neutralizing injected scripts...");
 
+        functionsToNeutralize.forEach(fn => {
+            window[fn] = noOp;
+        });
 
-
-    console.log("=====");
-
-    // re-assign
-    window.isYoutube = function () { }    // no-op function
-    window.loadES6 = function () { }    // no-op function
-    window.checkCurrentSite = function () { }    // no-op function
-    window.getHardBlockPolicy = function () { }    // no-op function
-    window.hardBlock = function () { }    // no-op function
-    window.stopVideo = function () { }    // no-op function
-    window.updateLocation = function () { }    // no-op function
-    window.initFlagScanning = function () { }    // no-op function
-    window.getLoaderPolicy = function () { }    // no-op function
-    window.loaderPolicy = function () { }    // no-op function
-
-    console.log("Just incase, Functions deleted again:");
-
-    console.log("=====");
+        console.log("Injected scripts neutralized.");
+    }
 }
-Never()
+
+neutralizeInjectedScripts();
 
 document.addEventListener('DOMContentLoaded', () => {
-
-
     document.getElementById("year").innerHTML = new Date().getFullYear();
 
     async function fetchFile(url, targetElement) {
@@ -56,6 +38,35 @@ document.addEventListener('DOMContentLoaded', () => {
             targetElement.innerHTML = text;
         } catch (error) {
             console.error(`Error fetching ${url}:`, error);
+        }
+    }
+
+    async function fetchRepositories(user) {
+        try {
+            const response = await fetch(`https://api.github.com/users/${user}/repos`);
+            if (!response.ok) throw new Error(`Error fetching repos for ${user}: ${response.status}`);
+            const repos = await response.json();
+            return repos;
+        } catch (error) {
+            console.error(`Error fetching repositories for ${user}:`, error);
+            return [];
+        }
+    }
+
+    async function populateProjectsDropdown() {
+        const users = ['RanchoDVT', 'Voidless7125'];
+        const projectsDropdown = document.getElementById('projects-dropdown');
+        projectsDropdown.innerHTML = ''; // Clear existing content
+
+        for (const user of users) {
+            const repos = await fetchRepositories(user);
+            repos.forEach(repo => {
+                const repoLink = document.createElement('a');
+                repoLink.href = repo.html_url;
+                repoLink.target = '_blank';
+                repoLink.textContent = repo.name;
+                projectsDropdown.appendChild(repoLink);
+            });
         }
     }
 
@@ -71,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     link.classList.add("active");
                 }
             });
+            populateProjectsDropdown(); // Populate the projects dropdown after loading the navbar
         });
 
     if (document.getElementById('readme-content')) fetchFile('https://raw.githubusercontent.com/RanchoDVT/Comp-V3/dev/README.md', document.getElementById('readme-content'));
@@ -159,7 +171,6 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
             }
         });
     }
-
 
     window.showPopup = async function (type) {
         let popupText = '', downloadLink = '';
