@@ -6,6 +6,7 @@ async function neutralizeInjectedScripts() {
     // SCREW YOU LIGHT SPEED, IT'S WAR!
     const startTime = Date.now();
     const noOp = () => { };
+    let counter = 0;
 
     const functionsToNeutralize = [
         'getLoaderPolicy', 'loadES6', 'isYoutube', 'checkCurrentSite',
@@ -22,7 +23,10 @@ async function neutralizeInjectedScripts() {
         });
 
         console.log("Injected scripts neutralized.");
+        counter++;
     }
+
+    console.log(`Neutralization loop executed ${counter} times.`);
 }
 
 neutralizeInjectedScripts();
