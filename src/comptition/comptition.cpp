@@ -159,24 +159,18 @@ void userControl()
         switch (currentDriveMode)
         {
         case configManager::DriveMode::LeftArcade:
-            turnVolts = primaryController.Axis1.position() * 0.12; // -12 to 12
-            forwardVolts = primaryController.Axis3.position() * 0.12 * (1 - (std::abs(turnVolts) / 12));
-            LeftDriveSmart.spin(vex::directionType::fwd, forwardVolts + turnVolts, vex::voltageUnits::volt);
-            RightDriveSmart.spin(vex::directionType::fwd, forwardVolts - turnVolts, vex::voltageUnits::volt);
+            turnVolts = primaryController.Axis4.position() * 0.12; // -12 to 12
+            forwardVolts = primaryController.Axis3.position() * 0.12;
             break;
 
         case configManager::DriveMode::RightArcade:
-            turnVolts = primaryController.Axis4.position() * 0.12; // -12 to 12
-            forwardVolts = primaryController.Axis3.position() * 0.12 * (1 - (std::abs(turnVolts) / 12));
-            LeftDriveSmart.spin(vex::directionType::fwd, forwardVolts + turnVolts, vex::voltageUnits::volt);
-            RightDriveSmart.spin(vex::directionType::fwd, forwardVolts - turnVolts, vex::voltageUnits::volt);
+            turnVolts = primaryController.Axis1.position() * 0.12; // -12 to 12
+            forwardVolts = primaryController.Axis2.position() * 0.12;
             break;
 
         case configManager::DriveMode::SplitArcade:
-            turnVolts = primaryController.Axis4.position() * 0.12; // -12 to 12
-            forwardVolts = primaryController.Axis3.position() * 0.12 * (1 - (std::abs(turnVolts) / 12));
-            LeftDriveSmart.spin(vex::directionType::fwd, forwardVolts + turnVolts, vex::voltageUnits::volt);
-            RightDriveSmart.spin(vex::directionType::fwd, forwardVolts - turnVolts, vex::voltageUnits::volt);
+            turnVolts = primaryController.Axis1.position() * 0.12; // -12 to 12
+            forwardVolts = primaryController.Axis3.position() * 0.12;
             break;
 
         case configManager::DriveMode::Tank:
@@ -187,17 +181,38 @@ void userControl()
             break;
         }
 
-        // Open configuration menu
-        if (primaryController.ButtonUp.pressing())
+        // Apply traction control if enabled
+        if (tractionControlEnabled)
         {
-            configMenuActive = !configMenuActive;
-            if (configMenuActive)
-            {
-                displayDriveModeMenu();
-                currentDriveMode = ConfigManager.getDriveMode(); // Update currentDriveMode after selection
-            }
+            applyTractionControl(forwardVolts);
         }
 
-        vex::this_thread::sleep_for(20);
+        // Apply stability control if enabled
+        if (stabilityControlEnabled)
+        {
+            applyStabilityControl(forwardVolts);
+        }
+
+        // Apply the calculated voltages to the motors
+        if (currentDriveMode != configManager::DriveMode::Tank)
+        {
+            LeftDriveSmart.spin(vex::directionType::fwd, forwardVolts + turnVolts, vex::voltageUnits::volt);
+            RightDriveSmart.spin(vex::directionType::fwd, forwardVolts - turnVolts, vex::voltageUnits::volt);
+        }
+
+        vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
     }
+
+    // Open configuration menu
+    if (primaryController.ButtonUp.pressing())
+    {
+        configMenuActive = !configMenuActive;
+        if (configMenuActive)
+        {
+            displayDriveModeMenu();
+            currentDriveMode = ConfigManager.getDriveMode(); // Update currentDriveMode after selection
+        }
+    }
+
+    vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
 }

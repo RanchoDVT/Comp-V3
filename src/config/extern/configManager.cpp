@@ -88,7 +88,14 @@ void configManager::setCustomMessage(const std::string &value)
 int configManager::getMotorPort(const std::string &motorName) const
 {
     auto it = motorPorts.find(motorName);
-    return (it != motorPorts.end()) ? it->second : -1; // Default invalid port
+    if (it != motorPorts.end())
+    {
+        return it->second;
+    }
+    else
+    {
+        throw std::runtime_error("Motor port not found: " + motorName);
+    }
 }
 
 std::string configManager::getGearRatio(const std::string &motorName) const

@@ -35,6 +35,7 @@ extern std::string BuildDate;
 /// @param timeOfDisplay How long the message stays on the screen for.
 void logHandler(const std::string &functionName, const std::string &message, const Log::Level level, const float &timeOfDisplay = 2);
 
+void SD_Card_Logging(const Log::Level &level, const std::string &functionName, const std::string &message);
 
 /// @brief GUI for settting options
 /// @param settingName The name for what you want to change (duh)

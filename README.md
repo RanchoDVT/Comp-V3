@@ -10,15 +10,15 @@
 <h3 id="3-0">3.0:</h3>
 <ol>
 <li>Custom theming ✅</li>
-<li>Controller settings ✅ (Requires rewrite of User_Control)</li>
-<li>AWD/FWD/RWD Switcher ✅ (Requires rewrite of User_Control)</li>
-<li>Odometer ☑️ (Tamper protection could not be completed)</li>
+<li>AWD/FWD/RWD Switcher ✅</li>
 <li>Maintenance reminders ✅</li>
 <li>Diagnostic mode ✅ </li>
-<li>Traction control &amp; Stability control ✅(Requires rewrite of User_Control)</li>
+<li>Traction control &amp; Stability control ✅</li>
 <li>Custom user messages 🔃 (Requires rewrite of startup)</li>
-<li>Import code updates from SD card (Requires rewrite of startup, need hardware ❌) </li>
-<li>Hot swap of Ports (Requires rewrite of user_control, need hardware ❌) </li>
+<li>Hot swap of Ports (Requires rewrite of user_control, 🔃) </li>
+<li>Odometer ☑️ (Tamper protection could not be completed)</li>
+<li>Controller settings ☑️ (Have to add deadzone settings)</li>
+<li>Import code updates from internet (Requires rewrite of startup, need hardware ❌) </li>
 <li>Automatic Emergency Braking (Requires vision sensor or AI vision, need hardware ❌)<ul>
 <li>(Requires rewrite of User_Control | Prevent acceleration when a collision is imminent)</li>
 <li>Forward warning - 2 Seconds till impact</li>
@@ -32,20 +32,14 @@
 <hr>
 <h3 id="website-todo-">Website todo:</h3>
 <ol>
-<li>Blob effect around curser 🔃</li>
 <li>Update the program from the website 🔃</li>
-<li>Caching 🔃</li>
-<li>Apply new features to the config generator 🔃</li>
-<li>Features for all my programs 🔃</li>
 <li>Support forum 🔃</li>
-<li>XSS protection 🔃</li>
-<li>Fetures on tiles 🔃</li>
 </ol>
 <hr>
 <h3 id="custom-sdk-todo-">Custom SDK todo:</h3>
 <ol>
-<li>Use the newest version of Clang and GCC. 🔃</li>
-<li>Use Vex&#39;s API. 🔃</li>
+<li>Use the newest version of Clang and GCC. ✅</li>
+<li>Use Vex&#39;s API. ✅</li>
 <li>Support for V5, IQ2, EXP 🔃</li>
 <li>Better templates and makefiles. 🔃</li>
 </ol>

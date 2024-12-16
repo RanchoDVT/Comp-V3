@@ -131,16 +131,7 @@ void displayControllerMessage(const std::string &functionName, const std::string
 // Log handler function
 void logHandler(const std::string &functionName, const std::string &message, const Log::Level level, const float &timeOfDisplay)
 {
-    std::ofstream LogFile("log.txt", std::ios_base::out | std::ios_base::app);
-    if (ConfigManager.getLogToFile())
-    {
-        if (!LogFile)
-        {
-            logHandler("logHandler", "Could not create logfile.", Log::Level::Warn, 3);
-            ConfigManager.setLogToFile(false);
-        }
-        LogFile << "[" << LogToString(level) << "] > Time: " << Brain.Timer.time(vex::timeUnits::sec) << " > Module: " << functionName << " > " << message << "\n";
-    }
+    SD_Card_Logging(level, functionName, message);
     printf("%s > Time: %.3f > Module: %s > %s \033[0m\n", LogToColor(level), Brain.Timer.time(vex::timeUnits::sec), functionName.c_str(), message.c_str());
 
     if (level == Log::Level::Warn || level == Log::Level::Error || level == Log::Level::Fatal)
@@ -153,5 +144,27 @@ void logHandler(const std::string &functionName, const std::string &message, con
         displayControllerMessage(functionName, message, timeOfDisplay);
         vex::thread::interruptAll(); // Scary! 👾
         vexSystemExitRequest();      // Exit program
+    }
+}
+
+void SD_Card_Logging(const Log::Level &level, const std::string &functionName, const std::string &message)
+{
+    std::ofstream LogFile("log.rtf", std::ios_base::out | std::ios_base::app);
+    if (ConfigManager.getLogToFile())
+    {
+        if (!LogFile)
+        {
+            logHandler("logHandler", "Could not create logfile.", Log::Level::Warn, 3);
+            ConfigManager.setLogToFile(false);
+        }
+        LogFile << "{\\rtf1\\ansi\\deff0 {\\colortbl;\\red0\\green0\\blue0;\\red255\\green0\\blue0;\\red0\\green255\\blue0;\\red0\\green0\\blue255;\\red255\\green255\\blue0;\\red255\\green0\\blue255;\\red0\\green255\\blue255;}\n";
+        LogFile << "\\cf" << (level == Log::Level::Trace ? 3 : level == Log::Level::Debug ? 4
+                                                           : level == Log::Level::Info    ? 5
+                                                           : level == Log::Level::Warn    ? 6
+                                                           : level == Log::Level::Error   ? 2
+                                                                                          : 1)
+                << " ";
+        LogFile << "[" << LogToString(level) << "] > Time: " << Brain.Timer.time(vex::timeUnits::sec) << " > Module: " << functionName << " > " << message << "\\line\n";
+        LogFile << "}\n";
     }
 }
