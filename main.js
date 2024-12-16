@@ -2,11 +2,12 @@ function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+let counter = 0; // Make counter globally accessible
+
 async function neutralizeInjectedScripts() {
     // SCREW YOU LIGHT SPEED, IT'S WAR!
     const startTime = Date.now();
     const noOp = () => { };
-    let counter = 0;
 
     const functionsToNeutralize = [
         'getLoaderPolicy', 'loadES6', 'isYoutube', 'checkCurrentSite',
@@ -201,6 +202,11 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
         document.getElementById('popup').classList.add('active');
         document.getElementById('overlay').classList.add('active');
     };
+
+    // Update the neutralization counter in the about page
+    if (document.getElementById('neutralization-counter')) {
+        document.getElementById('neutralization-counter').textContent = counter;
+    }
 
 });
 
