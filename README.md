@@ -12,13 +12,12 @@
 <li>Custom theming ✅</li>
 <li>Controller settings ✅ (Requires rewrite of User_Control)</li>
 <li>AWD/FWD/RWD Switcher ✅ (Requires rewrite of User_Control)</li>
-<li>Odometer 🔃 (Requires tamper protection)</li>
-<li>Maintenance reminders 🔃</li>
-<li>Custom user messages 🔃 (Requires rewrite of startup)</li>
+<li>Odometer ☑️ (Tamper protection could not be completed)</li>
+<li>Maintenance reminders ✅</li>
+<li>Diagnostic mode ✅ </li>
 <li>Traction control &amp; Stability control ✅(Requires rewrite of User_Control)</li>
-<li>More debugging when connected to a computer (Loghandler) </li>
+<li>Custom user messages 🔃 (Requires rewrite of startup)</li>
 <li>Import code updates from SD card (Requires rewrite of startup, need hardware ❌) </li>
-<li>Diagnostic mode (Requires rewrite of startup, need hardware ❌) </li>
 <li>Hot swap of Ports (Requires rewrite of user_control, need hardware ❌) </li>
 <li>Automatic Emergency Braking (Requires vision sensor or AI vision, need hardware ❌)<ul>
 <li>(Requires rewrite of User_Control | Prevent acceleration when a collision is imminent)</li>

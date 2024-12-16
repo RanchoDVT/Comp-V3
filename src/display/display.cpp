@@ -1,6 +1,115 @@
 #include "vex.h"
 
 #include <algorithm>
+
+// define some more colors
+const vex::color grey((uint32_t)0x202020);
+const vex::color dgrey((uint32_t)0x2F4F4F);
+const vex::color lblue((uint32_t)0x303060);
+const vex::color lred((uint32_t)0x603030);
+
+/*-----------------------------------------------------------------------------*/
+/** @brief      Display data for one motor                                     */
+/*-----------------------------------------------------------------------------*/
+void displayMotorData(vex::motor &m) {
+    int ypos = 0;
+    int xpos = m.index() * 48;
+
+    // There's no C++ API to get motor command value, use C API, this returns rpm
+    int v1  = vexMotorVelocityGet(m.index());
+
+    // The actual velocity of the motor in rpm
+    int v2  = m.velocity(vex::velocityUnits::rpm);
+
+    // The position of the motor internal encoder in revolutions
+    double pos = m.position(vex::rotationUnits::rev);
+
+    // Motor current in Amps    
+    double c1 = m.current();
+
+    // Motor temperature
+    double t1 = m.temperature(vex::temperatureUnits::celsius);
+
+    Brain.Screen.setFont(vex::mono15);
+
+    // background color based on
+    // device and whether it's left, right or other motor
+    if (!m.installed()) {
+        // no motor
+        Brain.Screen.setFillColor(grey);
+    } else if (m.index() == frontLeftMotor.index() || m.index() == rearLeftMotor.index()) {
+        Brain.Screen.setFillColor(lblue);
+    } else if (m.index() == frontRightMotor.index() || m.index() == rearRightMotor.index()) {
+        Brain.Screen.setFillColor(lred);
+    } else {
+        Brain.Screen.setFillColor(dgrey);
+    }
+    
+    // Draw outline for motor info
+    Brain.Screen.setPenColor(vex::white);
+    int w = (m.index() < 9) ? 49 : 48;
+    Brain.Screen.drawRectangle(xpos, ypos, w, 79);
+    
+    // no motor, then return early
+    if (!m.installed()) {
+        Brain.Screen.printAt(xpos + 15, ypos + 30, true, "NC");
+        return;
+    }
+
+    // Show commanded speed
+    if (v1 != 0)
+        Brain.Screen.setPenColor(vex::green);
+    else
+        Brain.Screen.setPenColor(vex::white);
+    Brain.Screen.printAt(xpos + 13, ypos + 13, true, "%4d", v1);
+
+    // Show actual speed
+    Brain.Screen.setPenColor(vex::yellow);
+    Brain.Screen.printAt(xpos + 13, ypos + 30, true, "%4d", v2);
+
+    // Show position
+    Brain.Screen.printAt(xpos + 5, ypos + 45, true, "%5.1f", pos);
+
+    // Show current
+    Brain.Screen.printAt(xpos + 5, ypos + 60, true, "%4.1fA", c1);
+
+    // Show temperature
+    Brain.Screen.printAt(xpos + 5, ypos + 75, true, "%4.0fC", t1);
+
+    Brain.Screen.setPenColor(vex::white);
+    Brain.Screen.drawLine(xpos, ypos + 14, xpos + 48, ypos + 14);  
+}
+
+/*----------------------------------------------------------------------------*/
+/** @brief  Display task - show some useful motor data                        */
+/*----------------------------------------------------------------------------*/
+void displayTask() {
+    Brain.Screen.setFont(vex::prop40);
+    Brain.Screen.setPenColor(vex::red);
+    Brain.Screen.printAt(90, 160, "DIAGNOSTIC MODE");
+
+    vex::motor *motors[] = { &frontLeftMotor, 
+                             &frontRightMotor,
+                             &rearLeftMotor,
+                             &rearRightMotor
+                           };
+                      
+    while (true) {
+        for (int i = 0; i < 4; i++) {
+            displayMotorData(*motors[i]);
+        }
+
+        // Display battery status
+        Brain.Screen.setCursor(10, 1);
+        Brain.Screen.print("Battery: %d%%", Brain.Battery.capacity());
+
+        // Display using back buffer, stops flickering
+        Brain.Screen.render();
+
+        vex::this_thread::sleep_for(100);
+    }
+}
+
 void clearScreen(const bool &brainClear, const bool &primaryControllerClear, const bool &partnerControllerClear)
 {
     if (brainClear)

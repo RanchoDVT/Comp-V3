@@ -38,19 +38,40 @@ vex::bumper RearBumper = vex::bumper(*bumperTriPort);
 vex::competition Competition;
 
 /**
+ * Check if the Y button is held at startup to enter diagnostic mode.
+ */
+bool isDiagnosticMode() {
+    // Wait for a short period to allow the user to press the button
+    vex::this_thread::sleep_for(1000);
+    return primaryController.ButtonY.pressing();
+}
+
+/**
+ * Initialize diagnostic mode.
+ */
+void initializeDiagnosticMode() {
+    Brain.Screen.clearScreen();
+    Brain.Screen.setCursor(1, 1);
+    Brain.Screen.print("Entering Diagnostic Mode...");
+
+    // Add any additional diagnostic initialization here
+
+    // Run the display task for diagnostic mode
+    displayTask();
+}
+
+/**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
  *
  * This should be called at the start of your int main function.
  */
-void vexCodeInit(void)
-{
+void vexCodeInit(void) {
     clearScreen(true, true, true);
 
     primaryController.Screen.print("Starting up...");
     logHandler("startup", "Starting GUI startup...", Log::Level::Info);
 
-    if (Competition.isEnabled())
-    {
+    if (Competition.isEnabled()) {
         logHandler("startup", "Robot is IN Competition mode!", Log::Level::Fatal);
     }
 
@@ -58,8 +79,12 @@ void vexCodeInit(void)
 
     vex::competition::bStopAllTasksBetweenModes = false;
 
-    if (ConfigManager.configType == configManager::ConfigType::Brain)
-    {
+    if (isDiagnosticMode()) {
+        initializeDiagnosticMode();
+        return;
+    }
+
+    if (ConfigManager.configType == configManager::ConfigType::Brain) {
         // Display team number at the top right
         std::string teamNumber = ConfigManager.getTeamNumber();
         Brain.Screen.setCursor(1, 20);
@@ -81,16 +106,13 @@ void vexCodeInit(void)
         bool optionSelected = false;
         bool runAutonomous = false;
 
-        while (!optionSelected)
-        {
-            if (Brain.Screen.pressing())
-            {
+        while (!optionSelected) {
+            if (Brain.Screen.pressing()) {
                 int x = Brain.Screen.xPosition();
                 int y = Brain.Screen.yPosition();
 
                 // Check if 'Yes' button is clicked
-                if (x > 40 && x < 100 && y > 100 && y < 140) // Adjust positions based on screen layout
-                {
+                if (x > 40 && x < 100 && y > 100 && y < 140) { // Adjust positions based on screen layout
                     logHandler("startup", "Starting autonomous from Brain screen.", Log::Level::Trace);
                     Brain.Screen.clearScreen();
                     Brain.Screen.setCursor(3, 5);
@@ -99,8 +121,7 @@ void vexCodeInit(void)
                     optionSelected = true;
                 }
                 // Check if 'No' button is clicked
-                else if (x > 140 && x < 200 && y > 100 && y < 140) // Adjust positions
-                {
+                else if (x > 140 && x < 200 && y > 100 && y < 140) { // Adjust positions
                     logHandler("startup", "Skipped autonomous from Brain screen.", Log::Level::Trace);
                     Brain.Screen.clearScreen();
                     Brain.Screen.setCursor(3, 5);
@@ -112,36 +133,26 @@ void vexCodeInit(void)
             vex::this_thread::sleep_for(50); // Avoid high CPU usage
         }
 
-        if (runAutonomous)
-        {
+        if (runAutonomous) {
             autonomous();
             logHandler("startup", "Finished autonomous from Brain screen.", Log::Level::Trace);
         }
         vex::this_thread::sleep_for(1000);
-    }
-
-    else if (ConfigManager.configType == configManager::ConfigType::Controller)
-    {
+    } else if (ConfigManager.configType == configManager::ConfigType::Controller) {
         std::string message = "Battery is at: " + std::to_string(Brain.Battery.capacity()) + "%%";
-        if (Brain.Battery.capacity() < 90)
-        {
+        if (Brain.Battery.capacity() < 90) {
             logHandler("startup", message, Log::Level::Warn, 3);
-        }
-        else
-        {
+        } else {
             logHandler("startup", message, Log::Level::Info, 3);
         }
 
         std::string autorun = getUserOption("Run Autonomous?", {"Yes", "No"});
-        if (autorun == "Yes")
-        {
+        if (autorun == "Yes") {
             logHandler("startup", "Starting autonomous from setup.", Log::Level::Trace);
             primaryController.Screen.print("Running autonomous.");
             autonomous();
             logHandler("startup", "Finished autonomous.", Log::Level::Trace);
-        }
-        else if (autorun == "No")
-        {
+        } else if (autorun == "No") {
             primaryController.Screen.print("Skipped autonomous.");
             logHandler("startup", "Skipped autonomous.", Log::Level::Trace);
             vex::this_thread::sleep_for(1000);
