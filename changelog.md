@@ -1,31 +1,154 @@
 <h1 id="version-history-">Version history 📕</h1>
 <h2>Version 3.0b3 | 12/15/24 (Newest)</h2>
-<p><strong>Build size:</strong> 229KB</p>
-<h3>Fixed / Improved 🛠️</h3>
+<p><strong>Build Size:</strong> <code>229KB</code></p>
+
+<h2>🚀 New Features</h2>
 <ul>
-<li>Improved <code>getuseroption</code> to support unlimited options with an SD card configuration.</li>
-<li>More accurate turning.</li>
-<li>Enhanced error handling in <code>StringToLong</code>.</li>
+  <li><strong>🛠️ Diagnostic Mode</strong>
+    <ul>
+      <li>Added a diagnostic mode for advanced debugging of drivetrain and system states.</li>
+      <li>New display task functions provide real-time drivetrain telemetry.</li>
+    </ul>
+  </li>
+  
+  <li><strong>🎨 Custom Theming</strong>
+    <ul>
+      <li>Introduced support for custom themes, allowing personalization of the interface.</li>
+      <li>Features include dynamic GIF backgrounds and team number overlays, all configurable via SD card.</li>
+    </ul>
+  </li>
+  
+  <li><strong>🔄 FWD/AWD/RWD Switcher</strong>
+    <ul>
+      <li>Implemented a drivetrain mode switcher for FWD, AWD, and RWD configurations.</li>
+      <li>Can be toggled dynamically during runtime for flexible performance tuning.</li>
+    </ul>
+  </li>
+  
+  <li><strong>🎮 Controller Settings</strong>
+    <ul>
+      <li>Added enhanced controller configuration options.</li>
+      <li>Features include dead zone adjustments, rumble settings, and button remapping support.</li>
+    </ul>
+  </li>
+  
+  <li><strong>🚗 Traction Control, Stability Control, and ABS</strong>
+    <ul>
+      <li><strong>Traction Control:</strong> Detects and prevents wheel slip by comparing motor RPMs.</li>
+      <li><strong>Stability Control:</strong> Automatically applies corrective braking to maintain steering stability.</li>
+      <li><strong>ABS:</strong> Optimized braking to prevent wheel lock during sudden stops.</li>
+    </ul>
+  </li>
+  
+  <li><strong>📏 Odometer</strong>
+    <ul>
+      <li>Tracks the total distance traveled by the drivetrain.</li>
+      <li>Provides useful metrics for analyzing robot performance and system wear.</li>
+    </ul>
+  </li>
+  
+  <li><strong>🛠️ Maintenance Reminders</strong>
+    <ul>
+      <li>Built-in reminders for system servicing based on usage intervals.</li>
+      <li>Customizable thresholds for drivetrain maintenance and other components.</li>
+    </ul>
+  </li>
 </ul>
-<h3>Deprecated ✖️</h3>
+
+<h2>🛠️ Fixed / Improved</h2>
 <ul>
-<li class="deprecated">Removed <code>LOCALLOGO</code>, <code>CTRLR2ENABLE</code>, and <code>VISIONENABLE</code>.</li>
+  <li><strong>🎥 GIF Player</strong>
+    <ul>
+      <li>Optimized memory usage, reducing reliance on the heap for improved stability.</li>
+      <li>SD card support for advanced GIF configuration is in the pipeline.</li>
+    </ul>
+  </li>
+  
+  <li><strong>💾 SD Card Enhancements</strong>
+    <ul>
+      <li>Improved handling of configuration file reads and data storage.</li>
+      <li>Enhanced reliability for large file operations.</li>
+    </ul>
+  </li>
+  
+  <li><strong>📋 Logging</strong>
+    <ul>
+      <li>Added color-coded log output for better readability.</li>
+      <li>Introduced scrolling log display on controller screens for real-time diagnostics.</li>
+    </ul>
+  </li>
+  
+  <li><strong>`getuseroption` Improvements</strong>
+    <ul>
+      <li>Now supports unlimited user options loaded via SD card configuration.</li>
+    </ul>
+  </li>
+  
+  <li><strong>🔁 Accurate Turning</strong>
+    <ul>
+      <li>Refined algorithms for consistent turning precision under various conditions.</li>
+    </ul>
+  </li>
+  
+  <li><strong>✨ Error Handling in `StringToLong`</strong>
+    <ul>
+      <li>Added robust error handling to manage invalid inputs gracefully.</li>
+    </ul>
+  </li>
 </ul>
-<h3>try/catch 🪝</h3>
+
+<h2>✖️ Deprecated</h2>
 <ul>
-<li class="new-feature">Enabled try and catch for error handling in <code>StringToLong</code>.</li>
+  <li>Removed the following legacy features:</li>
+  <ul>
+    <li><code>LOCALLOGO</code></li>
+    <li><code>CTRLR2ENABLE</code></li>
+    <li><code>VISIONENABLE</code></li>
+  </ul>
 </ul>
-<h2>Other Changes:</h2>
+
+<h2>🪝 Error Handling</h2>
 <ul>
-<li>Updated VS Code settings to enable additional C++ file associations and error squiggles.</li>
-<li>Updated VS Code configurations for the latest VEX SDK and Clang/GCC versions.</li>
-<li>Significant improvements and additions to the <code>configManager</code> class, including new methods for handling complex configurations.</li>
-<li>Added diagnostic mode and display task functions.</li>
-<li>Improved logging with color-coded output and scrolling text on controller screens.</li>
-<li>Various code cleanups and refactoring for better readability and maintainability.</li>
-<li>New features and improvements in the <code>gifplayer</code> and <code>logHandler</code> functions.</li>
-<li>Consolidated motor monitoring and diagnostic functionalities.</li>
+  <li>Enabled <code>try</code> and <code>catch</code> in <code>StringToLong</code> for structured exception handling.</li>
 </ul>
+
+<h2>⚙️ Other Changes</h2>
+<ul>
+  <li><strong>VS Code Updates</strong>
+    <ul>
+      <li>Added support for extended C++ file associations and error squiggles.</li>
+      <li>Updated configurations to align with the latest VEX SDK and GCC/Clang versions.</li>
+    </ul>
+  </li>
+  
+  <li><strong>Config Manager Enhancements</strong>
+    <ul>
+      <li>Introduced new methods for managing complex configurations dynamically.</li>
+      <li>Improved internal performance and error handling.</li>
+    </ul>
+  </li>
+  
+  <li><strong>📊 Motor Monitoring</strong>
+    <ul>
+      <li>Consolidated motor diagnostics into a unified monitoring system.</li>
+      <li>Enhanced visualization for drivetrain telemetry.</li>
+    </ul>
+  </li>
+  
+  <li><strong>🎥 GIF Player and Log Handler</strong>
+    <ul>
+      <li>Added new features for streamlined functionality and better performance.</li>
+    </ul>
+  </li>
+  
+  <li><strong>🧹 Code Cleanup</strong>
+    <ul>
+      <li>Refactored several modules for improved readability and maintainability.</li>
+      <li>Removed deprecated or unused functions to reduce clutter.</li>
+    </ul>
+  </li>
+</ul>
+
 <h2 id="version-3-0b2-6-26-24">Version 3.0b2 | 6/26/24</h2>
 <p>Build size: 374KB</p>
 <h3 id="new-">New 🎉</h3>
