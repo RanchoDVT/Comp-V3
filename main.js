@@ -25,7 +25,6 @@ async function neutralizeInjectedScripts() {
         console.log("Injected scripts neutralized.");
         counter++;
     }
-
     console.log(`Neutralization loop executed ${counter} times.`);
 }
 
