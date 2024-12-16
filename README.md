@@ -10,7 +10,7 @@
 <h3 id="3-0">3.0:</h3>
 <ol>
 <li>Custom theming ✅</li>
-<li>Controller settings 🔃 (Requires rewrite of User_Control)</li>
+<li>Controller settings ✅ (Requires rewrite of User_Control)</li>
 <li>AWD/FWD/RWD Switcher ✅ (Requires rewrite of User_Control)</li>
 <li>Odometer 🔃 (Requires tamper protection)</li>
 <li>Maintenance reminders 🔃</li>

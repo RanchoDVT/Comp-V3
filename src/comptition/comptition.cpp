@@ -93,6 +93,50 @@ void applyTractionControl(double &forwardVolts)
     }
 }
 
+void displayDriveModeMenu()
+{
+    primaryController.Screen.clearScreen();
+    primaryController.Screen.setCursor(1, 1);
+    primaryController.Screen.print("Select Drive Mode:");
+    primaryController.Screen.setCursor(2, 1);
+    primaryController.Screen.print("1. Left Arcade");
+    primaryController.Screen.setCursor(3, 1);
+    primaryController.Screen.print("2. Right Arcade");
+    primaryController.Screen.setCursor(4, 1);
+    primaryController.Screen.print("3. Split Arcade");
+    primaryController.Screen.setCursor(5, 1);
+    primaryController.Screen.print("4. Tank");
+
+    while (true)
+    {
+        auto [buttonPressed, pressDuration] = ctrl1BttnPressed();
+        if (buttonPressed == "1")
+        {
+            ConfigManager.setDriveMode(configManager::DriveMode::LeftArcade);
+            break;
+        }
+        else if (buttonPressed == "2")
+        {
+            ConfigManager.setDriveMode(configManager::DriveMode::RightArcade);
+            break;
+        }
+        else if (buttonPressed == "3")
+        {
+            ConfigManager.setDriveMode(configManager::DriveMode::SplitArcade);
+            break;
+        }
+        else if (buttonPressed == "4")
+        {
+            ConfigManager.setDriveMode(configManager::DriveMode::Tank);
+            break;
+        }
+        vex::this_thread::sleep_for(100);
+    }
+
+    primaryController.Screen.clearScreen();
+    primaryController.Screen.print("Drive Mode Selected");
+}
+
 void userControl()
 {
     if (!Competition.isEnabled())
@@ -107,73 +151,53 @@ void userControl()
 
     bool configMenuActive = false; // Tracks if options menu is active
 
+    // Load drive mode from config
+    configManager::DriveMode currentDriveMode = ConfigManager.getDriveMode();
+
     while (Competition.isEnabled())
     {
-        turnVolts = primaryController.Axis1.position() * 0.12; // -12 to 12
-        forwardVolts = primaryController.Axis3.position() * 0.12 * (1 - (std::abs(turnVolts) / 12));
+        switch (currentDriveMode)
+        {
+        case configManager::DriveMode::LeftArcade:
+            turnVolts = primaryController.Axis1.position() * 0.12; // -12 to 12
+            forwardVolts = primaryController.Axis3.position() * 0.12 * (1 - (std::abs(turnVolts) / 12));
+            LeftDriveSmart.spin(vex::directionType::fwd, forwardVolts + turnVolts, vex::voltageUnits::volt);
+            RightDriveSmart.spin(vex::directionType::fwd, forwardVolts - turnVolts, vex::voltageUnits::volt);
+            break;
+
+        case configManager::DriveMode::RightArcade:
+            turnVolts = primaryController.Axis4.position() * 0.12; // -12 to 12
+            forwardVolts = primaryController.Axis3.position() * 0.12 * (1 - (std::abs(turnVolts) / 12));
+            LeftDriveSmart.spin(vex::directionType::fwd, forwardVolts + turnVolts, vex::voltageUnits::volt);
+            RightDriveSmart.spin(vex::directionType::fwd, forwardVolts - turnVolts, vex::voltageUnits::volt);
+            break;
+
+        case configManager::DriveMode::SplitArcade:
+            turnVolts = primaryController.Axis4.position() * 0.12; // -12 to 12
+            forwardVolts = primaryController.Axis3.position() * 0.12 * (1 - (std::abs(turnVolts) / 12));
+            LeftDriveSmart.spin(vex::directionType::fwd, forwardVolts + turnVolts, vex::voltageUnits::volt);
+            RightDriveSmart.spin(vex::directionType::fwd, forwardVolts - turnVolts, vex::voltageUnits::volt);
+            break;
+
+        case configManager::DriveMode::Tank:
+            double leftVolts = primaryController.Axis3.position() * 0.12;  // -12 to 12
+            double rightVolts = primaryController.Axis2.position() * 0.12; // -12 to 12
+            LeftDriveSmart.spin(vex::directionType::fwd, leftVolts, vex::voltageUnits::volt);
+            RightDriveSmart.spin(vex::directionType::fwd, rightVolts, vex::voltageUnits::volt);
+            break;
+        }
 
         // Open configuration menu
         if (primaryController.ButtonUp.pressing())
         {
-            configMenuActive = true;
-            displaySystemStates();
-
-            while (primaryController.ButtonUp.pressing())
+            configMenuActive = !configMenuActive;
+            if (configMenuActive)
             {
-                vex::this_thread::sleep_for(50); // Wait for the button to release
+                displayDriveModeMenu();
+                currentDriveMode = ConfigManager.getDriveMode(); // Update currentDriveMode after selection
             }
         }
 
-        // Configuration menu logic
-        if (configMenuActive)
-        {
-            if (primaryController.ButtonX.pressing())
-            {
-                // Hold X to disable stability control, tap to toggle traction control
-                vex::this_thread::sleep_for(300); // Debounce
-                if (primaryController.ButtonX.pressing())
-                {
-                    stabilityControlEnabled = !stabilityControlEnabled;
-                    logHandler("userControl", "Stability Control " + std::string(stabilityControlEnabled ? "ENABLED" : "DISABLED"), Log::Level::Info);
-                }
-                else
-                {
-                    tractionControlEnabled = !tractionControlEnabled;
-                    logHandler("userControl", "Traction Control " + std::string(tractionControlEnabled ? "ENABLED" : "DISABLED"), Log::Level::Info);
-                }
-            }
-
-            if (primaryController.ButtonB.pressing())
-            {
-                // Hold B to disable ABS
-                vex::this_thread::sleep_for(300); // Debounce
-                if (primaryController.ButtonB.pressing())
-                {
-                    absEnabled = !absEnabled;
-                    logHandler("userControl", "ABS " + std::string(absEnabled ? "ENABLED" : "DISABLED"), Log::Level::Info);
-                }
-            }
-
-            displaySystemStates(); // Update display with current settings
-            continue;              // Skip motor control when in config menu
-        }
-
-        // Apply traction control if enabled
-        if (tractionControlEnabled)
-        {
-            applyTractionControl(forwardVolts);
-        }
-
-        // Apply stability control if enabled
-        if (stabilityControlEnabled)
-        {
-            applyStabilityControl(forwardVolts);
-        }
-
-        // Motor control logic
-        LeftDriveSmart.spin(vex::directionType::fwd, forwardVolts + turnVolts, vex::voltageUnits::volt);
-        RightDriveSmart.spin(vex::directionType::fwd, forwardVolts - turnVolts, vex::voltageUnits::volt);
-
-        vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
+        vex::this_thread::sleep_for(20);
     }
 }

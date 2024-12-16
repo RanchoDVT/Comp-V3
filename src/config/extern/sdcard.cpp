@@ -19,13 +19,15 @@ void configManager::resetOrInitializeConfig(const std::string &message)
             return;
         }
         // Write default configuration to the file
-        configFile << ";Config File:\n";
+        configFile << "# Config File:\n";
         configFile << "POLLINGRATE=1\n";
         configFile << "PRINTLOGO=true\n";
         configFile << "LOGTOFILE=true\n";
         configFile << "MAXOPTIONSSIZE=4\n";
         configFile << "CTRLR1POLLINGRATE=25\n";
         configFile << "LOGLEVEL=Info\n";
+        configFile << "DRIVEMODE=SplitArcade\n"; // Default drive mode
+        configFile << "ConfigType=Brain\n";
         configFile << "VERSION=" << Version << "\n";
         configFile.close();
     }
@@ -126,6 +128,17 @@ void configManager::setValuesFromConfig()
             else if (key == "LOGLEVEL")
             {
                 setLogLevel(stringToLogLevel(value));
+            }
+            else if (key == "DRIVEMODE")
+            {
+                if (value == "Arcade")
+                    setDriveMode(DriveMode::LeftArcade);
+                else if (value == "SplitArcade")
+                    setDriveMode(DriveMode::RightArcade);
+                else if (value == "Tank")
+                    setDriveMode(DriveMode::SplitArcade);
+                else if (value == "Custom")
+                    setDriveMode(DriveMode::Tank);
             }
             else if (key == "VERSION")
             {

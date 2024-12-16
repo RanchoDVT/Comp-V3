@@ -20,6 +20,17 @@ public:
 
     ConfigType configType;
 
+    enum class DriveMode
+    {
+        LeftArcade,
+        RightArcade,
+        SplitArcade,
+        Tank
+    };
+
+    DriveMode getDriveMode() const;
+    void setDriveMode(const DriveMode &mode);
+
     std::string teamNumber;
     std::string loadingGifPath;
     std::string autoGifPath;
@@ -81,6 +92,7 @@ private:
     int odometer;
     int lastService;
     int serviceInterval;
+    DriveMode driveMode;
 
     void readMaintenanceData();
     void writeMaintenanceData();

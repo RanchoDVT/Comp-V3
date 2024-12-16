@@ -8,7 +8,7 @@ configManager ConfigManager("config.cfg", "maintenance.txt");
 // Constructor
 configManager::configManager(const std::string &configFileName, const std::string &maintenanceFileName)
     : configFileName(configFileName), maintenanceFileName(maintenanceFileName), maxOptionSize(4), logToFile(true),
-      POLLINGRATE(5), PRINTLOGO(true), CTRLR1POLLINGRATE(25), logLevel(Log::Level::Info), odometer(0), lastService(0), serviceInterval(1000)
+      POLLINGRATE(5), PRINTLOGO(true), CTRLR1POLLINGRATE(25), logLevel(Log::Level::Info), odometer(0), lastService(0), serviceInterval(1000), driveMode(DriveMode::SplitArcade)
 {
     readMaintenanceData();
 
@@ -216,4 +216,37 @@ Log::Level configManager::stringToLogLevel(const std::string &str)
 std::string configManager::getTeamNumber() const
 {
     return teamNumber;
+}
+
+configManager::DriveMode configManager::getDriveMode() const
+{
+    return driveMode;
+}
+
+void configManager::setDriveMode(const configManager::DriveMode &mode)
+{
+    driveMode = mode; // Update the member variable
+
+    std::ofstream configFile(configFileName, std::ios::app);
+    if (configFile.is_open())
+    {
+        configFile << "DRIVEMODE=";
+        switch (mode)
+        {
+        case configManager::DriveMode::LeftArcade:
+            configFile << "LeftArcade";
+            break;
+        case configManager::DriveMode::RightArcade:
+            configFile << "RightArcade";
+            break;
+        case configManager::DriveMode::SplitArcade:
+            configFile << "SplitArcade";
+            break;
+        case configManager::DriveMode::Tank:
+            configFile << "Tank";
+            break;
+        }
+        configFile << "\n";
+        configFile.close();
+    }
 }
