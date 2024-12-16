@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const user of users) {
             const repos = await fetchRepositories(user);
             repos.forEach(repo => {
-                if (repo.name !== '.github') { // Exclude .github repository
+                if (repo.name !== '.github' && repo.name !== 'Voidless7125') { // Exclude .github and Voidless7125 repositories
                     const repoLink = document.createElement('a');
                     repoLink.href = repo.html_url;
                     repoLink.target = '_blank';
