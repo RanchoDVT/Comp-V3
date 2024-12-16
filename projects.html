@@ -7,130 +7,167 @@
     <link rel="shortcut icon" href="images/Logo.png">
     <link rel="stylesheet" href="style.css">
     <script src="main.js"></script>
-
 </head>
 
 <body>
 
     <div id="navbar"></div>
 
-    <h1>Voidless - Comp-V3 (Vex V5)</h3>
-        <h2><a href="https://github.com/RanchoDVT/Comp-V3/wiki">Comp-V3 Wiki</a></h2>
-        <h2>Config File Generator
-    </h1>
+    <h1>Voidless - Comp-V3 (Vex V5)</h1>
+    <h2><a href="https://github.com/RanchoDVT/Comp-V3/wiki">Comp-V3 Wiki</a></h2>
+    <h2>Config File Generator</h2>
     <form id="config-form" action="javascript:void(0);">
-        <h3>Motor Configuration</h2>
-            <div class="form-group">
-                <label for="front-left-port">Front Left Motor Port:</label>
-                <input type="number" id="front-left-port" name="front_left_port" min="0" max="20" value="1" required>
-            </div>
-            <div class="form-group">
-                <label for="front-left-gear-ratio">Front Left Gear Ratio:</label>
-                <select id="front-left-gear-ratio" name="front_left_gear_ratio" required>
-                    <option value="6_1">6_1</option>
-                    <option value="18_1">18_1</option>
-                    <option value="36_1">36_1</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="front-left-reversed">Front Left Reversed:</label>
-                <input type="checkbox" id="front-left-reversed" name="front_left_reversed">
-            </div>
-            <br>
-            <div class="form-group">
-                <label for="front-right-port">Front Right Motor Port:</label>
-                <input type="number" id="front-right-port" name="front_right_port" min="0" max="20" value="10" required>
-            </div>
-            <div class="form-group">
-                <label for="front-right-gear-ratio">Front Right Gear Ratio:</label>
-                <select id="front-right-gear-ratio" name="front_right_gear_ratio" required>
-                    <option value="6_1">6_1</option>
-                    <option value="18_1">18_1</option>
-                    <option value="36_1">36_1</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="front-right-reversed">Front Right Reversed:</label>
-                <input type="checkbox" id="front-right-reversed" name="front_right_reversed" checked>
-            </div>
-            <br>
-            <div class="form-group">
-                <label for="rear-left-port">Rear Left Motor Port:</label>
-                <input type="number" id="rear-left-port" name="rear_left_port" min="0" max="20" value="11" required>
-            </div>
-            <div class="form-group">
-                <label for="rear-left-gear-ratio">Rear Left Gear Ratio:</label>
-                <select id="rear-left-gear-ratio" name="rear_left_gear_ratio" required>
-                    <option value="6_1">6_1</option>
-                    <option value="18_1">18_1</option>
-                    <option value="36_1">36_1</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="rear-left-reversed">Rear Left Reversed:</label>
-                <input type="checkbox" id="rear-left-reversed" name="rear_left_reversed">
-            </div>
-            <br>
-            <div class="form-group">
-                <label for="rear-right-port">Rear Right Motor Port:</label>
-                <input type="number" id="rear-right-port" name="rear_right_port" min="0" max="20" value="20" required>
-            </div>
-            <div class="form-group">
-                <label for="rear-right-gear-ratio">Rear Right Gear Ratio:</label>
-                <select id="rear-right-gear-ratio" name="rear_right_gear_ratio" required>
-                    <option value="6_1">6_1</option>
-                    <option value="18_1">18_1</option>
-                    <option value="36_1">36_1</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="rear-right-reversed">Rear Right Reversed:</label>
-                <input type="checkbox" id="rear-right-reversed" name="rear_right_reversed" checked>
-            </div>
-            <br>
-            <div class="form-group">
-                <label for="inertial-port">Inertial Sensor Port:</label>
-                <input type="number" id="inertial-port" name="inertial_port" min="0" max="20" value="3" required>
-            </div>
-            <br>
-            <div>
-                <label for="rear-bumper">Rear bumper 3-Wire Port:</label>
-                <select id="rear-bumper" name="rear_bumper_port" required>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                    <option value="E">E</option>
-                    <option value="F">F</option>
-                    <option value="G">G</option>
-                </select>
-            </div>
-            </div>
-            <h2>Other Settings</h2>
-            <div class="form-group">
-                <label for="print-logo">Print Logo:</label>
-                <input type="checkbox" id="print-logo" name="print_logo" checked>
-            </div>
-            <div class="form-group">
-                <label for="log-to-file">Log to File:</label>
-                <input type="checkbox" id="log-to-file" name="log_to_file" checked>
-            </div>
-            <div class="form-group">
-                <label for="max-options-size">Max Options Size:</label>
-                <input type="number" id="max-options-size" name="max_options_size" min="2" max="10" value="4" required>
-            </div>
-            <div class="form-group">
-                <label for="polling-rate">Polling Rate:</label>
-                <input type="number" id="polling-rate" name="polling_rate" min="1" max="100" value="5" required>
-            </div>
-            <div class="form-group">
-                <label for="ctrlr1-polling-rate">Controller 1 Polling Rate:</label>
-                <input type="number" id="ctrlr1-polling-rate" name="ctrlr1_polling_rate" min="1" max="100" value="25"
-                    required>
-            </div>
+        <h3>Motor Configuration</h3>
+        <div class="form-group">
+            <label for="front-left-port">Front Left Motor Port:</label>
+            <input type="number" id="front-left-port" name="front_left_port" min="0" max="20" value="1" required>
+        </div>
+        <div class="form-group">
+            <label for="front-left-gear-ratio">Front Left Gear Ratio:</label>
+            <select id="front-left-gear-ratio" name="front_left_gear_ratio" required>
+                <option value="6_1" selected>6_1</option>
+                <option value="18_1">18_1</option>
+                <option value="36_1">36_1</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="front-left-reversed">Front Left Reversed:</label>
+            <input type="checkbox" id="front-left-reversed" name="front_left_reversed">
+        </div>
+        <br>
+        <div class="form-group">
+            <label for="front-right-port">Front Right Motor Port:</label>
+            <input type="number" id="front-right-port" name="front_right_port" min="0" max="20" value="10" required>
+        </div>
+        <div class="form-group">
+            <label for="front-right-gear-ratio">Front Right Gear Ratio:</label>
+            <select id="front-right-gear-ratio" name="front_right_gear_ratio" required>
+                <option value="6_1" selected>6_1</option>
+                <option value="18_1">18_1</option>
+                <option value="36_1">36_1</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="front-right-reversed">Front Right Reversed:</label>
+            <input type="checkbox" id="front-right-reversed" name="front_right_reversed" checked>
+        </div>
+        <br>
+        <div class="form-group">
+            <label for="rear-left-port">Rear Left Motor Port:</label>
+            <input type="number" id="rear-left-port" name="rear_left_port" min="0" max="20" value="11" required>
+        </div>
+        <div class="form-group">
+            <label for="rear-left-gear-ratio">Rear Left Gear Ratio:</label>
+            <select id="rear-left-gear-ratio" name="rear_left_gear_ratio" required>
+                <option value="6_1" selected>6_1</option>
+                <option value="18_1">18_1</option>
+                <option value="36_1">36_1</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="rear-left-reversed">Rear Left Reversed:</label>
+            <input type="checkbox" id="rear-left-reversed" name="rear_left_reversed">
+        </div>
+        <br>
+        <div class="form-group">
+            <label for="rear-right-port">Rear Right Motor Port:</label>
+            <input type="number" id="rear-right-port" name="rear_right_port" min="0" max="20" value="20" required>
+        </div>
+        <div class="form-group">
+            <label for="rear-right-gear-ratio">Rear Right Gear Ratio:</label>
+            <select id="rear-right-gear-ratio" name="rear_right_gear_ratio" required>
+                <option value="6_1" selected>6_1</option>
+                <option value="18_1">18_1</option>
+                <option value="36_1">36_1</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="rear-right-reversed">Rear Right Reversed:</label>
+            <input type="checkbox" id="rear-right-reversed" name="rear_right_reversed" checked>
+        </div>
+        <br>
+        <div class="form-group">
+            <label for="inertial-port">Inertial Sensor Port:</label>
+            <input type="number" id="inertial-port" name="inertial_port" min="0" max="20" value="3" required>
+        </div>
+        <br>
+        <div>
+            <label for="rear-bumper">Rear bumper 3-Wire Port:</label>
+            <select id="rear-bumper" name="rear_bumper_port" required>
+                <option value="A" selected>A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+                <option value="G">G</option>
+            </select>
+        </div>
+        <br>
+        <h2>Other Settings</h2>
+        <div class="form-group">
+            <label for="print-logo">Print Logo:</label>
+            <input type="checkbox" id="print-logo" name="print_logo" checked>
+        </div>
+        <div class="form-group">
+            <label for="log-to-file">Log to File:</label>
+            <input type="checkbox" id="log-to-file" name="log_to_file" checked>
+        </div>
+        <div class="form-group">
+            <label for="max-options-size">Max Options Size:</label>
+            <input type="number" id="max-options-size" name="max_options_size" min="2" max="10" value="4" required>
+        </div>
+        <div class="form-group">
+            <label for="polling-rate">Polling Rate:</label>
+            <input type="number" id="polling-rate" name="polling_rate" min="1" max="100" value="5" required>
+        </div>
+        <div class="form-group">
+            <label for="ctrlr1-polling-rate">Controller 1 Polling Rate:</label>
+            <input type="number" id="ctrlr1-polling-rate" name="ctrlr1_polling_rate" min="1" max="100" value="25" required>
+        </div>
+        <div class="form-group">
+            <label for="config-type">Config Type:</label>
+            <select id="config-type" name="config_type" required>
+                <option value="Brain" selected>Brain</option>
+                <option value="Controller">Controller</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="team-number">Team Number:</label>
+            <input type="number" id="team-number" name="team_number" min="0" value="12" required>
+        </div>
+        <div class="form-group">
+            <label for="loading-gif-path">Loading GIF Path:</label>
+            <input type="text" id="loading-gif-path" name="loading_gif_path" value="loading.gif" required>
+        </div>
+        <div class="form-group">
+            <label for="auto-gif-path">Auto GIF Path:</label>
+            <input type="text" id="auto-gif-path" name="auto_gif_path" value="auto.gif" required>
+        </div>
+        <div class="form-group">
+            <label for="drive-gif-path">Drive GIF Path:</label>
+            <input type="text" id="drive-gif-path" name="drive_gif_path" value="drive.gif" required>
+        </div>
+        <div class="form-group">
+            <label for="custom-message">Custom Message:</label>
+            <input type="text" id="custom-message" name="custom_message" value="test">
+        </div>
+        <div class="form-group">
+            <label for="drive-mode">Drive Mode:</label>
+            <select id="drive-mode" name="drive_mode" required>
+                <option value="Left Arcade">Left Arcade</option>
+                <option value="Right Arcade">Right Arcade</option>
+                <option value="Split" selected>Split</option>
+                <option value="Tank">Tank</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="gif-player">Enable GIF Player:</label>
+            <input type="checkbox" id="gif-player" name="gif_player" checked>
+        </div>
 
-            <button id="submit" type="submit">Generate Config</button>
-            <button id="copy-button" style="display: none;">Copy to Clipboard</button>
+        <button id="submit" type="submit">Generate Config</button>
+        <button id="copy-button" style="display: none;">Copy to Clipboard</button>
     </form>
     <pre id="config-output" class="config-output"></pre>
     <div id="changelog-content"></div>

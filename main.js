@@ -1,51 +1,51 @@
- function timeout(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-    async function Never() {
-        await timeout(75);
-        console.clear();
-        console.log("=====");
+async function Never() {
+    await timeout(75);
+    console.clear();
+    console.log("=====");
 
-        // Functions
-        var getLoaderPolicy = function () { }    // no-op function;
-        var loadES6 = function () { }    // no-op function;
-        var isYoutube = function () { }    // no-op function;
-        var checkCurrentSite = function () { }    // no-op function;
-        var getHardBlockPolicy = function () { }    // no-op function;
-        var hardBlock = function () { }    // no-op function;
-        var stopVideo = function () { }    // no-op function;
-        var updateLocation = function () { }    // no-op function;
+    // Functions
+    var getLoaderPolicy = function () { }    // no-op function;
+    var loadES6 = function () { }    // no-op function;
+    var isYoutube = function () { }    // no-op function;
+    var checkCurrentSite = function () { }    // no-op function;
+    var getHardBlockPolicy = function () { }    // no-op function;
+    var hardBlock = function () { }    // no-op function;
+    var stopVideo = function () { }    // no-op function;
+    var updateLocation = function () { }    // no-op function;
 
-        // Variables
-        var hardBlockPolicy = null;
-        var prevURL = null;
+    // Variables
+    var hardBlockPolicy = null;
+    var prevURL = null;
 
 
 
-        console.log("=====");
+    console.log("=====");
 
-        // re-assign
-        window.isYoutube = function () { }    // no-op function
-        window.loadES6 = function () { }    // no-op function
-        window.checkCurrentSite = function () { }    // no-op function
-        window.getHardBlockPolicy = function () { }    // no-op function
-        window.hardBlock = function () { }    // no-op function
-        window.stopVideo = function () { }    // no-op function
-        window.updateLocation = function () { }    // no-op function
-        window.initFlagScanning = function () { }    // no-op function
-        window.getLoaderPolicy = function () { }    // no-op function
-        window.loaderPolicy = function () { }    // no-op function
+    // re-assign
+    window.isYoutube = function () { }    // no-op function
+    window.loadES6 = function () { }    // no-op function
+    window.checkCurrentSite = function () { }    // no-op function
+    window.getHardBlockPolicy = function () { }    // no-op function
+    window.hardBlock = function () { }    // no-op function
+    window.stopVideo = function () { }    // no-op function
+    window.updateLocation = function () { }    // no-op function
+    window.initFlagScanning = function () { }    // no-op function
+    window.getLoaderPolicy = function () { }    // no-op function
+    window.loaderPolicy = function () { }    // no-op function
 
-        console.log("Just incase, Functions deleted again:");
+    console.log("Just incase, Functions deleted again:");
 
-        console.log("=====");
-    }
+    console.log("=====");
+}
 Never()
 
 document.addEventListener('DOMContentLoaded', () => {
-    
-   
+
+
     document.getElementById("year").innerHTML = new Date().getFullYear();
 
     async function fetchFile(url, targetElement) {
@@ -134,6 +134,13 @@ LOGTOFILE=${formData.has('log_to_file')}
 MAXOPTIONSSIZE=${formData.get('max_options_size')}
 POLLINGRATE=${formData.get('polling_rate')}
 CTRLR1POLLINGRATE=${formData.get('ctrlr1_polling_rate')}
+CONFIGTYPE=${formData.get('config_type')}
+TEAMNUMBER=${formData.get('team_number')}
+LOADINGGIFPATH=${formData.get('loading_gif_path')}
+AUTOGIFPATH=${formData.get('auto_gif_path')}
+DRIVEGIFPATH=${formData.get('drive_gif_path')}
+CUSTOMMESSAGE=${formData.get('custom_message')}
+DRIVEMODE=${formData.get('drive_mode')}
 VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
 
             (document.getElementById('copy-button')).style.display = 'inline-block';
