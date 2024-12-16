@@ -1,19 +1,30 @@
 <h1 id="version-history-">Version history 📕</h1>
-<h2 id="version-3-0b3-7-13-24-newest-">Version 3.0b3 | 7/13/24 (Newest)</h2>
-<p>Build size: 375KB</p>
-<h3 id="fixed-improved-">Fixed / Improved 🛠️</h3>
+<h2>Version 3.0b3 | 12/15/24 (Newest)</h2>
+<p><strong>Build size:</strong> 229KB</p>
+<h3>Fixed / Improved 🛠️</h3>
 <ul>
-<li>Improved <code>getuseroption</code> to support unlimited amount of options!<br>  You can configure the maximum amount with an SD card.</li>
-<li>Turning is now more accurate.</li>
-<li><code>StringToLong</code> has better error handling.</li>
+<li>Improved <code>getuseroption</code> to support unlimited options with an SD card configuration.</li>
+<li>More accurate turning.</li>
+<li>Enhanced error handling in <code>StringToLong</code>.</li>
 </ul>
-<h3 id="deprecated-">Deprecated ✖️</h3>
+<h3>Deprecated ✖️</h3>
 <ul>
-<li><code>LOCALLOGO</code>, <code>CTRLR2ENABLE</code> and <code>VISIONENABLE</code> will be removed. Local images are no longer supported; a second controller is auto-detected, and A vision sensor is auto-detected.</li>
+<li class="deprecated">Removed <code>LOCALLOGO</code>, <code>CTRLR2ENABLE</code>, and <code>VISIONENABLE</code>.</li>
 </ul>
-<h3 id="try-catch-">try/catch 🪝</h3>
+<h3>try/catch 🪝</h3>
 <ul>
-<li>Try and catch are now enabled. I did this to catch errors in StringToLong. Other error catches will be migrated.</li>
+<li class="new-feature">Enabled try and catch for error handling in <code>StringToLong</code>.</li>
+</ul>
+<h2>Other Changes:</h2>
+<ul>
+<li>Updated VS Code settings to enable additional C++ file associations and error squiggles.</li>
+<li>Updated VS Code configurations for the latest VEX SDK and Clang/GCC versions.</li>
+<li>Significant improvements and additions to the <code>configManager</code> class, including new methods for handling complex configurations.</li>
+<li>Added diagnostic mode and display task functions.</li>
+<li>Improved logging with color-coded output and scrolling text on controller screens.</li>
+<li>Various code cleanups and refactoring for better readability and maintainability.</li>
+<li>New features and improvements in the <code>gifplayer</code> and <code>logHandler</code> functions.</li>
+<li>Consolidated motor monitoring and diagnostic functionalities.</li>
 </ul>
 <h2 id="version-3-0b2-6-26-24">Version 3.0b2 | 6/26/24</h2>
 <p>Build size: 374KB</p>
