@@ -62,5 +62,6 @@
 		"typeinfo": "cpp",
 		"variant": "cpp",
 		"ranges": "cpp"
-	}
+	},
+	"C_Cpp.dimInactiveRegions": false
 }

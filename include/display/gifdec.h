@@ -67,7 +67,6 @@ namespace vex
         gd_GIF *_gif = nullptr;
         int _sx;
         int _sy;
-        void *_gifmem = nullptr;
         void *_buffer = nullptr;
         int _frame = 0;
 
@@ -79,7 +78,7 @@ namespace vex
         void cleanup();
 
     public:
-        Gif(const char *fname, int sx, int sy, bool bMemoryBuffer = true);
+        Gif(const char *fname, int sx, int sy);
         ~Gif();
         int getFrameIndex();
     };

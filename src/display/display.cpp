@@ -1,6 +1,6 @@
 #include "vex.h"
 
-#include <algorithm>
+
 #include <numeric>
 #include <format>
 
