@@ -1,4 +1,7 @@
 #include "vex.h"
+#include <ranges>
+#include <chrono>
+#include <format>
 
 void calibrateGyro()
 {
@@ -11,215 +14,124 @@ void calibrateGyro()
 	return;
 }
 
-std::pair<std::string, int> ctrl1BttnPressed()
+std::map<std::string, int> controllerButtonsPressed(const vex::controller &controller)
 {
 	if (Competition.isEnabled())
 	{
-		logHandler("ctrl1BttnPressed", "Robot is IN competition mode!", Log::Level::Error, 3);
+		logHandler("controllerButtonsPressed", "Robot is IN competition mode!", Log::Level::Error, 3);
 	}
 
-	std::string buttonPressed;
-	int pressDuration = 0;
+	std::map<std::string, int> buttonPressTimes;
 	vex::timer pressTimer;
+
+	struct ButtonInfo
+	{
+		const vex::controller::button &button;
+		const std::string name;
+	};
+
+	const std::array buttons = {
+		ButtonInfo{controller.ButtonA, "A"},
+		ButtonInfo{controller.ButtonX, "X"},
+		ButtonInfo{controller.ButtonY, "Y"},
+		ButtonInfo{controller.ButtonB, "B"},
+		ButtonInfo{controller.ButtonUp, "UP"},
+		ButtonInfo{controller.ButtonDown, "DOWN"},
+		ButtonInfo{controller.ButtonRight, "RIGHT"},
+		ButtonInfo{controller.ButtonLeft, "LEFT"},
+		ButtonInfo{controller.ButtonL1, "L1"},
+		ButtonInfo{controller.ButtonL2, "L2"},
+		ButtonInfo{controller.ButtonR1, "R1"},
+		ButtonInfo{controller.ButtonR2, "R2"}};
+
+	auto checkButtonPress = [&](const ButtonInfo &buttonInfo)
+	{
+		if (buttonInfo.button.pressing())
+		{
+			pressTimer.clear();
+			while (buttonInfo.button.pressing())
+			{
+				vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
+			}
+			buttonPressTimes[buttonInfo.name] = pressTimer.time();
+		}
+	};
+
 	while (!Competition.isEnabled())
 	{
-		if (primaryController.ButtonA.pressing())
+		for (const auto &buttonInfo : buttons)
 		{
-			buttonPressed = "A";
-			pressTimer.clear();
-			while (primaryController.ButtonA.pressing())
-			{
-				vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
-			}
-			pressDuration = pressTimer.time();
-			break;
-		}
-		else if (primaryController.ButtonX.pressing())
-		{
-			buttonPressed = "X";
-			pressTimer.clear();
-			while (primaryController.ButtonX.pressing())
-			{
-				vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
-			}
-			pressDuration = pressTimer.time();
-			break;
-		}
-		else if (primaryController.ButtonY.pressing())
-		{
-			buttonPressed = "Y";
-			pressTimer.clear();
-			while (primaryController.ButtonY.pressing())
-			{
-				vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
-			}
-			pressDuration = pressTimer.time();
-			break;
-		}
-		else if (primaryController.ButtonB.pressing())
-		{
-			buttonPressed = "B";
-			pressTimer.clear();
-			while (primaryController.ButtonB.pressing())
-			{
-				vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
-			}
-			pressDuration = pressTimer.time();
-			break;
-		}
-		else if (primaryController.ButtonUp.pressing())
-		{
-			buttonPressed = "UP";
-			pressTimer.clear();
-			while (primaryController.ButtonUp.pressing())
-			{
-				vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
-			}
-			pressDuration = pressTimer.time();
-			break;
-		}
-		else if (primaryController.ButtonDown.pressing())
-		{
-			buttonPressed = "DOWN";
-			pressTimer.clear();
-			while (primaryController.ButtonDown.pressing())
-			{
-				vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
-			}
-			pressDuration = pressTimer.time();
-			break;
-		}
-		else if (primaryController.ButtonRight.pressing())
-		{
-			buttonPressed = "RIGHT";
-			pressTimer.clear();
-			while (primaryController.ButtonRight.pressing())
-			{
-				vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
-			}
-			pressDuration = pressTimer.time();
-			break;
-		}
-		else if (primaryController.ButtonLeft.pressing())
-		{
-			buttonPressed = "LEFT";
-			pressTimer.clear();
-			while (primaryController.ButtonLeft.pressing())
-			{
-				vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
-			}
-			pressDuration = pressTimer.time();
-			break;
-		}
-		else if (primaryController.ButtonL1.pressing())
-		{
-			buttonPressed = "L1";
-			pressTimer.clear();
-			while (primaryController.ButtonL1.pressing())
-			{
-				vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
-			}
-			pressDuration = pressTimer.time();
-			break;
-		}
-		else if (primaryController.ButtonL2.pressing())
-		{
-			buttonPressed = "L2";
-			pressTimer.clear();
-			while (primaryController.ButtonL2.pressing())
-			{
-				vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
-			}
-			pressDuration = pressTimer.time();
-			break;
-		}
-		else if (primaryController.ButtonR1.pressing())
-		{
-			buttonPressed = "R1";
-			pressTimer.clear();
-			while (primaryController.ButtonR1.pressing())
-			{
-				vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
-			}
-			pressDuration = pressTimer.time();
-			break;
-		}
-		else if (primaryController.ButtonR2.pressing())
-		{
-			buttonPressed = "R2";
-			pressTimer.clear();
-			while (primaryController.ButtonR2.pressing())
-			{
-				vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
-			}
-			pressDuration = pressTimer.time();
-			break;
+			checkButtonPress(buttonInfo);
 		}
 
 		vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
 	}
 
-	std::string message = "Selected button: " + buttonPressed + ", Duration: " + std::to_string(pressDuration) + " ms";
-	logHandler("ctrl1BttnPressed", message, Log::Level::Debug);
-	return std::make_pair(buttonPressed, pressDuration);
+	for (const auto &[button, duration] : buttonPressTimes)
+	{
+		std::string message = std::format("Button: {}, Duration: {} ms", button, duration);
+		logHandler("controllerButtonsPressed", message, Log::Level::Debug);
+	}
+
+	return buttonPressTimes;
 }
 
 void motorMonitor()
 {
 	logHandler("motorMonitor", "motorMonitor is starting up...", Log::Level::Trace);
 
+	auto logOverheat = [&](const std::string &motorName, int temperature)
+	{
+		if (temperature >= 55)
+		{
+			logHandler("motorMonitor", std::format("{} overheat: {}°", motorName, temperature), Log::Level::Warn, 3);
+		}
+	};
+
 	while (Competition.isEnabled())
 	{
-		int frontLeftTemp = frontLeftMotor.temperature(vex::temperatureUnits::celsius);
-		int frontRightTemp = frontRightMotor.temperature(vex::temperatureUnits::celsius);
-		int rearLeftTemp = rearLeftMotor.temperature(vex::temperatureUnits::celsius);
-		int rearRightTemp = rearRightMotor.temperature(vex::temperatureUnits::celsius);
+		std::array motorTemps = {
+			static_cast<int>(frontLeftMotor.temperature(vex::temperatureUnits::celsius)),
+			static_cast<int>(frontRightMotor.temperature(vex::temperatureUnits::celsius)),
+			static_cast<int>(rearLeftMotor.temperature(vex::temperatureUnits::celsius)),
+			static_cast<int>(rearRightMotor.temperature(vex::temperatureUnits::celsius))};
 
-		// Get the position of both motors
-		int leftMotorPosition = LeftDriveSmart.position(vex::rotationUnits::deg);
-		int rightMotorPosition = RightDriveSmart.position(vex::rotationUnits::deg);
+		constexpr std::array motorNames = {"FLM", "FRM", "RLM", "RRM"};
 
-		// Check for overheat conditions for each motor
-		if (frontLeftTemp >= 55)
+		for (size_t i = 0; i < motorTemps.size(); ++i)
 		{
-			logHandler("motorMonitor", "FLM overheat: " + std::to_string(frontLeftTemp) + "°", Log::Level::Warn, 3);
+			logOverheat(motorNames[i], motorTemps[i]);
 		}
-		if (frontRightTemp >= 55)
-		{
-			logHandler("motorMonitor", "FRM overheat: " + std::to_string(frontRightTemp) + "°", Log::Level::Warn, 3);
-		}
-		if (rearLeftTemp >= 55)
-		{
-			logHandler("motorMonitor", "RLM overheat: " + std::to_string(rearLeftTemp) + "°", Log::Level::Warn, 3);
-		}
-		if (rearRightTemp >= 55)
-		{
-			logHandler("motorMonitor", "RRM overheat: " + std::to_string(rearRightTemp) + "°", Log::Level::Warn, 3);
-		}
+
 		if (Brain.Battery.voltage() < 12)
 		{
 			logHandler("motorMonitor", "Brain voltage at a critical level!", Log::Level::Warn, 3);
 		}
-		// Get the average of the two motors
+
+		int leftMotorPosition = LeftDriveSmart.position(vex::rotationUnits::deg);
+		int rightMotorPosition = RightDriveSmart.position(vex::rotationUnits::deg);
 		int averagePosition = (leftMotorPosition + rightMotorPosition) / 2;
 
-		// Update the odometer with the new position
 		ConfigManager.updateOdometer(averagePosition);
 
-		// Log motor temperatures
-		std::string motorTemps = "\n | LeftTemp: " + std::to_string(frontLeftTemp) + "°\n | RightTemp: " + std::to_string(frontRightTemp) + "°\n | RearLeftTemp: " + std::to_string(rearLeftTemp) + "°\n | RearRightTemp: " + std::to_string(rearRightTemp) + "°\n | Battery Voltage: " + std::to_string(Brain.Battery.voltage()) + "V\n";
-		logHandler("motorMonitor", motorTemps, Log::Level::Info);
-		std::string dataBuffer = "\nX Axis: " + std::to_string(InertialGyro.pitch(vex::rotationUnits::deg)) + "\nY Axis: " + std::to_string(InertialGyro.roll(vex::rotationUnits::deg)) + "\nZ Axis: " + std::to_string(InertialGyro.yaw(vex::rotationUnits::deg));
+		std::string motorTempsStr = std::format("\n | LeftTemp: {}°\n | RightTemp: {}°\n | RearLeftTemp: {}°\n | RearRightTemp: {}°\n | Battery Voltage: {}V\n",
+												motorTemps[0], motorTemps[1], motorTemps[2], motorTemps[3], Brain.Battery.voltage());
+		logHandler("motorMonitor", motorTempsStr, Log::Level::Info);
+
+		std::string dataBuffer = std::format("\nX Axis: {}\nY Axis: {}\nZ Axis: {}",
+											 InertialGyro.pitch(vex::rotationUnits::deg),
+											 InertialGyro.roll(vex::rotationUnits::deg),
+											 InertialGyro.yaw(vex::rotationUnits::deg));
 		logHandler("motorMonitor", dataBuffer, Log::Level::Info);
+
 		clearScreen(false, true, true);
-		primaryController.Screen.print("FLM: %d° | FRM: %d°", frontLeftTemp, frontRightTemp);
+		primaryController.Screen.print("FLM: %d° | FRM: %d°", motorTemps[0], motorTemps[1]);
 		primaryController.Screen.newLine();
-		primaryController.Screen.print("RLM: %d° | RRM: %d°", rearLeftTemp, rearRightTemp);
+		primaryController.Screen.print("RLM: %d° | RRM: %d°", motorTemps[2], motorTemps[3]);
 		primaryController.Screen.newLine();
 		primaryController.Screen.print("Battery: %.1fV", Brain.Battery.voltage());
 		vex::this_thread::sleep_for(5000);
 	}
-	return;
 }
 
 void gifplayer()

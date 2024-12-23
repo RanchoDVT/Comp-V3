@@ -109,7 +109,12 @@ void displayDriveModeMenu()
 
     while (true)
     {
-        auto [buttonPressed, pressDuration] = ctrl1BttnPressed();
+        auto buttonPressDurations = controllerButtonsPressed(primaryController);
+        std::string buttonPressed;
+        if (!buttonPressDurations.empty())
+        {
+            buttonPressed = buttonPressDurations.begin()->first;
+        }
         if (buttonPressed == "1")
         {
             ConfigManager.setDriveMode(configManager::DriveMode::LeftArcade);

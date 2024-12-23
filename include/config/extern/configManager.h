@@ -5,9 +5,9 @@ class configManager
 {
 public:
     configManager(const std::string &configFileName, const std::string &maintenanceFileName);
-    void resetOrInitializeConfig(const std::string &message);
-    bool stringToBool(const std::string &str);
-    long stringToLong(const std::string &str);
+    void resetOrInitializeConfig(std::string_view message);
+    bool stringToBool(std::string_view str);
+    long stringToLong(std::string_view str);
     void setValuesFromConfig();
     void parseConfig();
     void parseComplexConfig(std::ifstream &configFile, const std::string &section);

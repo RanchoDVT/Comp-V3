@@ -1,6 +1,8 @@
 #include "vex.h"
 
 #include <algorithm>
+#include <numeric>
+#include <format>
 
 // define some more colors
 const vex::color grey((uint32_t)0x202020);
@@ -11,20 +13,21 @@ const vex::color lred((uint32_t)0x603030);
 /*-----------------------------------------------------------------------------*/
 /** @brief      Display data for one motor                                     */
 /*-----------------------------------------------------------------------------*/
-void displayMotorData(vex::motor &m) {
+void displayMotorData(vex::motor &m)
+{
     int ypos = 0;
     int xpos = m.index() * 48;
 
     // There's no C++ API to get motor command value, use C API, this returns rpm
-    int v1  = vexMotorVelocityGet(m.index());
+    int v1 = vexMotorVelocityGet(m.index());
 
     // The actual velocity of the motor in rpm
-    int v2  = m.velocity(vex::velocityUnits::rpm);
+    int v2 = m.velocity(vex::velocityUnits::rpm);
 
     // The position of the motor internal encoder in revolutions
     double pos = m.position(vex::rotationUnits::rev);
 
-    // Motor current in Amps    
+    // Motor current in Amps
     double c1 = m.current();
 
     // Motor temperature
@@ -34,74 +37,81 @@ void displayMotorData(vex::motor &m) {
 
     // background color based on
     // device and whether it's left, right or other motor
-    if (!m.installed()) {
+    if (!m.installed())
+    {
         // no motor
         Brain.Screen.setFillColor(grey);
-    } else if (m.index() == frontLeftMotor.index() || m.index() == rearLeftMotor.index()) {
+    }
+    else if (m.index() == frontLeftMotor.index() || m.index() == rearLeftMotor.index())
+    {
         Brain.Screen.setFillColor(lblue);
-    } else if (m.index() == frontRightMotor.index() || m.index() == rearRightMotor.index()) {
+    }
+    else if (m.index() == frontRightMotor.index() || m.index() == rearRightMotor.index())
+    {
         Brain.Screen.setFillColor(lred);
-    } else {
+    }
+    else
+    {
         Brain.Screen.setFillColor(dgrey);
     }
-    
+
     // Draw outline for motor info
     Brain.Screen.setPenColor(vex::white);
     int w = (m.index() < 9) ? 49 : 48;
     Brain.Screen.drawRectangle(xpos, ypos, w, 79);
-    
+
     // no motor, then return early
-    if (!m.installed()) {
+    if (!m.installed())
+    {
         Brain.Screen.printAt(xpos + 15, ypos + 30, true, "NC");
         return;
     }
 
     // Show commanded speed
-    if (v1 != 0)
-        Brain.Screen.setPenColor(vex::green);
-    else
-        Brain.Screen.setPenColor(vex::white);
-    Brain.Screen.printAt(xpos + 13, ypos + 13, true, "%4d", v1);
+    Brain.Screen.setPenColor(v1 != 0 ? vex::green : vex::white);
+    Brain.Screen.printAt(xpos + 13, ypos + 13, true, "{:4}", v1);
 
     // Show actual speed
     Brain.Screen.setPenColor(vex::yellow);
-    Brain.Screen.printAt(xpos + 13, ypos + 30, true, "%4d", v2);
+    Brain.Screen.printAt(xpos + 13, ypos + 30, true, "{:4}", v2);
 
     // Show position
-    Brain.Screen.printAt(xpos + 5, ypos + 45, true, "%5.1f", pos);
+    Brain.Screen.printAt(xpos + 5, ypos + 45, true, "{:5.1f}", pos);
 
     // Show current
-    Brain.Screen.printAt(xpos + 5, ypos + 60, true, "%4.1fA", c1);
+    Brain.Screen.printAt(xpos + 5, ypos + 60, true, "{:4.1f}A", c1);
 
     // Show temperature
-    Brain.Screen.printAt(xpos + 5, ypos + 75, true, "%4.0fC", t1);
+    Brain.Screen.printAt(xpos + 5, ypos + 75, true, "{:4.0f}C", t1);
 
     Brain.Screen.setPenColor(vex::white);
-    Brain.Screen.drawLine(xpos, ypos + 14, xpos + 48, ypos + 14);  
+    Brain.Screen.drawLine(xpos, ypos + 14, xpos + 48, ypos + 14);
 }
 
 /*----------------------------------------------------------------------------*/
 /** @brief  Display task - show some useful motor data                        */
 /*----------------------------------------------------------------------------*/
-void displayTask() {
+void displayTask()
+{
     Brain.Screen.setFont(vex::prop40);
     Brain.Screen.setPenColor(vex::red);
     Brain.Screen.printAt(90, 160, "DIAGNOSTIC MODE");
 
-    vex::motor *motors[] = { &frontLeftMotor, 
-                             &frontRightMotor,
-                             &rearLeftMotor,
-                             &rearRightMotor
-                           };
-                      
-    while (true) {
-        for (int i = 0; i < 4; i++) {
-            displayMotorData(*motors[i]);
+    vex::motor *motors[] = {&frontLeftMotor,
+                            &frontRightMotor,
+                            &rearLeftMotor,
+                            &rearRightMotor};
+
+    while (true)
+    {
+        for (auto &motor : motors)
+        {
+            displayMotorData(*motor);
         }
 
         // Display battery status
         Brain.Screen.setCursor(10, 1);
-        Brain.Screen.print("Battery: %d%%", Brain.Battery.capacity());
+        Brain.Screen.print("Battery: {}%", Brain.Battery.capacity());
 
         // Display using back buffer, stops flickering
         Brain.Screen.render();
@@ -144,15 +154,11 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
         return "DEFAULT";
     }
 
-    std::string optmessage = "Options: ";
-    for (auto optionIterator = options.begin(); optionIterator != options.end(); ++optionIterator)
-    {
-        if (optionIterator != options.begin())
-        {
-            optmessage += ", "; // Separate options with a comma and space (except for the first option)
-        }
-        optmessage += *optionIterator;
-    }
+    std::string optmessage = "Options: " + std::accumulate(std::next(options.begin()), options.end(), options[0],
+                                                           [](const std::string &a, const std::string &b)
+                                                           {
+                                                               return a + ", " + b;
+                                                           });
 
     logHandler("getUserOption", optmessage, Log::Level::Debug);
 
@@ -181,10 +187,12 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
         partnerController.Screen.print("Waiting for #1...");
 
         int displayedOptions = std::min(static_cast<int>(options.size() - offset), static_cast<int>(buttons.size()));
+        std::string displayBuffer;
+        displayBuffer.reserve(128); // Reserve some space to avoid multiple allocations (Fixes bug of random characters appearing on the screen)
+
         for (int i = 0; i < displayedOptions; ++i) // Display available options
         {
-            primaryController.Screen.newLine();
-            primaryController.Screen.print("%s: %s", buttons[i].c_str(), options[i + offset].c_str());
+            displayBuffer += std::format("{}: {}\n", buttons[i], options[i + offset]);
             buttonString += buttons[i];
             if (i != displayedOptions - 1) // Add comma if not the last button
             {
@@ -194,58 +202,67 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
 
         if (options.size() > buttons.size())
         {
-            primaryController.Screen.newLine();
             if (offset + displayedOptions < static_cast<int>(options.size()))
             {
-                primaryController.Screen.print(">");
+                displayBuffer += ">\n";
             }
             if (offset > 0)
             {
-                primaryController.Screen.print("^");
+                displayBuffer += "^\n";
             }
         }
 
-        optmessage = "Available buttons for current visible options: " + buttonString; // Append button string to message.
+        primaryController.Screen.print(displayBuffer.c_str());
+
+        optmessage = std::format("Available buttons for current visible options: {}", buttonString); // Append button string to message.
         logHandler("getUserOption", optmessage, Log::Level::Debug);
 
-        const std::string &buttonPressed = std::get<0>(ctrl1BttnPressed());
+        auto buttonPressed = controllerButtonsPressed(primaryController);
+        std::string buttonPressedStr;
+        if (!buttonPressed.empty())
+        {
+            buttonPressedStr = buttonPressed.begin()->first;
+        }
 
-        auto buttonIt = std::find(buttons.begin(), buttons.end(), buttonPressed);
+        auto buttonIt = std::find(buttons.begin(), buttons.end(), buttonPressedStr);
         if (buttonIt != buttons.end())
         {
             int buttonIndex = std::distance(buttons.begin(), buttonIt);
             if (buttonIndex < displayedOptions)
             {
                 Index = buttonIndex + offset;
-                logHandler("getUserOption", "[Valid Selection] Index = " + std::to_string(Index) + " | Offset = " + std::to_string(offset), Log::Level::Debug);
+                logHandler("getUserOption", std::format("[Valid Selection] Index = {} | Offset = {} | Button Pressed = {}", Index, offset, buttonPressedStr), Log::Level::Debug);
                 break;
             }
         }
-        else if (buttonPressed == "DOWN" && (offset + displayedOptions < static_cast<int>(options.size())))
+        else if (std::find(scrollButtons.begin(), scrollButtons.end(), buttonPressedStr) != scrollButtons.end())
         {
-            ++offset;
-            logHandler("getUserOption", "[Scroll DOWN] Offset = " + std::to_string(offset), Log::Level::Debug);
-        }
-        else if (buttonPressed == "UP" && offset > 0)
-        {
-            --offset;
-            logHandler("getUserOption", "[Scroll UP] Offset = " + std::to_string(offset), Log::Level::Debug);
+            if (buttonPressedStr == "DOWN" && (offset + displayedOptions < static_cast<int>(options.size())))
+            {
+                ++offset;
+            }
+            else if (buttonPressedStr == "UP" && offset > 0)
+            {
+                --offset;
+            }
+            logHandler("getUserOption", std::format("[Scroll {}] Offset = {}", buttonPressedStr, offset), Log::Level::Debug);
         }
         else
         {
-            logHandler("getUserOption", "[Invalid Selection] Index = " + std::to_string(Index) + " | Offset = " + std::to_string(offset), Log::Level::Debug);
+            logHandler("getUserOption", std::format("[Invalid Selection] Index = {} | Offset = {} | Button Pressed = {}", Index, offset, buttonPressedStr), Log::Level::Debug);
             // Display message
             if (wrongAttemptCount < maxWrongAttempts)
             {
                 clearScreen(false, true, true);
                 primaryController.Screen.print(wrongMessages[wrongAttemptCount].c_str());
                 ++wrongAttemptCount; // Increment wrong attempt count
-                logHandler("getUserOption", "wrongAttemptCount: " + std::to_string(wrongAttemptCount), Log::Level::Debug);
+                logHandler("getUserOption", std::format("wrongAttemptCount: {}", wrongAttemptCount), Log::Level::Debug);
                 vex::this_thread::sleep_for(2000);
             }
             else
             {
-                logHandler("getUserOption", "Your half arsed.", Log::Level::Fatal);
+                logHandler("getUserOption", "Too many invalid attempts, returning default option.", Log::Level::Fatal);
+                return "DEFAULT";
             }
         }
     }

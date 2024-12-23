@@ -3,8 +3,8 @@
 		"${config:vexrobotics.vexcode.Cpp.Sdk.Home}\\V5\\V5_20240802_15_00_00\\vexv5\\gcc\\include\\sys"
 	],
 	"C_Cpp.errorSquiggles": "enabled",
+	"C_Cpp.codeAnalysis.ignoreIfdefs": true,
 	"files.associations": {
-		"iosfwd": "cpp",
 		"algorithm": "cpp",
 		"cmath": "cpp",
 		"array": "cpp",
@@ -48,6 +48,7 @@
 		"fstream": "cpp",
 		"initializer_list": "cpp",
 		"iomanip": "cpp",
+		"iosfwd": "cpp",
 		"istream": "cpp",
 		"limits": "cpp",
 		"new": "cpp",
@@ -58,9 +59,8 @@
 		"stdexcept": "cpp",
 		"streambuf": "cpp",
 		"text_encoding": "cpp",
-		"cinttypes": "cpp",
 		"typeinfo": "cpp",
 		"variant": "cpp",
-		"iostream": "cpp"
+		"ranges": "cpp"
 	}
 }

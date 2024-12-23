@@ -2,12 +2,13 @@
 
 #include <fstream>
 #include <sstream>
+#include <format>
 
 // Method to reset or initialize the config file
-void configManager::resetOrInitializeConfig(const std::string &message)
+void configManager::resetOrInitializeConfig(std::string_view message)
 {
     maxOptionSize = 4;
-    std::string resetcfg = getUserOption(message, {"Yes", "No"});
+    std::string resetcfg = getUserOption(std::string(message), {"Yes", "No"});
     if (resetcfg == "Yes")
     {
         primaryController.Screen.print("Resetting config file...");
@@ -28,38 +29,38 @@ void configManager::resetOrInitializeConfig(const std::string &message)
         configFile << "LOGLEVEL=Info\n";
         configFile << "DRIVEMODE=SplitArcade\n"; // Default drive mode
         configFile << "ConfigType=Brain\n";
-        configFile << "VERSION=" << Version << "\n";
+        configFile << std::format("VERSION={}\n", Version);
         configFile.close();
     }
     logHandler("resetConfig", "Successfully reset config file.", Log::Level::Debug);
 }
 
 // Method to convert a string to boolean
-bool configManager::stringToBool(const std::string &str)
+bool configManager::stringToBool(std::string_view str)
 {
     return (str == "true" || str == "1");
 }
 
 // Method to convert a string to long
-long configManager::stringToLong(const std::string &str)
+long configManager::stringToLong(std::string_view str)
 {
     try
     {
-        return std::stol(str);
+        return std::stol(std::string(str));
     }
     catch (const std::invalid_argument &e)
     {
-        logHandler("stringToLong", "Invalid argument: " + str, Log::Level::Error);
+        logHandler("stringToLong", std::format("Invalid argument: {}", str), Log::Level::Error);
         return 0;
     }
     catch (const std::out_of_range &e)
     {
-        logHandler("stringToLong", "Out of range: " + str, Log::Level::Error);
+        logHandler("stringToLong", std::format("Out of range: {}", str), Log::Level::Error);
         return 0;
     }
 }
 
-// Method to set values from the config file
+// Method to set values from the config file and parse complex config sections
 void configManager::setValuesFromConfig()
 {
     std::ifstream configFile(configFileName);
@@ -144,83 +145,77 @@ void configManager::setValuesFromConfig()
             {
                 if (value != Version)
                 {
-                    resetOrInitializeConfig("Version mismatch with Config file (" + value + ") and code version (" + Version + "). Do you want to reset the config file?");
+                    resetOrInitializeConfig(std::format("Version mismatch with Config file ({}) and code version ({}). Do you want to reset the config file?", value, Version));
                 }
             }
             else
             {
-                resetOrInitializeConfig("Unknown key in config file: " + key + ". Do you want to reset the config?");
+                resetOrInitializeConfig(std::format("Unknown key in config file: {}. Do you want to reset the config?", key));
             }
         }
         else if (key == "MOTOR_CONFIG" || key == "INERTIAL" || key == "TRIPORT_CONFIG")
         {
-            parseComplexConfig(configFile, key);
+            std::string section = key;
+            while (std::getline(configFile, configLine) && configLine != "}")
+            {
+                if (configLine.empty() || configLine[0] == ';' || configLine[0] == '#')
+                {
+                    continue; // Skip empty lines and comments
+                }
+
+                std::string name = configLine;
+                std::getline(configFile, configLine); // Skip the opening brace
+
+                std::string port, gearRatio, reversedStr;
+                while (std::getline(configFile, configLine) && configLine != "}")
+                {
+                    std::istringstream iss(configLine);
+                    std::string configKey, configValue;
+                    if (std::getline(iss, configKey, '=') && std::getline(iss, configValue))
+                    {
+                        if (configKey == "PORT")
+                        {
+                            port = configValue;
+                        }
+                        else if (configKey == "GEAR_RATIO")
+                        {
+                            gearRatio = configValue;
+                        }
+                        else if (configKey == "REVERSED")
+                        {
+                            reversedStr = configValue;
+                        }
+                    }
+                }
+
+                if (section == "MOTOR_CONFIG")
+                {
+                    motorPorts[name] = std::stoi(port);
+                    motorGearRatios[name] = gearRatio;
+                    motorReversed[name] = stringToBool(reversedStr);
+                }
+                else if (section == "INERTIAL")
+                {
+                    inertialPorts[name] = std::stoi(port);
+                }
+                else if (section == "TRIPORT_CONFIG")
+                {
+                    triPorts[name] = getTriPort(port);
+                }
+            }
         }
         else
         {
-            resetOrInitializeConfig("Invalid line in config file: " + configLine + ". Do you want to reset the config?");
+            resetOrInitializeConfig(std::format("Invalid line in config file: {}. Do you want to reset the config?", configLine));
         }
     }
     configFile.close();
 }
 
-// Method to parse complex config sections
-void configManager::parseComplexConfig(std::ifstream &configFile, const std::string &section)
-{
-    std::string configLine;
-    while (std::getline(configFile, configLine) && configLine != "}")
-    {
-        if (configLine.empty() || configLine[0] == ';' || configLine[0] == '#')
-        {
-            continue; // Skip empty lines and comments
-        }
-
-        std::string name = configLine;
-        std::getline(configFile, configLine); // Skip the opening brace
-
-        std::string port, gearRatio, reversedStr;
-        while (std::getline(configFile, configLine) && configLine != "}")
-        {
-            std::istringstream iss(configLine);
-            std::string configKey, configValue;
-            if (std::getline(iss, configKey, '=') && std::getline(iss, configValue))
-            {
-                if (configKey == "PORT")
-                {
-                    port = configValue;
-                }
-                else if (configKey == "GEAR_RATIO")
-                {
-                    gearRatio = configValue;
-                }
-                else if (configKey == "REVERSED")
-                {
-                    reversedStr = configValue;
-                }
-            }
-        }
-
-        if (section == "MOTOR_CONFIG")
-        {
-            motorPorts[name] = std::stoi(port);
-            motorGearRatios[name] = gearRatio;
-            motorReversed[name] = stringToBool(reversedStr);
-        }
-        else if (section == "INERTIAL")
-        {
-            inertialPorts[name] = std::stoi(port);
-        }
-        else if (section == "TRIPORT_CONFIG")
-        {
-            triPorts[name] = getTriPort(port);
-        }
-    }
-}
-
 // Method to parse the config file
 void configManager::parseConfig()
 {
-    std::string message = "Version: " + Version + " | Build date: " + BuildDate;
+    std::string message = std::format("Version: {} | Build date: {}", Version, BuildDate);
     logHandler("main", message, Log::Level::Info);
     primaryController.Screen.print("Starting up...");
 

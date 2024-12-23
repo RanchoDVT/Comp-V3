@@ -9,8 +9,8 @@
 
 #include "vex.h"
 
-std::string Version = "3.0b3";
-std::string BuildDate = "12/16/24";
+std::string Version = "3.0b3-f2";
+std::string BuildDate = "12/22/24";
 
 int main()
 {

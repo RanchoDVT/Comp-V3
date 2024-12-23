@@ -1,77 +1,96 @@
 #include <stdlib.h>
+#include <map>
 
 #include "v5_cpp.h"
 
 /**
- * @author @Voidless7125
- * @date 4/10/24
- * @brief Class for `Log`.
- * @public enum class `Level`.
+ * @class Log
+ * @brief Handles logging with different severity levels.
+ * @details Provides an enumeration for log levels.
  */
 class Log
 {
 public:
+    /**
+     * @enum Level
+     * @brief Defines the severity levels for logging.
+     */
     enum class Level
     {
-        Trace,
-        Debug,
-        Info,
-        Warn,
-        Error,
-        Fatal
+        Trace, ///< Detailed information.
+        Debug, ///< Debug-level messages.
+        Info,  ///< Informational messages that highlight the progress of the application.
+        Warn,  ///< Potentially harmful situations.
+        Error, ///< Error events that still allow the application to continue running.
+        Fatal  ///< Very severe error events that will lead the application to abort.
     };
 };
 
-/// @brief Version Number of code.
+/// @brief Version number of the code.
 extern std::string Version;
 
-/// @brief Build date of code.
+/// @brief Build date of the code.
 extern std::string BuildDate;
 
-/// @brief Handles logging, to sd card if supported, to user if warn and higher, and outputs it in the console.
-/// @param functionName Name of function that you want to log.
-/// @param message The message! (If you can't understand this, you don't deserve a computer)
-/// @param level The log level (from the class Log::Level)
-/// @param timeOfDisplay How long the message stays on the screen for.
+/**
+ * @brief Handles logging to various outputs.
+ * @param functionName The name of the function where the log is generated.
+ * @param message The log message.
+ * @param level The severity level of the log (from Log::Level).
+ * @param timeOfDisplay Duration for which the message is displayed on the screen.
+ */
 void logHandler(const std::string &functionName, const std::string &message, const Log::Level level, const float &timeOfDisplay = 2);
 
+/**
+ * @brief Logs messages to the SD card if supported.
+ * @param level The severity level of the log (from Log::Level).
+ * @param functionName The name of the function where the log is generated.
+ * @param message The log message.
+ */
 void SD_Card_Logging(const Log::Level &level, const std::string &functionName, const std::string &message);
 
-/// @brief GUI for settting options
-/// @param settingName The name for what you want to change (duh)
-/// @param options The options you want (duh), in a vector like this: {"Opt1", "Opt2"}
-/// @return a string output of what got selected.
+/**
+ * @brief Displays a GUI for setting options.
+ * @param settingName The name of the setting to be changed.
+ * @param options A vector of options to choose from.
+ * @return The selected option as a string.
+ */
 std::string getUserOption(const std::string &settingName, const std::vector<std::string> &options);
 
-/// @brief Helper cmd for clearing screens on one line of code.
-/// @param brainClear Wither to clear the screen on the V5 Brain
-/// @param primaryControllerClear Wither to clear the screen on the 1st controller
-/// @param partnerControllerClear Wither to clear the screen on the 2nd controller
+/**
+ * @brief Clears the screens of various devices.
+ * @param brainClear Whether to clear the screen on the V5 Brain.
+ * @param primaryControllerClear Whether to clear the screen on the primary controller.
+ * @param partnerControllerClear Whether to clear the screen on the partner controller.
+ */
 void clearScreen(const bool &brainClear, const bool &primaryControllerClear, const bool &partnerControllerClear);
 
-/// @brief Function to calibrate Gyro
+/// @brief Calibrates the gyro sensor.
 void calibrateGyro();
 
-/// @brief Caller for autonomous code
+/// @brief Executes autonomous code.
 void autonomous();
 
-/// @brief
+/// @brief Executes user control code.
 void userControl();
 
-/// @brief
+/// @brief Monitors motor status.
 void motorMonitor();
 
-/// @brief Gets input from the controller, NO GUI.
-/// @return Time of button held (int), and what button got pressed (string)
-std::pair<std::string, int> ctrl1BttnPressed();
+/**
+ * @brief Gets input from the controller without a GUI.
+ * @param controller The controller to get input from.
+ * @return A map containing the button pressed and the duration it was held.
+ */
+std::map<std::string, int> controllerButtonsPressed(const vex::controller &controller);
 
-/// @brief Called to start the gif player.
+/// @brief Starts the GIF player.
 void gifplayer();
 
 #include "config/robot-config.h"
-
 #include "config/extern/configManager.h"
 
+/// @brief Manages configuration settings.
 extern configManager ConfigManager;
 
 #include "display/gifdec.h"
