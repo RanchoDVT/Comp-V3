@@ -4,7 +4,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#ifdef USE_ALLOCATED_SPACE
 uint8_t *emu_memory;
 size_t emu_offset;
 size_t emu_size;
@@ -84,13 +83,11 @@ int emu_lseek(int, size_t value, int type)
 
     return emu_offset;
 }
-
-// Redefine standard file operations to use the memory-mapped functions
 #define read emu_read
 #define lseek emu_lseek
 #define open emu_open
 #define close emu_close
-#endif
+// Redefine standard file operations to use the memory-mapped functions
 
 // Define macros for minimum and maximum values
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
