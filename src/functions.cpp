@@ -1,7 +1,4 @@
 #include "vex.h"
-#include <ranges>
-#include <chrono>
-#include <format>
 
 void calibrateGyro()
 {
@@ -14,63 +11,46 @@ void calibrateGyro()
 	return;
 }
 
-std::map<std::string, int> controllerButtonsPressed(const vex::controller &controller)
+std::map<std::string, std::vector<int>> controllerButtonsPressed(const vex::controller &controller)
 {
+
 	if (Competition.isEnabled())
 	{
 		logHandler("controllerButtonsPressed", "Robot is IN competition mode!", Log::Level::Error, 3);
 	}
 
-	std::map<std::string, int> buttonPressTimes;
+	std::map<std::string, std::vector<int>> buttonPressTimes;
 	vex::timer pressTimer;
 
-	struct ButtonInfo
+	auto checkButtonPress = [&](const ControllerButtonInfo &info)
 	{
-		const vex::controller::button &button;
-		const std::string name;
-	};
-
-	const std::array buttons = {
-		ButtonInfo{controller.ButtonA, "A"},
-		ButtonInfo{controller.ButtonX, "X"},
-		ButtonInfo{controller.ButtonY, "Y"},
-		ButtonInfo{controller.ButtonB, "B"},
-		ButtonInfo{controller.ButtonUp, "UP"},
-		ButtonInfo{controller.ButtonDown, "DOWN"},
-		ButtonInfo{controller.ButtonRight, "RIGHT"},
-		ButtonInfo{controller.ButtonLeft, "LEFT"},
-		ButtonInfo{controller.ButtonL1, "L1"},
-		ButtonInfo{controller.ButtonL2, "L2"},
-		ButtonInfo{controller.ButtonR1, "R1"},
-		ButtonInfo{controller.ButtonR2, "R2"}};
-
-	auto checkButtonPress = [&](const ButtonInfo &buttonInfo)
-	{
-		if (buttonInfo.button.pressing())
+		if (info.button->pressing())
 		{
 			pressTimer.clear();
-			while (buttonInfo.button.pressing())
+			while (info.button->pressing())
 			{
 				vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
 			}
-			buttonPressTimes[buttonInfo.name] = pressTimer.time();
+			buttonPressTimes[info.name].push_back(pressTimer.time());
 		}
 	};
 
 	while (!Competition.isEnabled())
 	{
-		for (const auto &buttonInfo : buttons)
+		for (const auto &btn : AllControllerButtons)
 		{
-			checkButtonPress(buttonInfo);
+			checkButtonPress(btn);
 		}
-
 		vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
 	}
 
-	for (const auto &[button, duration] : buttonPressTimes)
+	for (const auto &[button, durations] : buttonPressTimes)
 	{
-		std::string message = std::format("Button: {}, Duration: {} ms", button, duration);
-		logHandler("controllerButtonsPressed", message, Log::Level::Debug);
+		for (auto duration : durations)
+		{
+			std::string message = std::format("Button: {}, Duration: {} ms", button, duration);
+			logHandler("controllerButtonsPressed", message, Log::Level::Debug);
+		}
 	}
 
 	return buttonPressTimes;

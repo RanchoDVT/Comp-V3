@@ -41,4 +41,3 @@ void initializeDiagnosticMode();
  * Display task for diagnostic mode.
  */
 void displayTask();
-

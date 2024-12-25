@@ -1,44 +1,164 @@
 #include "vex.h"
 
 #include <fstream>
-#include <sstream>
-#include <format>
 
 // Method to reset or initialize the config file
 void configManager::resetOrInitializeConfig(std::string_view message)
 {
-    maxOptionSize = 4;
+    maxOptionSize = 4; // Example, already validated in setMaxOptionSize
     std::string resetcfg = getUserOption(std::string(message), {"Yes", "No"});
     if (resetcfg == "Yes")
     {
         primaryController.Screen.print("Resetting config file...");
-
         std::ofstream configFile(configFileName);
         if (!configFile)
         {
             logHandler("resetOrInitializeConfig", "Could not create config.", Log::Level::Warn, 3);
             return;
         }
-        // Write default configuration to the file
+        // Write default configuration
         configFile << "# Config File:\n";
-        configFile << "POLLINGRATE=1\n";
+        configFile << "MOTOR_CONFIG {\n";
+        configFile << "    FRONT_LEFT_MOTOR {\n";
+        configFile << "        PORT=1\n";
+        configFile << "        GEAR_RATIO=6_1\n";
+        configFile << "        REVERSED=false\n";
+        configFile << "    }\n";
+        configFile << "    FRONT_RIGHT_MOTOR {\n";
+        configFile << "        PORT=10\n";
+        configFile << "        GEAR_RATIO=6_1\n";
+        configFile << "        REVERSED=true\n";
+        configFile << "    }\n";
+        configFile << "    REAR_LEFT_MOTOR {\n";
+        configFile << "        PORT=11\n";
+        configFile << "        GEAR_RATIO=6_1\n";
+        configFile << "        REVERSED=false\n";
+        configFile << "    }\n";
+        configFile << "    REAR_RIGHT_MOTOR {\n";
+        configFile << "        PORT=20\n";
+        configFile << "        GEAR_RATIO=6_1\n";
+        configFile << "        REVERSED=true\n";
+        configFile << "    }\n";
+        configFile << "    INERTIAL {\n";
+        configFile << "        PORT=3\n";
+        configFile << "    }\n";
+        configFile << "    Rear_Bumper {\n";
+        configFile << "        PORT=A\n";
+        configFile << "    }\n";
+        configFile << "}\n";
         configFile << "PRINTLOGO=true\n";
         configFile << "LOGTOFILE=true\n";
         configFile << "MAXOPTIONSSIZE=4\n";
+        configFile << "POLLINGRATE=5\n";
         configFile << "CTRLR1POLLINGRATE=25\n";
-        configFile << "LOGLEVEL=Info\n";
-        configFile << "DRIVEMODE=SplitArcade\n"; // Default drive mode
-        configFile << "ConfigType=Brain\n";
+        configFile << "CONFIGTYPE=Brain\n";
+        configFile << "TEAMNUMBER=12\n";
+        configFile << "LOADINGGIFPATH=loading.gif\n";
+        configFile << "AUTOGIFPATH=auto.gif\n";
+        configFile << "DRIVEGIFPATH=drive.gif\n";
+        configFile << "CUSTOMMESSAGE=test\n";
+        configFile << "DRIVEMODE=Split\n";
         configFile << std::format("VERSION={}\n", Version);
         configFile.close();
+
+        logHandler("resetConfig", "Successfully reset config file.", Log::Level::Debug);
     }
-    logHandler("resetConfig", "Successfully reset config file.", Log::Level::Debug);
+}
+
+void configManager::writeMaintenanceData()
+{
+    std::ofstream maintenanceFile(maintenanceFileName);
+    if (maintenanceFile.is_open())
+    {
+        maintenanceFile << "ODOMETER=" << odometer << "\n";
+        maintenanceFile << "LAST_SERVICE=" << lastService << "\n";
+        maintenanceFile << "SERVICE_INTERVAL=" << serviceInterval << "\n";
+        maintenanceFile.close();
+    }
+}
+
+void configManager::setDriveMode(const configManager::DriveMode &mode)
+{
+    driveMode = mode; // Update in-memory
+
+    // Also write to config file
+    std::ofstream configFile(configFileName, std::ios::app);
+    if (configFile.is_open())
+    {
+        configFile << "DRIVEMODE=";
+        switch (mode)
+        {
+        case DriveMode::LeftArcade:
+            configFile << "LeftArcade";
+            break;
+        case DriveMode::RightArcade:
+            configFile << "RightArcade";
+            break;
+        case DriveMode::SplitArcade:
+            configFile << "SplitArcade";
+            break;
+        case DriveMode::Tank:
+            configFile << "Tank";
+            break;
+        }
+        configFile << "\n";
+        configFile.close();
+    }
+}
+
+void configManager::readMaintenanceData()
+{
+    std::ifstream maintenanceFile(maintenanceFileName);
+    if (maintenanceFile.is_open())
+    {
+        std::string line;
+        while (std::getline(maintenanceFile, line))
+        {
+            std::istringstream iss(line);
+            std::string key, value;
+            if (std::getline(iss, key, '=') && std::getline(iss, value))
+            {
+                if (key == "ODOMETER")
+                {
+                    odometer = stringToLong(value);
+                }
+                else if (key == "LAST_SERVICE")
+                {
+                    lastService = stringToLong(value);
+                }
+                else if (key == "SERVICE_INTERVAL")
+                {
+                    serviceInterval = stringToLong(value);
+                }
+            }
+        }
+        maintenanceFile.close();
+    }
 }
 
 // Method to convert a string to boolean
 bool configManager::stringToBool(std::string_view str)
 {
-    return (str == "true" || str == "1");
+    try
+    {
+        if (str == "true" || str == "1")
+        {
+            return true;
+        }
+        else if (str == "false" || str == "0")
+        {
+            return false;
+        }
+        else
+        {
+            throw std::invalid_argument("Invalid boolean string");
+        }
+    }
+    catch (const std::invalid_argument &e)
+    {
+        logHandler("stringToBool", std::format("Invalid argument: {}", str), Log::Level::Error);
+        return false;
+    }
 }
 
 // Method to convert a string to long
@@ -158,7 +278,7 @@ void configManager::setValuesFromConfig()
             std::string section = key;
             while (std::getline(configFile, configLine) && configLine != "}")
             {
-                if (configLine.empty() || configLine[0] == ';' || configLine[0] == '#')
+                if (configLine.empty() || configLine.starts_with(';') || configLine.starts_with('#'))
                 {
                     continue; // Skip empty lines and comments
                 }
@@ -235,9 +355,16 @@ void configManager::parseConfig()
     {
         // Default values
         POLLINGRATE = 1;
-        PRINTLOGO = false;
+        PRINTLOGO = true;
+        logToFile = true;
         maxOptionSize = 4;
         CTRLR1POLLINGRATE = 25;
+        logLevel = Log::Level::Info;
+        driveMode = DriveMode::SplitArcade;
+        configType = ConfigType::Brain;
+        odometer = 0;
+        lastService = 0;
+        serviceInterval = 1000;
         logHandler("configParser", "No SD card installed. Using default values.", Log::Level::Info);
     }
     calibrateGyro();

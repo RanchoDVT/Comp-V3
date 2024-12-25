@@ -12,14 +12,6 @@ public:
     void parseConfig();
     void parseComplexConfig(std::ifstream &configFile, const std::string &section);
 
-    enum class ConfigType
-    {
-        Brain,
-        Controller
-    };
-
-    ConfigType configType;
-
     enum class DriveMode
     {
         LeftArcade,
@@ -28,14 +20,14 @@ public:
         Tank
     };
 
-    DriveMode getDriveMode() const;
-    void setDriveMode(const DriveMode &mode);
+    enum class ConfigType
+    {
+        Brain,
+        Controller
+    };
 
-    std::string teamNumber;
-    std::string loadingGifPath;
-    std::string autoGifPath;
-    std::string driverGifPath;
-    std::string customMessage;
+    ConfigType configType;
+    DriveMode driveMode;
 
     std::size_t getMaxOptionSize() const { return maxOptionSize; }
     bool getLogToFile() const { return logToFile; }
@@ -43,6 +35,11 @@ public:
     bool getPrintLogo() const { return PRINTLOGO; }
     std::size_t getCtrlr1PollingRate() const { return CTRLR1POLLINGRATE; }
     Log::Level getLogLevel() const { return logLevel; }
+    std::string getTeamNumber() const { return teamNumber; };
+    int getOdometer() const { return odometer; }
+    int getLastService() const { return lastService; }
+    int getServiceInterval() const { return serviceInterval; }
+    DriveMode getDriveMode() const { return driveMode; };
 
     void setMaxOptionSize(const std::size_t &value);
     void setLogToFile(const bool &value);
@@ -56,6 +53,7 @@ public:
     void setAutoGifPath(const std::string &value);
     void setDriverGifPath(const std::string &value);
     void setCustomMessage(const std::string &value);
+    void setDriveMode(const DriveMode &mode);
 
     std::string getGearRatio(const std::string &motorName) const;
     bool getMotorReversed(const std::string &motorName) const;
@@ -63,10 +61,6 @@ public:
     int getMotorPort(const std::string &motorName) const;
     vex::triport::port *getTriPort(const std::string &portName) const;
 
-    std::string getTeamNumber() const;
-    int getOdometer() const { return odometer; }
-    int getLastService() const { return lastService; }
-    int getServiceInterval() const { return serviceInterval; }
     void updateOdometer(const int &averagePosition);
     void checkServiceInterval();
 
@@ -89,10 +83,15 @@ private:
     std::size_t CTRLR1POLLINGRATE;
     Log::Level logLevel;
 
+    std::string teamNumber;
+    std::string loadingGifPath;
+    std::string autoGifPath;
+    std::string driverGifPath;
+    std::string customMessage;
+
     int odometer;
     int lastService;
     int serviceInterval;
-    DriveMode driveMode;
 
     void readMaintenanceData();
     void writeMaintenanceData();

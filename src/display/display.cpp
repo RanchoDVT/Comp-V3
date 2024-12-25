@@ -1,8 +1,6 @@
 #include "vex.h"
 
-
 #include <numeric>
-#include <format>
 
 // define some more colors
 const vex::color grey((uint32_t)0x202020);
@@ -116,6 +114,14 @@ void displayTask()
         // Display using back buffer, stops flickering
         Brain.Screen.render();
 
+        // Check if the exit button is pressed
+        if (Brain.Screen.pressing() && Brain.Screen.xPosition() < 50 && Brain.Screen.yPosition() < 50)
+        {
+            logHandler("displayTask", "Exit button pressed, terminating program.", Log::Level::Fatal);
+            vex::task::stopAll();
+            return;
+        }
+
         vex::this_thread::sleep_for(100);
     }
 }
@@ -171,8 +177,21 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
     std::size_t Index = options.size(); // Invalid selection by default
     int offset = 0;
 
-    const std::vector<std::string> &buttons = {"A", "X", "Y", "B"};
-    const std::vector<std::string> &scrollButtons = {"DOWN", "UP"};
+    const auto buttonsInfo = getControllerButtonArray(primaryController);
+    std::vector<std::string> buttons;
+    std::vector<std::string> scrollButtons;
+
+    for (const auto &buttonInfo : buttonsInfo)
+    {
+        if (buttonInfo.name == "A" || buttonInfo.name == "X" || buttonInfo.name == "Y" || buttonInfo.name == "B")
+        {
+            buttons.push_back(buttonInfo.name);
+        }
+        else if (buttonInfo.name == "DOWN" || buttonInfo.name == "UP")
+        {
+            scrollButtons.push_back(buttonInfo.name);
+        }
+    }
 
     while (!primaryController.installed())
     {
@@ -224,7 +243,7 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
             buttonPressedStr = buttonPressed.begin()->first;
         }
 
-        auto buttonIt = std::find(buttons.begin(), buttons.end(), buttonPressedStr);
+        auto buttonIt = std::ranges::find(buttons, buttonPressedStr);
         if (buttonIt != buttons.end())
         {
             int buttonIndex = std::distance(buttons.begin(), buttonIt);
@@ -235,7 +254,7 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
                 break;
             }
         }
-        else if (std::find(scrollButtons.begin(), scrollButtons.end(), buttonPressedStr) != scrollButtons.end())
+        else if (std::ranges::find(scrollButtons, buttonPressedStr) != scrollButtons.end())
         {
             if (buttonPressedStr == "DOWN" && (offset + displayedOptions < static_cast<int>(options.size())))
             {

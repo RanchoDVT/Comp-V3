@@ -3,12 +3,36 @@
 #include <fstream>
 #include <sstream>
 
+std::array<ControllerButtonInfo, 12> createControllerButtonArray(const vex::controller &controller)
+{
+    return {
+        ControllerButtonInfo{&controller.ButtonA, "A"},
+        ControllerButtonInfo{&controller.ButtonB, "B"},
+        ControllerButtonInfo{&controller.ButtonX, "X"},
+        ControllerButtonInfo{&controller.ButtonY, "Y"},
+        ControllerButtonInfo{&controller.ButtonUp, "Up"},
+        ControllerButtonInfo{&controller.ButtonDown, "Down"},
+        ControllerButtonInfo{&controller.ButtonLeft, "Left"},
+        ControllerButtonInfo{&controller.ButtonRight, "Right"},
+        ControllerButtonInfo{&controller.ButtonL1, "L1"},
+        ControllerButtonInfo{&controller.ButtonL2, "L2"},
+        ControllerButtonInfo{&controller.ButtonR1, "R1"},
+        ControllerButtonInfo{&controller.ButtonR2, "R2"}};
+}
+
+std::array<ControllerButtonInfo, 12> AllControllerButtons = createControllerButtonArray(primaryController);
+
+std::array<ControllerButtonInfo, 12> getControllerButtonArray(const vex::controller &controller)
+{
+    return createControllerButtonArray(controller);
+}
+
 configManager ConfigManager("config.cfg", "maintenance.txt");
 
 // Constructor
 configManager::configManager(const std::string &configFileName, const std::string &maintenanceFileName)
-    : configFileName(configFileName), maintenanceFileName(maintenanceFileName), maxOptionSize(4), logToFile(true),
-      POLLINGRATE(5), PRINTLOGO(true), CTRLR1POLLINGRATE(25), logLevel(Log::Level::Info), odometer(0), lastService(0), serviceInterval(1000), driveMode(DriveMode::SplitArcade)
+    : driveMode(DriveMode::SplitArcade), configFileName(configFileName), maintenanceFileName(maintenanceFileName), maxOptionSize(4), logToFile(true),
+      POLLINGRATE(5), PRINTLOGO(true), CTRLR1POLLINGRATE(25), logLevel(Log::Level::Info), odometer(0), lastService(0), serviceInterval(1000)
 {
     readMaintenanceData();
 
@@ -26,13 +50,28 @@ configManager::configManager(const std::string &configFileName, const std::strin
 vex::triport::port *configManager::getTriPort(const std::string &portName) const
 {
     auto it = triPorts.find(portName);
-    return (it != triPorts.end()) ? it->second : &Brain.ThreeWirePort.A; // Default to A if not found
+    if (it != triPorts.end())
+    {
+        return it->second;
+    }
+    else
+    {
+        logHandler("configManager::getTriPort", "Triport not found: " + portName, Log::Level::Error, 5);
+        return nullptr; // Return nullptr if not found
+    }
 }
 
 // Setters with validation
 void configManager::setMaxOptionSize(const std::size_t &value)
 {
-    maxOptionSize = value;
+    if (value > 0)
+    {
+        maxOptionSize = value;
+    }
+    else
+    {
+        logHandler("configManager::setMaxOptionSize", "Max option size must be greater than 0", Log::Level::Error, 5);
+    }
 }
 
 void configManager::setLogToFile(const bool &value)
@@ -42,7 +81,14 @@ void configManager::setLogToFile(const bool &value)
 
 void configManager::setPollingRate(const std::size_t &value)
 {
-    POLLINGRATE = value;
+    if (value > 0)
+    {
+        POLLINGRATE = value;
+    }
+    else
+    {
+        logHandler("configManager::setPollingRate", "Polling rate must be greater than 0", Log::Level::Error, 5);
+    }
 }
 
 void configManager::setPrintLogo(const bool &value)
@@ -52,7 +98,14 @@ void configManager::setPrintLogo(const bool &value)
 
 void configManager::setCtrlr1PollingRate(const std::size_t &value)
 {
-    CTRLR1POLLINGRATE = value;
+    if (value > 0)
+    {
+        CTRLR1POLLINGRATE = value;
+    }
+    else
+    {
+        logHandler("configManager::setCtrlr1PollingRate", "Controller 1 polling rate must be greater than 0", Log::Level::Error, 5);
+    }
 }
 
 void configManager::setLogLevel(const Log::Level &value)
@@ -62,22 +115,50 @@ void configManager::setLogLevel(const Log::Level &value)
 
 void configManager::setTeamNumber(const std::string &value)
 {
-    teamNumber = value;
+    if (!value.empty())
+    {
+        teamNumber = value;
+    }
+    else
+    {
+        logHandler("configManager::setTeamNumber", "Team number cannot be empty", Log::Level::Error, 5);
+    }
 }
 
 void configManager::setLoadingGifPath(const std::string &value)
 {
-    loadingGifPath = value;
+    if (!value.empty())
+    {
+        loadingGifPath = value;
+    }
+    else
+    {
+        logHandler("configManager::setLoadingGifPath", "Loading GIF path cannot be empty", Log::Level::Error, 5);
+    }
 }
 
 void configManager::setAutoGifPath(const std::string &value)
 {
-    autoGifPath = value;
+    if (!value.empty())
+    {
+        autoGifPath = value;
+    }
+    else
+    {
+        logHandler("configManager::setAutoGifPath", "Auto GIF path cannot be empty", Log::Level::Error, 5);
+    }
 }
 
 void configManager::setDriverGifPath(const std::string &value)
 {
-    driverGifPath = value;
+    if (!value.empty())
+    {
+        driverGifPath = value;
+    }
+    else
+    {
+        logHandler("configManager::setDriverGifPath", "Driver GIF path cannot be empty", Log::Level::Error, 5);
+    }
 }
 
 void configManager::setCustomMessage(const std::string &value)
@@ -94,20 +175,37 @@ int configManager::getMotorPort(const std::string &motorName) const
     }
     else
     {
-        throw std::runtime_error("Motor port not found: " + motorName);
+        logHandler("configManager::getMotorPort", "Motor port not found: " + motorName, Log::Level::Error, 5);
+        return -1; // Return an invalid port number if not found
     }
 }
 
 std::string configManager::getGearRatio(const std::string &motorName) const
 {
     auto it = motorGearRatios.find(motorName);
-    return (it != motorGearRatios.end()) ? it->second : "18_1"; // Default ratio
+    if (it != motorGearRatios.end())
+    {
+        return it->second;
+    }
+    else
+    {
+        logHandler("configManager::getGearRatio", "Motor gear ratio not found for: " + motorName + ". Using default ratio 18_1.", Log::Level::Warn, 3);
+        return "18_1"; // Default ratio
+    }
 }
 
 bool configManager::getMotorReversed(const std::string &motorName) const
 {
     auto it = motorReversed.find(motorName);
-    return (it != motorReversed.end()) ? it->second : false; // Default reversed state
+    if (it != motorReversed.end())
+    {
+        return it->second;
+    }
+    else
+    {
+        logHandler("configManager::getMotorReversed", "Motor reversed state not found for: " + motorName + ". Using default state false.", Log::Level::Warn, 3);
+        return false; // Default reversed state
+    }
 }
 
 vex::gearSetting configManager::getGearSetting(const std::string &ratio) const
@@ -126,49 +224,8 @@ vex::gearSetting configManager::getGearSetting(const std::string &ratio) const
     }
     else
     {
+        logHandler("configManager::getGearSetting", "Invalid gear ratio: " + ratio + ". Using default ratio 18_1.", Log::Level::Warn, 3);
         return vex::gearSetting::ratio18_1; // Default
-    }
-}
-
-void configManager::readMaintenanceData()
-{
-    std::ifstream maintenanceFile(maintenanceFileName);
-    if (maintenanceFile.is_open())
-    {
-        std::string line;
-        while (std::getline(maintenanceFile, line))
-        {
-            std::istringstream iss(line);
-            std::string key, value;
-            if (std::getline(iss, key, '=') && std::getline(iss, value))
-            {
-                if (key == "ODOMETER")
-                {
-                    odometer = stringToLong(value);
-                }
-                else if (key == "LAST_SERVICE")
-                {
-                    lastService = stringToLong(value);
-                }
-                else if (key == "SERVICE_INTERVAL")
-                {
-                    serviceInterval = stringToLong(value);
-                }
-            }
-        }
-        maintenanceFile.close();
-    }
-}
-
-void configManager::writeMaintenanceData()
-{
-    std::ofstream maintenanceFile(maintenanceFileName);
-    if (maintenanceFile.is_open())
-    {
-        maintenanceFile << "ODOMETER=" << odometer << "\n";
-        maintenanceFile << "LAST_SERVICE=" << lastService << "\n";
-        maintenanceFile << "SERVICE_INTERVAL=" << serviceInterval << "\n";
-        maintenanceFile.close();
     }
 }
 
@@ -198,7 +255,8 @@ configManager::ConfigType configManager::stringToConfigType(const std::string &s
     }
     else
     {
-        throw std::invalid_argument("Invalid config type");
+        logHandler("configManager::stringToConfigType", "Invalid config type", Log::Level::Error, 5);
+        return ConfigType::Brain; // Default return to avoid compilation error
     }
 }
 
@@ -217,43 +275,6 @@ Log::Level configManager::stringToLogLevel(const std::string &str)
     else if (str == "Fatal")
         return Log::Level::Fatal;
     else
-        throw std::invalid_argument("Invalid log level");
-}
-
-std::string configManager::getTeamNumber() const
-{
-    return teamNumber;
-}
-
-configManager::DriveMode configManager::getDriveMode() const
-{
-    return driveMode;
-}
-
-void configManager::setDriveMode(const configManager::DriveMode &mode)
-{
-    driveMode = mode; // Update the member variable
-
-    std::ofstream configFile(configFileName, std::ios::app);
-    if (configFile.is_open())
-    {
-        configFile << "DRIVEMODE=";
-        switch (mode)
-        {
-        case configManager::DriveMode::LeftArcade:
-            configFile << "LeftArcade";
-            break;
-        case configManager::DriveMode::RightArcade:
-            configFile << "RightArcade";
-            break;
-        case configManager::DriveMode::SplitArcade:
-            configFile << "SplitArcade";
-            break;
-        case configManager::DriveMode::Tank:
-            configFile << "Tank";
-            break;
-        }
-        configFile << "\n";
-        configFile.close();
-    }
+        logHandler("configManager::stringToLogLevel", "Invalid log level", Log::Level::Error, 5);
+    return Log::Level::Info; // Default return to avoid compilation error
 }

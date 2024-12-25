@@ -82,7 +82,7 @@ void motorMonitor();
  * @param controller The controller to get input from.
  * @return A map containing the button pressed and the duration it was held.
  */
-std::map<std::string, int> controllerButtonsPressed(const vex::controller &controller);
+std::map<std::string, std::vector<int>> controllerButtonsPressed(const vex::controller &controller);
 
 /// @brief Starts the GIF player.
 void gifplayer();
@@ -94,3 +94,14 @@ void gifplayer();
 extern configManager ConfigManager;
 
 #include "display/gifdec.h"
+
+struct ControllerButtonInfo
+{
+    const vex::controller::button *button;
+    std::string name;
+};
+
+extern std::array<ControllerButtonInfo, 12> AllControllerButtons;
+
+std::array<ControllerButtonInfo, 12> createControllerButtonArray(const vex::controller &controller);
+std::array<ControllerButtonInfo, 12> getControllerButtonArray(const vex::controller &controller);

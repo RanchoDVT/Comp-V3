@@ -2,49 +2,57 @@
 
 vex::brain Brain;
 
-auto frontLeftPort = ConfigManager.getMotorPort("FRONT_LEFT_MOTOR");
-auto rearLeftPort = ConfigManager.getMotorPort("REAR_LEFT_MOTOR");
-auto frontRightPort = ConfigManager.getMotorPort("FRONT_RIGHT_MOTOR");
-auto rearRightPort = ConfigManager.getMotorPort("REAR_RIGHT_MOTOR");
+int frontLeftPort = ConfigManager.getMotorPort("FRONT_LEFT_MOTOR");
+int rearLeftPort = ConfigManager.getMotorPort("REAR_LEFT_MOTOR");
+int frontRightPort = ConfigManager.getMotorPort("FRONT_RIGHT_MOTOR");
+int rearRightPort = ConfigManager.getMotorPort("REAR_RIGHT_MOTOR");
 
-auto frontLeftGearRatio = ConfigManager.getGearSetting(ConfigManager.getGearRatio("FRONT_LEFT_MOTOR"));
-auto rearLeftGearRatio = ConfigManager.getGearSetting(ConfigManager.getGearRatio("REAR_LEFT_MOTOR"));
-auto frontRightGearRatio = ConfigManager.getGearSetting(ConfigManager.getGearRatio("FRONT_RIGHT_MOTOR"));
-auto rearRightGearRatio = ConfigManager.getGearSetting(ConfigManager.getGearRatio("REAR_RIGHT_MOTOR"));
+vex::gearSetting frontLeftGearRatio = ConfigManager.getGearSetting(ConfigManager.getGearRatio("FRONT_LEFT_MOTOR"));
+vex::gearSetting rearLeftGearRatio = ConfigManager.getGearSetting(ConfigManager.getGearRatio("REAR_LEFT_MOTOR"));
+vex::gearSetting frontRightGearRatio = ConfigManager.getGearSetting(ConfigManager.getGearRatio("FRONT_RIGHT_MOTOR"));
+vex::gearSetting rearRightGearRatio = ConfigManager.getGearSetting(ConfigManager.getGearRatio("REAR_RIGHT_MOTOR"));
 
-auto frontLeftReversed = ConfigManager.getMotorReversed("FRONT_LEFT_MOTOR");
-auto rearLeftReversed = ConfigManager.getMotorReversed("REAR_LEFT_MOTOR");
-auto frontRightReversed = ConfigManager.getMotorReversed("FRONT_RIGHT_MOTOR");
-auto rearRightReversed = ConfigManager.getMotorReversed("REAR_RIGHT_MOTOR");
+bool frontLeftReversed = ConfigManager.getMotorReversed("FRONT_LEFT_MOTOR");
+bool rearLeftReversed = ConfigManager.getMotorReversed("REAR_LEFT_MOTOR");
+bool frontRightReversed = ConfigManager.getMotorReversed("FRONT_RIGHT_MOTOR");
+bool rearRightReversed = ConfigManager.getMotorReversed("REAR_RIGHT_MOTOR");
 
-auto bumperTriPort = ConfigManager.getTriPort("REAR_BUMPER"); // Thanks vex for making this with pointers! (sarcasm)
+vex::triport::port *bumperTriPort = ConfigManager.getTriPort("REAR_BUMPER"); // Thanks vex for making this with pointers! (sarcasm)
 
-vex::motor frontLeftMotor{frontLeftPort, frontLeftGearRatio, frontLeftReversed};
-vex::motor rearLeftMotor{rearLeftPort, rearLeftGearRatio, rearLeftReversed};
-vex::motor_group LeftDriveSmart{frontLeftMotor, rearLeftMotor};
+vex::motor frontLeftMotor = vex::motor(frontLeftPort, frontLeftGearRatio, frontLeftReversed);
+vex::motor rearLeftMotor = vex::motor(rearLeftPort, rearLeftGearRatio, rearLeftReversed);
+vex::motor_group LeftDriveSmart = vex::motor_group(frontLeftMotor, rearLeftMotor);
 
-vex::motor frontRightMotor{frontRightPort, frontRightGearRatio, frontRightReversed};
-vex::motor rearRightMotor{rearRightPort, rearRightGearRatio, rearRightReversed};
-vex::motor_group RightDriveSmart{frontRightMotor, rearRightMotor};
+vex::motor frontRightMotor = vex::motor(frontRightPort, frontRightGearRatio, frontRightReversed);
+vex::motor rearRightMotor = vex::motor(rearRightPort, rearRightGearRatio, rearRightReversed);
+vex::motor_group RightDriveSmart = vex::motor_group(frontRightMotor, rearRightMotor);
 
-vex::inertial InertialGyro{vex::PORT3};
-vex::smartdrive Drivetrain{LeftDriveSmart, RightDriveSmart, InertialGyro, 319.19, 320, 165, vex::distanceUnits::mm, 1};
+vex::inertial InertialGyro = vex::inertial(vex::PORT3);
+vex::smartdrive Drivetrain = vex::smartdrive(LeftDriveSmart, RightDriveSmart, InertialGyro, 319.19, 320, 165, vex::distanceUnits::mm, 1);
 
-vex::controller primaryController{vex::controllerType::primary};
-vex::controller partnerController{vex::controllerType::partner};
+vex::controller primaryController = vex::controller(vex::controllerType::primary);
+vex::controller partnerController = vex::controller(vex::controllerType::partner);
 
-vex::bumper RearBumper{*bumperTriPort};
+vex::bumper RearBumper = vex::bumper(*bumperTriPort);
 
 vex::competition Competition;
-
 /**
  * Check if the Y button is held at startup to enter diagnostic mode.
  */
 bool isDiagnosticMode()
 {
-    // Wait for a short period to allow the user to press the button
-    vex::this_thread::sleep_for(1000);
-    return primaryController.ButtonY.pressing();
+    auto buttonPressTimes = controllerButtonsPressed(primaryController);
+    if (buttonPressTimes.find("Y") != buttonPressTimes.end())
+    {
+        for (auto duration : buttonPressTimes["Y"])
+        {
+            if (duration >= 1000)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 /**
