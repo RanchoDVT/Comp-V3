@@ -16,7 +16,6 @@
 <li>Maintenance reminders ✅</li>
 <li>Diagnostic mode ✅ </li>
 <li>Traction control &amp; Stability control ✅</li>
-<li>Custom user messages 🔃 (Requires rewrite of startup)</li>
 <li>Hot swap of Ports (Requires rewrite of user_control, 🔃) </li>
 <li>Odometer ☑️ (Tamper protection could not be completed)</li>
 <li>Controller settings ☑️ (Have to add deadzone settings)</li>
