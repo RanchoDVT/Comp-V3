@@ -26,122 +26,82 @@ bool absEnabled = true;
 // Function to display system states on the Brain Screen
 void displaySystemStates()
 {
-    Brain.Screen.clearScreen();
-    Brain.Screen.setCursor(1, 1);
-    Brain.Screen.print("Traction Control: %s", tractionControlEnabled ? "ON" : "OFF");
-    Brain.Screen.newLine();
-    Brain.Screen.print("Stability Control: %s", stabilityControlEnabled ? "ON" : "OFF");
-    Brain.Screen.newLine();
-    Brain.Screen.print("ABS: %s", absEnabled ? "ON" : "OFF");
-}
-
-// Function to apply stability control based on wheel RPM
-void applyStabilityControl(const double &forwardVolts)
-{
-    // Get the current RPM of the left and right motors
-    double leftRPM = LeftDriveSmart.velocity(vex::velocityUnits::rpm);
-    double rightRPM = RightDriveSmart.velocity(vex::velocityUnits::rpm);
-
-    // Compare the RPMs, check for oversteer or understeer
-    double rpmDifference = std::abs(leftRPM - rightRPM);
-
-    // If the difference is too high, apply stability control
-    if (rpmDifference > 20)
-    { // Threshold for detecting instability
-        // Find the slowest motor speed
-        double minSpeed = std::min(std::abs(leftRPM), std::abs(rightRPM));
-
-        // Gradually reduce the motor speed to the slowest motor's speed (instead of stopping abruptly)
-        if (leftRPM > rightRPM)
-        {
-            // Reduce the speed of the left motor to match the right motor's speed (slowest motor)
-            LeftDriveSmart.spin(vex::directionType::fwd, minSpeed * 0.7, vex::voltageUnits::volt); // Adjust 0.7 if needed
-        }
-        else if (rightRPM > leftRPM)
-        {
-            // Reduce the speed of the right motor to match the left motor's speed (slowest motor)
-            RightDriveSmart.spin(vex::directionType::fwd, minSpeed * 0.7, vex::voltageUnits::volt); // Adjust 0.7 if needed
-        }
-
-        // Apply the reduced speed to the other motor as well
-        LeftDriveSmart.spin(vex::directionType::fwd, minSpeed * 0.7, vex::voltageUnits::volt);
-        RightDriveSmart.spin(vex::directionType::fwd, minSpeed * 0.7, vex::voltageUnits::volt);
-
-        // You can also add logic to apply more gradual braking if needed
-        // Adjust the speed decrease factor (e.g., *0.7) as necessary to control the braking intensity
-    }
+    clearScreen(true, false, false);
+    Brain.Screen.print("Traction Control: %s\nStability Control: %s\nABS: %s",
+                       tractionControlEnabled ? "ON" : "OFF",
+                       stabilityControlEnabled ? "ON" : "OFF",
+                       absEnabled ? "ON" : "OFF");
 }
 
 // Function to apply traction control
 void applyTractionControl(double &forwardVolts)
 {
-    // Get the current RPM of the left and right motors
     double frontLeftMotorRPM = frontLeftMotor.velocity(vex::velocityUnits::rpm);
     double rearLeftMotorRPM = rearLeftMotor.velocity(vex::velocityUnits::rpm);
     double frontRightMotorRPM = frontRightMotor.velocity(vex::velocityUnits::rpm);
     double rearRightMotorRPM = rearRightMotor.velocity(vex::velocityUnits::rpm);
 
-    // Find the minimum RPM among all motors
-    double minSpeed = std::min(std::min(std::abs(frontLeftMotorRPM), std::abs(rearLeftMotorRPM)), std::min(std::abs(frontRightMotorRPM), std::abs(rearRightMotorRPM)));
+    double minSpeed = std::min({std::abs(frontLeftMotorRPM), std::abs(rearLeftMotorRPM), std::abs(frontRightMotorRPM), std::abs(rearRightMotorRPM)});
 
-    // Check if any motor's RPM difference exceeds the threshold
-    if (std::abs(frontLeftMotorRPM - minSpeed) > 5 || std::abs(rearLeftMotorRPM - minSpeed) > 5 ||
-        std::abs(frontRightMotorRPM - minSpeed) > 5 || std::abs(rearRightMotorRPM - minSpeed) > 5)
-    {
-        // Reduce the forward voltage to match the slowest motor's speed
-        forwardVolts = minSpeed * 0.7; // Adjust 0.7 if needed
-    }
+    forwardVolts = minSpeed;
 }
 
+// Function to apply stability control
+void applyStabilityControl(const double &forwardVolts)
+{
+    double leftRPM = LeftDriveSmart.velocity(vex::velocityUnits::rpm);
+    double rightRPM = RightDriveSmart.velocity(vex::velocityUnits::rpm);
+
+    double minSpeed = std::min(std::abs(leftRPM), std::abs(rightRPM));
+
+    LeftDriveSmart.spin(vex::directionType::fwd, minSpeed, vex::voltageUnits::volt);
+    RightDriveSmart.spin(vex::directionType::fwd, minSpeed, vex::voltageUnits::volt);
+}
+
+// Function to apply ABS
+void applyABS(double &brakeVolts)
+{
+    double frontLeftMotorRPM = frontLeftMotor.velocity(vex::velocityUnits::rpm);
+    double rearLeftMotorRPM = rearLeftMotor.velocity(vex::velocityUnits::rpm);
+    double frontRightMotorRPM = frontRightMotor.velocity(vex::velocityUnits::rpm);
+    double rearRightMotorRPM = rearRightMotor.velocity(vex::velocityUnits::rpm);
+
+    double minSpeed = std::min({std::abs(frontLeftMotorRPM), std::abs(rearLeftMotorRPM), std::abs(frontRightMotorRPM), std::abs(rearRightMotorRPM)});
+
+    brakeVolts = minSpeed;
+}
+
+// Function to display drive mode menu
 void displayDriveModeMenu()
 {
-    primaryController.Screen.clearScreen();
-    primaryController.Screen.setCursor(1, 1);
-    primaryController.Screen.print("Select Drive Mode:");
-    primaryController.Screen.setCursor(2, 1);
-    primaryController.Screen.print("1. Left Arcade");
-    primaryController.Screen.setCursor(3, 1);
-    primaryController.Screen.print("2. Right Arcade");
-    primaryController.Screen.setCursor(4, 1);
-    primaryController.Screen.print("3. Split Arcade");
-    primaryController.Screen.setCursor(5, 1);
-    primaryController.Screen.print("4. Tank");
+    clearScreen(false, true, false);
+    getUserOption("Drive Mode", {"Left Arcade", "Right Arcade", "Split Arcade", "Tank"});
 
-    while (true)
+    auto buttonPressDurations = controllerButtonsPressed(primaryController);
+    std::string buttonPressed;
+
+    if (buttonPressed == "A")
     {
-        auto buttonPressDurations = controllerButtonsPressed(primaryController);
-        std::string buttonPressed;
-        if (!buttonPressDurations.empty())
-        {
-            buttonPressed = buttonPressDurations.begin()->first;
-        }
-        if (buttonPressed == "1")
-        {
-            ConfigManager.setDriveMode(configManager::DriveMode::LeftArcade);
-            break;
-        }
-        else if (buttonPressed == "2")
-        {
-            ConfigManager.setDriveMode(configManager::DriveMode::RightArcade);
-            break;
-        }
-        else if (buttonPressed == "3")
-        {
-            ConfigManager.setDriveMode(configManager::DriveMode::SplitArcade);
-            break;
-        }
-        else if (buttonPressed == "4")
-        {
-            ConfigManager.setDriveMode(configManager::DriveMode::Tank);
-            break;
-        }
-        vex::this_thread::sleep_for(100);
+        ConfigManager.setDriveMode(configManager::DriveMode::LeftArcade);
+    }
+    else if (buttonPressed == "B")
+    {
+        ConfigManager.setDriveMode(configManager::DriveMode::RightArcade);
+    }
+    else if (buttonPressed == "X")
+    {
+        ConfigManager.setDriveMode(configManager::DriveMode::SplitArcade);
+    }
+    else if (buttonPressed == "Y")
+    {
+        ConfigManager.setDriveMode(configManager::DriveMode::Tank);
     }
 
-    primaryController.Screen.clearScreen();
+    clearScreen(false, true, false);
     primaryController.Screen.print("Drive Mode Selected");
 }
 
+// User control task
 void userControl()
 {
     if (!Competition.isEnabled())
@@ -161,6 +121,17 @@ void userControl()
 
     while (Competition.isEnabled())
     {
+        // Open configuration menu
+        if (primaryController.ButtonUp.pressing())
+        {
+            configMenuActive = !configMenuActive;
+            if (configMenuActive)
+            {
+                displayDriveModeMenu();
+                currentDriveMode = ConfigManager.getDriveMode(); // Update currentDriveMode after selection
+            }
+        }
+
         switch (currentDriveMode)
         {
         case configManager::DriveMode::LeftArcade:
@@ -185,39 +156,30 @@ void userControl()
             RightDriveSmart.spin(vex::directionType::fwd, rightVolts, vex::voltageUnits::volt);
             break;
         }
-
-        // Apply traction control if enabled
-        if (tractionControlEnabled)
-        {
-            applyTractionControl(forwardVolts);
-        }
-
-        // Apply stability control if enabled
-        if (stabilityControlEnabled)
-        {
-            applyStabilityControl(forwardVolts);
-        }
-
-        // Apply the calculated voltages to the motors
         if (currentDriveMode != configManager::DriveMode::Tank)
         {
+            // Apply traction control if enabled
+            if (tractionControlEnabled)
+            {
+                applyTractionControl(forwardVolts);
+            }
+
+            // Apply stability control if enabled
+            if (stabilityControlEnabled)
+            {
+                applyStabilityControl(forwardVolts);
+            }
+
+            // Apply ABS if enabled
+            if (absEnabled)
+            {
+                applyABS(forwardVolts);
+            }
+
+            // Apply the calculated voltages to the motors
             LeftDriveSmart.spin(vex::directionType::fwd, forwardVolts + turnVolts, vex::voltageUnits::volt);
             RightDriveSmart.spin(vex::directionType::fwd, forwardVolts - turnVolts, vex::voltageUnits::volt);
         }
-
         vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
     }
-
-    // Open configuration menu
-    if (primaryController.ButtonUp.pressing())
-    {
-        configMenuActive = !configMenuActive;
-        if (configMenuActive)
-        {
-            displayDriveModeMenu();
-            currentDriveMode = ConfigManager.getDriveMode(); // Update currentDriveMode after selection
-        }
-    }
-
-    vex::this_thread::sleep_for(ConfigManager.getCtrlr1PollingRate());
 }

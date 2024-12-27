@@ -120,15 +120,15 @@ void configManager::readMaintenanceData()
             {
                 if (key == "ODOMETER")
                 {
-                    odometer = stringToLong(value);
+                    odometer = stringToNumber<int>(value);
                 }
                 else if (key == "LAST_SERVICE")
                 {
-                    lastService = stringToLong(value);
+                    lastService = stringToNumber<long>(value);
                 }
                 else if (key == "SERVICE_INTERVAL")
                 {
-                    serviceInterval = stringToLong(value);
+                    serviceInterval = stringToNumber<long>(value);
                 }
             }
         }
@@ -139,45 +139,66 @@ void configManager::readMaintenanceData()
 // Method to convert a string to boolean
 bool configManager::stringToBool(std::string_view str)
 {
-    try
+    if (str.empty())
     {
-        if (str == "true" || str == "1")
-        {
-            return true;
-        }
-        else if (str == "false" || str == "0")
-        {
-            return false;
-        }
-        else
-        {
-            throw std::invalid_argument("Invalid boolean string");
-        }
+        logHandler("stringToBool", "Empty string cannot be converted to boolean", Log::Level::Error);
+        return false;
     }
-    catch (const std::invalid_argument &e)
+
+    if (str == "true" || str == "1")
     {
-        logHandler("stringToBool", std::format("Invalid argument: {}", str), Log::Level::Error);
+        return true;
+    }
+    else if (str == "false" || str == "0")
+    {
+        return false;
+    }
+    else
+    {
+        logHandler("stringToBool", std::format("Invalid boolean string: {}", str), Log::Level::Error);
         return false;
     }
 }
 
-// Method to convert a string to long
-long configManager::stringToLong(std::string_view str)
+// Method to convert a string to a number
+template <typename T>
+T configManager::stringToNumber(std::string_view str)
 {
+    if (str.empty())
+    {
+        logHandler("stringToNumber", "Empty string cannot be converted to number", Log::Level::Error);
+        return T{};
+    }
+
     try
     {
-        return std::stol(std::string(str));
+        if constexpr (std::is_same_v<T, int>)
+        {
+            return std::stoi(std::string(str));
+        }
+        else if constexpr (std::is_same_v<T, long>)
+        {
+            return std::stol(std::string(str));
+        }
+        else if constexpr (std::is_same_v<T, double>)
+        {
+            return std::stod(std::string(str));
+        }
+        else if constexpr (std::is_same_v<T, std::size_t>)
+        {
+            return static_cast<std::size_t>(std::stoul(std::string(str)));
+        }
     }
     catch (const std::invalid_argument &e)
     {
-        logHandler("stringToLong", std::format("Invalid argument: {}", str), Log::Level::Error);
-        return 0;
+        logHandler("stringToNumber", std::format("Invalid argument: {}", str), Log::Level::Error);
     }
     catch (const std::out_of_range &e)
     {
-        logHandler("stringToLong", std::format("Out of range: {}", str), Log::Level::Error);
-        return 0;
+        logHandler("stringToNumber", std::format("Out of range: {}", str), Log::Level::Error);
     }
+
+    return T{};
 }
 
 // Method to set values from the config file and parse complex config sections
@@ -222,10 +243,6 @@ void configManager::setValuesFromConfig()
             {
                 setDriverGifPath(value);
             }
-            else if (key == "CustomMessage")
-            {
-                setCustomMessage(value);
-            }
             else if (key == "PRINTLOGO")
             {
                 setPrintLogo(stringToBool(value));
@@ -236,15 +253,15 @@ void configManager::setValuesFromConfig()
             }
             else if (key == "MAXOPTIONSSIZE")
             {
-                setMaxOptionSize(stringToLong(value));
+                setMaxOptionSize(stringToNumber<std::size_t>(value));
             }
             else if (key == "POLLINGRATE")
             {
-                setPollingRate(stringToLong(value));
+                setPollingRate(stringToNumber<std::size_t>(value));
             }
             else if (key == "CTRLR1POLLINGRATE")
             {
-                setCtrlr1PollingRate(stringToLong(value));
+                setCtrlr1PollingRate(stringToNumber<std::size_t>(value));
             }
             else if (key == "LOGLEVEL")
             {
@@ -310,13 +327,13 @@ void configManager::setValuesFromConfig()
 
                 if (section == "MOTOR_CONFIG")
                 {
-                    motorPorts[name] = std::stoi(port);
+                    motorPorts[name] = stringToNumber<int>(port);
                     motorGearRatios[name] = gearRatio;
                     motorReversed[name] = stringToBool(reversedStr);
                 }
                 else if (section == "INERTIAL")
                 {
-                    inertialPorts[name] = std::stoi(port);
+                    inertialPorts[name] = stringToNumber<int>(port);
                 }
                 else if (section == "TRIPORT_CONFIG")
                 {

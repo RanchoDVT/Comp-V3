@@ -7,8 +7,10 @@ public:
     configManager(const std::string &configFileName, const std::string &maintenanceFileName);
     void resetOrInitializeConfig(std::string_view message);
     bool stringToBool(std::string_view str);
-    long stringToLong(std::string_view str);
+    template <typename T>
+    T stringToNumber(std::string_view str);
     void setValuesFromConfig();
+    bool validateStringNotEmpty(const std::string &value);
     void parseConfig();
     void parseComplexConfig(std::ifstream &configFile, const std::string &section);
 
@@ -52,9 +54,9 @@ public:
     void setLoadingGifPath(const std::string &value);
     void setAutoGifPath(const std::string &value);
     void setDriverGifPath(const std::string &value);
-    void setCustomMessage(const std::string &value);
     void setDriveMode(const DriveMode &mode);
 
+    // Complex return types
     std::string getGearRatio(const std::string &motorName) const;
     bool getMotorReversed(const std::string &motorName) const;
     vex::gearSetting getGearSetting(const std::string &ratio) const;

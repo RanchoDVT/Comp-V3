@@ -1,7 +1,6 @@
 #include "vex.h"
 
 #include <fstream>
-#include <sstream>
 
 std::array<ControllerButtonInfo, 12> createControllerButtonArray(const vex::controller &controller)
 {
@@ -61,17 +60,24 @@ vex::triport::port *configManager::getTriPort(const std::string &portName) const
     }
 }
 
-// Setters with validation
-void configManager::setMaxOptionSize(const std::size_t &value)
+// New validation functions for strings
+bool configManager::validateStringNotEmpty(const std::string &value)
 {
-    if (value > 0)
+    if (!value.empty())
     {
-        maxOptionSize = value;
+        return true;
     }
     else
     {
-        logHandler("configManager::setMaxOptionSize", "Max option size must be greater than 0", Log::Level::Error, 5);
+        logHandler("validateStringNotEmpty", "String value cannot be empty", Log::Level::Error, 5);
+        return false;
     }
+}
+
+// Setters
+void configManager::setMaxOptionSize(const std::size_t &value)
+{
+    maxOptionSize = value;
 }
 
 void configManager::setLogToFile(const bool &value)
@@ -81,14 +87,7 @@ void configManager::setLogToFile(const bool &value)
 
 void configManager::setPollingRate(const std::size_t &value)
 {
-    if (value > 0)
-    {
-        POLLINGRATE = value;
-    }
-    else
-    {
-        logHandler("configManager::setPollingRate", "Polling rate must be greater than 0", Log::Level::Error, 5);
-    }
+    POLLINGRATE = value;
 }
 
 void configManager::setPrintLogo(const bool &value)
@@ -98,14 +97,7 @@ void configManager::setPrintLogo(const bool &value)
 
 void configManager::setCtrlr1PollingRate(const std::size_t &value)
 {
-    if (value > 0)
-    {
-        CTRLR1POLLINGRATE = value;
-    }
-    else
-    {
-        logHandler("configManager::setCtrlr1PollingRate", "Controller 1 polling rate must be greater than 0", Log::Level::Error, 5);
-    }
+    CTRLR1POLLINGRATE = value;
 }
 
 void configManager::setLogLevel(const Log::Level &value)
@@ -115,55 +107,58 @@ void configManager::setLogLevel(const Log::Level &value)
 
 void configManager::setTeamNumber(const std::string &value)
 {
-    if (!value.empty())
+    validateStringNotEmpty(value);
+    if (value.length() > 2)
     {
-        teamNumber = value;
+        logHandler("setTeamNumber", "Team number cannot be more than 2 digits", Log::Level::Error, 5);
+        return;
     }
     else
     {
-        logHandler("configManager::setTeamNumber", "Team number cannot be empty", Log::Level::Error, 5);
+        teamNumber = value;
     }
 }
 
 void configManager::setLoadingGifPath(const std::string &value)
 {
-    if (!value.empty())
+    validateStringNotEmpty(value);
+    if (value.length() > 20)
     {
-        loadingGifPath = value;
+        logHandler("setLoadingGifPath", "GIF path cannot be more than 20 characters", Log::Level::Error, 5);
+        return;
     }
     else
     {
-        logHandler("configManager::setLoadingGifPath", "Loading GIF path cannot be empty", Log::Level::Error, 5);
+        loadingGifPath = value;
     }
 }
 
 void configManager::setAutoGifPath(const std::string &value)
 {
-    if (!value.empty())
+    validateStringNotEmpty(value);
+    if (value.length() > 20)
     {
-        autoGifPath = value;
+        logHandler("setAutoGifPath", "GIF path cannot be more than 20 characters", Log::Level::Error, 5);
+        return;
     }
     else
     {
-        logHandler("configManager::setAutoGifPath", "Auto GIF path cannot be empty", Log::Level::Error, 5);
+        autoGifPath = value;
     }
 }
 
 void configManager::setDriverGifPath(const std::string &value)
 {
-    if (!value.empty())
+    validateStringNotEmpty(value);
+    if (value.length() > 20)
     {
-        driverGifPath = value;
+        logHandler("setDriverGifPath", "GIF path cannot be more than 20 characters", Log::Level::Error, 5);
+        return;
     }
     else
     {
-        logHandler("configManager::setDriverGifPath", "Driver GIF path cannot be empty", Log::Level::Error, 5);
+        driverGifPath = value;
     }
-}
-
-void configManager::setCustomMessage(const std::string &value)
-{
-    customMessage = value;
 }
 
 int configManager::getMotorPort(const std::string &motorName) const

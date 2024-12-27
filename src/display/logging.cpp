@@ -29,7 +29,7 @@ const char *consoleColors[] = {
     "\033[92m[Trace]",
     "\033[93m[Debug]",
     "\033[94m[Info]",
-    " \033[38;5;216m[Warn]",
+    "\033[38;5;216m[Warn]",
     "\033[31m[Error]",
     "\033[32m[Fatal]",
     "\033[31m[Error]" // Default
