@@ -1,3 +1,5 @@
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/{owner}/{repo}/badge)](https://scorecard.dev/viewer/?uri=github.com/{owner}/{repo})
+
 <h1 id="advanced-startup-vex-v5">Advanced Startup Vex V5</h1>
 <h2 id="getting-started-">Getting started: ▶️</h2>
 <ol>
