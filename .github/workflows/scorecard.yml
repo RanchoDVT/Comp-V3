@@ -71,3 +71,6 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif
+
+        name: OSSF Scorecard action
+        uses: ossf/scorecard-action@v2.4.0
