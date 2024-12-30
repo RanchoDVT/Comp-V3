@@ -77,9 +77,17 @@ void initializeDiagnosticMode()
  */
 void vexCodeInit()
 {
-    clearScreen(true, true, true);
+
+
+    Brain.Screen.clearScreen();
+    Brain.Screen.setCursor(1, 1);
+    primaryController.Screen.clearScreen();
+    primaryController.Screen.setCursor(1, 1);
+    partnerController.Screen.clearScreen();
+    partnerController.Screen.setCursor(1, 1);
 
     primaryController.Screen.print("Starting up...");
+    partnerController.Screen.print("Starting up...");
     logHandler("startup", "Starting GUI startup...", Log::Level::Info);
 
     if (Competition.isEnabled())
@@ -186,6 +194,9 @@ void vexCodeInit()
         }
     }
 
-    clearScreen(false, true, true);
+    primaryController.Screen.clearScreen();
+    primaryController.Screen.setCursor(1, 1);
+    partnerController.Screen.clearScreen();
+    partnerController.Screen.setCursor(1, 1);
     return;
 }

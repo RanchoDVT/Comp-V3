@@ -1,6 +1,40 @@
 #include <map>
 #include <string>
 
+/**
+ * @class Log
+ * @brief Handles logging with different severity levels.
+ * @details Provides an enumeration for log levels.
+ */
+class Log
+{
+public:
+    /**
+     * @enum Level
+     * @brief Defines the severity levels for logging.
+     */
+    enum class Level
+    {
+        Trace, ///< Detailed information.
+        Debug, ///< Debug-level messages.
+        Info,  ///< Informational messages that highlight the progress of the application.
+        Warn,  ///< Potentially harmful situations.
+        Error, ///< Error events that still allow the application to continue running.
+        Fatal  ///< Very severe error events that will lead the application to abort.
+    };
+};
+
+struct ControllerButtonInfo
+{
+    const vex::controller::button *button;
+    std::string name;
+};
+
+extern std::array<ControllerButtonInfo, 12> AllControllerButtons;
+
+std::array<ControllerButtonInfo, 12> createControllerButtonArray(const vex::controller &controller);
+std::array<ControllerButtonInfo, 12> getControllerButtonArray(const vex::controller &controller);
+
 class configManager
 {
 public:
@@ -98,3 +132,6 @@ private:
     void readMaintenanceData();
     void writeMaintenanceData();
 };
+
+/// @brief Manages configuration settings.
+extern configManager ConfigManager;

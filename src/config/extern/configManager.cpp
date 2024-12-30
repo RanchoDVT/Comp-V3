@@ -19,8 +19,6 @@ std::array<ControllerButtonInfo, 12> createControllerButtonArray(const vex::cont
         ControllerButtonInfo{&controller.ButtonR2, "R2"}};
 }
 
-std::array<ControllerButtonInfo, 12> AllControllerButtons = createControllerButtonArray(primaryController);
-
 std::array<ControllerButtonInfo, 12> getControllerButtonArray(const vex::controller &controller)
 {
     return createControllerButtonArray(controller);

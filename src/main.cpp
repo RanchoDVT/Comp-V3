@@ -9,18 +9,34 @@
 
 #include "vex.h"
 
-std::string Version = "3.0b3-f2";
-std::string BuildDate = "12/22/24";
+std::string Version = "3.0b3-f2 [DEV]";
+std::string BuildDate = "12/29/24";
 
 int main()
 {
     printf("\033[2J\033[1;1H\033[0m"); // Clears console and Sets color to grey.
     ConfigManager.parseConfig();
-    vexCodeInit();
     Competition.autonomous(autonomous);
     Competition.drivercontrol(userControl);
+    vexCodeInit();
     while (Competition.isEnabled())
     {
-        vex::this_thread::sleep_for(10);
+        if (!primaryController.installed())
+        {
+            Brain.Screen.drawRectangle(10, 10, 300, 50, vex::color::red);
+            Brain.Screen.setCursor(2, 2);
+            Brain.Screen.print("primaryController disconnected!");
+        }
+        else if (!partnerController.installed())
+        {
+            Brain.Screen.drawRectangle(10, 10, 300, 50, vex::color::red);
+            Brain.Screen.setCursor(2, 2);
+            Brain.Screen.print("partnerController disconnected!");
+        }
+        else
+        {
+            Brain.Screen.drawRectangle(10, 10, 300, 50, vex::color::black);
+        }
+        vex::this_thread::sleep_for(25);
     }
 }

@@ -26,7 +26,8 @@ bool absEnabled = true;
 // Function to display system states on the Brain Screen
 void displaySystemStates()
 {
-    clearScreen(true, false, false);
+    Brain.Screen.clearScreen();
+    Brain.Screen.setCursor(1, 1);
     Brain.Screen.print("Traction Control: %s\nStability Control: %s\nABS: %s",
                        tractionControlEnabled ? "ON" : "OFF",
                        stabilityControlEnabled ? "ON" : "OFF",
@@ -74,7 +75,8 @@ void applyABS(double &brakeVolts)
 // Function to display drive mode menu
 void displayDriveModeMenu()
 {
-    clearScreen(false, true, false);
+    primaryController.Screen.clearScreen();
+    primaryController.Screen.setCursor(1, 1);
     getUserOption("Drive Mode", {"Left Arcade", "Right Arcade", "Split Arcade", "Tank"});
 
     auto buttonPressDurations = controllerButtonsPressed(primaryController);
@@ -97,7 +99,8 @@ void displayDriveModeMenu()
         ConfigManager.setDriveMode(configManager::DriveMode::Tank);
     }
 
-    clearScreen(false, true, false);
+    primaryController.Screen.clearScreen();
+    primaryController.Screen.setCursor(1, 1);
     primaryController.Screen.print("Drive Mode Selected");
 }
 

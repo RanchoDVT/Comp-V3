@@ -126,27 +126,6 @@ void displayTask()
     }
 }
 
-void clearScreen(const bool &brainClear, const bool &primaryControllerClear, const bool &partnerControllerClear)
-{
-    if (brainClear)
-    {
-        Brain.Screen.clearScreen();
-        Brain.Screen.setCursor(1, 1);
-    }
-    if (primaryControllerClear)
-    {
-        primaryController.Screen.clearScreen();
-        primaryController.Screen.setCursor(1, 1);
-    }
-    if (partnerControllerClear)
-    {
-        partnerController.Screen.clearScreen();
-        partnerController.Screen.setCursor(1, 1);
-    }
-    logHandler("clearScreen", "Finished clearScreen", Log::Level::Trace);
-    return;
-}
-
 std::string getUserOption(const std::string &settingName, const std::vector<std::string> &options)
 {
     if (Competition.isEnabled())
@@ -200,8 +179,11 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
 
     while (!Competition.isEnabled() and primaryController.installed())
     {
-        buttonString.clear();
-        clearScreen(false, true, true);
+        buttonString.clear(); // fix bug of buttons not displaying
+        primaryController.Screen.clearScreen();
+        primaryController.Screen.setCursor(1, 1);
+        partnerController.Screen.clearScreen();
+        partnerController.Screen.setCursor(1, 1);
         primaryController.Screen.print(settingName.c_str());
         partnerController.Screen.print("Waiting for #1...");
 
@@ -272,7 +254,10 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
             // Display message
             if (wrongAttemptCount < maxWrongAttempts)
             {
-                clearScreen(false, true, true);
+                primaryController.Screen.clearScreen();
+                primaryController.Screen.setCursor(1, 1);
+                partnerController.Screen.clearScreen();
+                partnerController.Screen.setCursor(1, 1);
                 primaryController.Screen.print(wrongMessages[wrongAttemptCount].c_str());
                 ++wrongAttemptCount; // Increment wrong attempt count
                 logHandler("getUserOption", std::format("wrongAttemptCount: {}", wrongAttemptCount), Log::Level::Debug);
@@ -285,6 +270,9 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
             }
         }
     }
-    clearScreen(false, true, true);
+    primaryController.Screen.clearScreen();
+    primaryController.Screen.setCursor(1, 1);
+    partnerController.Screen.clearScreen();
+    partnerController.Screen.setCursor(1, 1);
     return options[Index];
 }

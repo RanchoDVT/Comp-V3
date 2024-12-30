@@ -51,29 +51,30 @@ const char *LogToColor(const Log::Level &str)
 
 void scrollText(const std::string &text, vex::controller &controller, const float &timeOfDisplay)
 {
-    int length = text.length();
-    int displayLength = 20;
+    const int displayLength = 20;
     int startIndex = 0;
     bool forward = true;
+    const auto length = static_cast<int>(text.length());
+
     for (float elapsed = 0; elapsed < timeOfDisplay; elapsed += 0.3)
     {
-        controller.Screen.setCursor(1, 1);
-        controller.Screen.clearLine();
+        primaryController.Screen.clearScreen();
+        primaryController.Screen.setCursor(1, 1);
+        partnerController.Screen.clearScreen();
+        partnerController.Screen.setCursor(1, 1);
         controller.Screen.print(text.substr(startIndex, displayLength).c_str());
 
         // Update startIndex for scrolling
         if (forward)
         {
-            startIndex++;
-            if (startIndex + displayLength >= length)
+            if (++startIndex + displayLength >= length)
             {
                 forward = false;
             }
         }
         else
         {
-            startIndex--;
-            if (startIndex <= 0)
+            if (--startIndex <= 0)
             {
                 forward = true;
             }
@@ -81,14 +82,16 @@ void scrollText(const std::string &text, vex::controller &controller, const floa
 
         vex::this_thread::sleep_for(30);
     }
-    return;
 }
 
 // Display messages on controller screens
 // #NoRedundantCode
 void displayControllerMessage(const std::string &functionName, const std::string &message, const float &timeOfDisplay)
 {
-    clearScreen(false, true, true);
+    primaryController.Screen.clearScreen();
+    primaryController.Screen.setCursor(1, 1);
+    partnerController.Screen.clearScreen();
+    partnerController.Screen.setCursor(1, 1);
     primaryController.Screen.print(std::format("Check logs.\nModule: {}\n", functionName).c_str());
     partnerController.Screen.print(std::format("{}\nCheck logs.\nModule: {}\n", message, functionName).c_str());
     if (message.length() > 20)
@@ -97,7 +100,10 @@ void displayControllerMessage(const std::string &functionName, const std::string
         scrollText(message, partnerController, timeOfDisplay);
     }
     vex::this_thread::sleep_for(timeOfDisplay * 1000);
-    clearScreen(false, true, true);
+    primaryController.Screen.clearScreen();
+    primaryController.Screen.setCursor(1, 1);
+    partnerController.Screen.clearScreen();
+    partnerController.Screen.setCursor(1, 1);
 }
 
 // Log handler function
@@ -109,13 +115,11 @@ void logHandler(const std::string &functionName, const std::string &message, con
     if (level == Log::Level::Warn || level == Log::Level::Error || level == Log::Level::Fatal)
     {
         displayControllerMessage(functionName, message, timeOfDisplay);
-    }
-
-    if (level == Log::Level::Fatal)
-    {
-        displayControllerMessage(functionName, message, timeOfDisplay);
-        vex::thread::interruptAll(); // Scary! 👾
-        vexSystemExitRequest();      // Exit program
+        if (level == Log::Level::Fatal)
+        {
+            vex::thread::interruptAll(); // Scary! 👾
+            vexSystemExitRequest();      // Exit program
+        }
     }
 }
 
