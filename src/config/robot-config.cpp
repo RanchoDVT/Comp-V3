@@ -168,14 +168,14 @@ void vexCodeInit()
     }
     else if (ConfigManager.configType == configManager::ConfigType::Controller)
     {
-        auto message = "Battery is at: " + std::to_string(Brain.Battery.capacity()) + "%%";
+        auto message = "Battery is at: " + std::to_string(Brain.Battery.capacity()) + "%"; // Fix bug of displaying 2 % signs on controller
         if (Brain.Battery.capacity() < 90)
         {
-            logHandler("startup", message, Log::Level::Warn, 3);
+            logHandler("startup", message + "%", Log::Level::Warn, 3); // Need to add another % sign to display correctly
         }
         else
         {
-            logHandler("startup", message, Log::Level::Info, 3);
+            logHandler("startup", message + "%", Log::Level::Info, 3);
         }
 
         auto autorun = getUserOption("Run Autonomous?", {"Yes", "No"});

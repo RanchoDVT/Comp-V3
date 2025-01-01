@@ -21,22 +21,6 @@ int main()
     vexCodeInit();
     while (Competition.isEnabled())
     {
-        if (!primaryController.installed())
-        {
-            Brain.Screen.drawRectangle(10, 10, 300, 50, vex::color::red);
-            Brain.Screen.setCursor(2, 2);
-            Brain.Screen.print("primaryController disconnected!");
-        }
-        else if (!partnerController.installed())
-        {
-            Brain.Screen.drawRectangle(10, 10, 300, 50, vex::color::red);
-            Brain.Screen.setCursor(2, 2);
-            Brain.Screen.print("partnerController disconnected!");
-        }
-        else
-        {
-            Brain.Screen.drawRectangle(10, 10, 300, 50, vex::color::black);
-        }
         vex::this_thread::sleep_for(25);
     }
 }

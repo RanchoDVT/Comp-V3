@@ -17,48 +17,50 @@ void configManager::resetOrInitializeConfig(std::string_view message)
             return;
         }
         // Write default configuration
-        configFile << "# Config File:\n";
-        configFile << "MOTOR_CONFIG {\n";
-        configFile << "    FRONT_LEFT_MOTOR {\n";
-        configFile << "        PORT=1\n";
-        configFile << "        GEAR_RATIO=6_1\n";
-        configFile << "        REVERSED=false\n";
-        configFile << "    }\n";
-        configFile << "    FRONT_RIGHT_MOTOR {\n";
-        configFile << "        PORT=10\n";
-        configFile << "        GEAR_RATIO=6_1\n";
-        configFile << "        REVERSED=true\n";
-        configFile << "    }\n";
-        configFile << "    REAR_LEFT_MOTOR {\n";
-        configFile << "        PORT=11\n";
-        configFile << "        GEAR_RATIO=6_1\n";
-        configFile << "        REVERSED=false\n";
-        configFile << "    }\n";
-        configFile << "    REAR_RIGHT_MOTOR {\n";
-        configFile << "        PORT=20\n";
-        configFile << "        GEAR_RATIO=6_1\n";
-        configFile << "        REVERSED=true\n";
-        configFile << "    }\n";
-        configFile << "    INERTIAL {\n";
-        configFile << "        PORT=3\n";
-        configFile << "    }\n";
-        configFile << "    Rear_Bumper {\n";
-        configFile << "        PORT=A\n";
-        configFile << "    }\n";
-        configFile << "}\n";
-        configFile << "PRINTLOGO=true\n";
-        configFile << "LOGTOFILE=true\n";
-        configFile << "MAXOPTIONSSIZE=4\n";
-        configFile << "POLLINGRATE=5\n";
-        configFile << "CTRLR1POLLINGRATE=25\n";
-        configFile << "CONFIGTYPE=Brain\n";
-        configFile << "TEAMNUMBER=12\n";
-        configFile << "LOADINGGIFPATH=loading.gif\n";
-        configFile << "AUTOGIFPATH=auto.gif\n";
-        configFile << "DRIVEGIFPATH=drive.gif\n";
-        configFile << "CUSTOMMESSAGE=test\n";
-        configFile << "DRIVEMODE=Split\n";
-        configFile << std::format("VERSION={}\n", Version);
+        configFile << R"(
+    # Config File:
+    MOTOR_CONFIG {
+        FRONT_LEFT_MOTOR {
+        PORT=1
+        GEAR_RATIO=6_1
+        REVERSED=false
+        }
+        FRONT_RIGHT_MOTOR {
+        PORT=10
+        GEAR_RATIO=6_1
+        REVERSED=true
+        }
+        REAR_LEFT_MOTOR {
+        PORT=11
+        GEAR_RATIO=6_1
+        REVERSED=false
+        }
+        REAR_RIGHT_MOTOR {
+        PORT=20
+        GEAR_RATIO=6_1
+        REVERSED=true
+        }
+        INERTIAL {
+        PORT=3
+        }
+        Rear_Bumper {
+        PORT=A
+        }
+    }
+    PRINTLOGO=true
+    LOGTOFILE=true
+    MAXOPTIONSSIZE=4
+    POLLINGRATE=5
+    CTRLR1POLLINGRATE=25
+    CONFIGTYPE=Brain
+    TEAMNUMBER=12
+    LOADINGGIFPATH=loading.gif
+    AUTOGIFPATH=auto.gif
+    DRIVEGIFPATH=drive.gif
+    CUSTOMMESSAGE=test
+    DRIVEMODE=Split
+    VERSION=)" << Version
+                   << "\n";
         configFile.close();
 
         logHandler("resetConfig", "Successfully reset config file.", Log::Level::Debug);

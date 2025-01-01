@@ -59,4 +59,5 @@ void motorMonitor();
 std::map<std::string, std::vector<int>> controllerButtonsPressed(const vex::controller &controller);
 
 /// @brief Starts the GIF player.
-void gifplayer();
+/// @param enableVsync Whether to enable vertical sync.
+void gifplayer(bool enableVsync = false);

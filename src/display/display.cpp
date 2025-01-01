@@ -128,9 +128,14 @@ void displayTask()
 
 std::string getUserOption(const std::string &settingName, const std::vector<std::string> &options)
 {
+    constexpr std::size_t maxWrongAttempts = 3;
+    const std::string wrongMessages[maxWrongAttempts] = {
+        "Invalid selection!", "Do you need a map?", "Rocks can do this!"};
+
     if (Competition.isEnabled())
     {
         logHandler("getUserOption", "Robot is IN competition mode!", Log::Level::Error, 2);
+        return "DEFAULT";
     }
 
     if (options.size() > ConfigManager.getMaxOptionSize() || options.size() < 2)
@@ -148,13 +153,9 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
     logHandler("getUserOption", optmessage, Log::Level::Debug);
 
     std::size_t wrongAttemptCount = 0;
-    const std::size_t maxWrongAttempts = 3;
-    const std::string wrongMessages[maxWrongAttempts] = {
-        "Invalid selection!", "Do you need a map?", "Rocks can do this!"};
-    std::string buttonString;
-    // Have a index number for what they selected and convert it to the option.
     std::size_t Index = options.size(); // Invalid selection by default
     int offset = 0;
+    std::string buttonString;
 
     const auto buttonsInfo = getControllerButtonArray(primaryController);
     std::vector<std::string> buttons;
@@ -174,10 +175,10 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
 
     while (!primaryController.installed())
     {
-        vex::this_thread::sleep_for(20);
+        vex::this_thread::sleep_for(25);
     }
 
-    while (!Competition.isEnabled() and primaryController.installed())
+    while (!Competition.isEnabled() && primaryController.installed())
     {
         buttonString.clear(); // fix bug of buttons not displaying
         primaryController.Screen.clearScreen();

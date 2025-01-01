@@ -125,13 +125,19 @@ void motorMonitor()
     }
 }
 
-void gifplayer()
+void gifplayer(bool enableVsync)
 {
     if (!ConfigManager.getPrintLogo())
     {
         return;
     }
-    else if (!Competition.isEnabled())
+
+    if (enableVsync)
+    {
+        Brain.Screen.waitForRefresh();
+    }
+
+    if (!Competition.isEnabled())
     {
         vex::Gif gif("assets/loading.gif", 0, 0);
         while (!Competition.isEnabled())
