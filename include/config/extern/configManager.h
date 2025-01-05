@@ -76,6 +76,7 @@ public:
     int getLastService() const { return lastService; }
     int getServiceInterval() const { return serviceInterval; }
     DriveMode getDriveMode() const { return driveMode; };
+    bool getVsyncGif() const { return vsyncGif; }
 
     void setMaxOptionSize(const std::size_t &value);
     void setLogToFile(const bool &value);
@@ -89,6 +90,7 @@ public:
     void setAutoGifPath(const std::string &value);
     void setDriverGifPath(const std::string &value);
     void setDriveMode(const DriveMode &mode);
+    void SetVsyncGif(const bool &value);
 
     // Complex return types
     std::string getGearRatio(const std::string &motorName) const;
@@ -109,7 +111,7 @@ public:
 
     int getRightDeadzone() const { return rightDeadzone; }
     void setRightDeadzone(int value) { rightDeadzone = value; }
-    
+
 private:
     std::map<std::string, int> motorPorts;
     std::map<std::string, std::string> motorGearRatios;
@@ -125,6 +127,7 @@ private:
     bool PRINTLOGO;
     std::size_t CTRLR1POLLINGRATE;
     Log::Level logLevel;
+    bool vsyncGif;
 
     std::string teamNumber;
     std::string loadingGifPath;

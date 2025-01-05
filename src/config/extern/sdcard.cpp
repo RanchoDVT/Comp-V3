@@ -51,12 +51,12 @@ void configManager::resetOrInitializeConfig(std::string_view message)
     MAXOPTIONSSIZE=4
     POLLINGRATE=5
     CTRLR1POLLINGRATE=25
-    CONFIGTYPE=Brain
+    CONFIGTYPE=Controller
     TEAMNUMBER=12
     LOADINGGIFPATH=loading.gif
     AUTOGIFPATH=auto.gif
     DRIVEGIFPATH=drive.gif
-    CUSTOMMESSAGE=test
+    vsyncGif=true
     DRIVEMODE=Split
     LEFTDEADZONE=10
     RIGHTDEADZONE=10
@@ -246,6 +246,10 @@ void configManager::setValuesFromConfig()
             {
                 setDriverGifPath(value);
             }
+            else if (key == "VsyncGif")
+            {
+                SetVsyncGif(stringToBool(value));
+            }
             else if (key == "PRINTLOGO")
             {
                 setPrintLogo(stringToBool(value));
@@ -293,12 +297,12 @@ void configManager::setValuesFromConfig()
             {
                 if (value != Version)
                 {
-                    resetOrInitializeConfig(std::format("Version mismatch with Config file ({}) and code version ({}). Do you want to reset the config file?", value, Version));
+                    logHandler("setValuesFromConfig", std::format("Version mismatch with Config file ({}) and code version ({}). Potential problems may occur.", value, Version), Log::Level::Warn, 4);
                 }
             }
             else
             {
-                resetOrInitializeConfig(std::format("Unknown key in config file: {}. Do you want to reset the config?", key));
+                logHandler("setValuesFromConfig", std::format("Unknown key in config file: {}. This value will be ignored.", value), Log::Level::Warn, 4);
             }
         }
         else if (key == "MOTOR_CONFIG" || key == "INERTIAL" || key == "TRIPORT_CONFIG")
@@ -363,41 +367,36 @@ void configManager::setValuesFromConfig()
 // Method to parse the config file
 void configManager::parseConfig()
 {
-    std::string message = std::format("Version: {} | Build date: {}", Version, BuildDate);
-    logHandler("main", message, Log::Level::Info);
+    logHandler("main", std::format("Version: {} | Build date: {}", Version, BuildDate), Log::Level::Info);
     primaryController.Screen.print("Starting up...");
 
     if (Brain.SDcard.isInserted())
     {
-        if (Brain.SDcard.exists(configFileName.c_str()))
-        {
-            setValuesFromConfig();
-        }
-        else
+        if (!Brain.SDcard.exists(configFileName.c_str()))
         {
             resetOrInitializeConfig("Missing config file. Create it?");
-            setValuesFromConfig();
         }
+        setValuesFromConfig();
     }
     else
     {
         // Default values
-        POLLINGRATE = 1;
+        POLLINGRATE = 5;
         PRINTLOGO = true;
-        logToFile = true;
+        logToFile = false;
         maxOptionSize = 4;
         CTRLR1POLLINGRATE = 25;
         logLevel = Log::Level::Info;
         driveMode = DriveMode::SplitArcade;
-        configType = ConfigType::Brain;
+        configType = ConfigType::Controller;
         odometer = 0;
         lastService = 0;
         serviceInterval = 1000;
-        leftDeadzone = 10; // Default left deadzone
+        leftDeadzone = 10;  // Default left deadzone
         rightDeadzone = 10; // Default right deadzone
         logHandler("configParser", "No SD card installed. Using default values.", Log::Level::Info);
     }
     calibrateGyro();
-    gifplayer();
+    gifplayer(getVsyncGif());
     Drivetrain.setStopping(vex::brakeType::coast);
 }

@@ -29,7 +29,7 @@ configManager ConfigManager("config.cfg", "maintenance.txt");
 // Constructor
 configManager::configManager(const std::string &configFileName, const std::string &maintenanceFileName)
     : driveMode(DriveMode::SplitArcade), configFileName(configFileName), maintenanceFileName(maintenanceFileName), maxOptionSize(4), logToFile(true),
-      POLLINGRATE(5), PRINTLOGO(true), CTRLR1POLLINGRATE(25), logLevel(Log::Level::Info), odometer(0), lastService(0), serviceInterval(1000)
+      POLLINGRATE(5), PRINTLOGO(true), CTRLR1POLLINGRATE(25), logLevel(Log::Level::Info), vsyncGif(true), odometer(0), lastService(0), serviceInterval(1000)
 {
     readMaintenanceData();
 
@@ -53,7 +53,7 @@ vex::triport::port *configManager::getTriPort(const std::string &portName)
     }
     else
     {
-        resetOrInitializeConfig( "Triport not found: " + portName);
+        resetOrInitializeConfig("Triport not found: " + portName);
         return it->second;
     }
 }
@@ -82,6 +82,11 @@ void configManager::setMaxOptionSize(const std::size_t &value)
     }
 
     maxOptionSize = value;
+}
+
+void configManager::SetVsyncGif(const bool &value)
+{
+    vsyncGif = value;
 }
 
 void configManager::setLogToFile(const bool &value)

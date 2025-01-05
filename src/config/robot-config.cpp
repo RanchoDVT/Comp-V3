@@ -78,7 +78,6 @@ void initializeDiagnosticMode()
 void vexCodeInit()
 {
 
-
     Brain.Screen.clearScreen();
     Brain.Screen.setCursor(1, 1);
     primaryController.Screen.clearScreen();
@@ -183,7 +182,7 @@ void vexCodeInit()
         {
             logHandler("startup", "Starting autonomous from setup.", Log::Level::Trace);
             primaryController.Screen.print("Running autonomous.");
-            autonomous();
+            
             logHandler("startup", "Finished autonomous.", Log::Level::Trace);
         }
         else if (autorun == "No")
