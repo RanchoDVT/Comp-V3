@@ -44,7 +44,7 @@ configManager::configManager(const std::string &configFileName, const std::strin
     triPorts["H"] = &Brain.ThreeWirePort.H;
 }
 
-vex::triport::port *configManager::getTriPort(const std::string &portName) const
+vex::triport::port *configManager::getTriPort(const std::string &portName)
 {
     auto it = triPorts.find(portName);
     if (it != triPorts.end())
@@ -53,8 +53,8 @@ vex::triport::port *configManager::getTriPort(const std::string &portName) const
     }
     else
     {
-        logHandler("configManager::getTriPort", "Triport not found: " + portName, Log::Level::Error, 5);
-        return nullptr; // Return nullptr if not found
+        resetOrInitializeConfig( "Triport not found: " + portName);
+        return it->second;
     }
 }
 
@@ -75,6 +75,12 @@ bool configManager::validateStringNotEmpty(const std::string &value)
 // Setters
 void configManager::setMaxOptionSize(const std::size_t &value)
 {
+    if (value < 4)
+    {
+        maxOptionSize = 4;
+        resetOrInitializeConfig("maxOptionSize cannot be lower than 4. Resetting...");
+    }
+
     maxOptionSize = value;
 }
 
@@ -108,13 +114,10 @@ void configManager::setTeamNumber(const std::string &value)
     validateStringNotEmpty(value);
     if (value.length() > 2)
     {
-        logHandler("setTeamNumber", "Team number cannot be more than 2 digits", Log::Level::Error, 5);
+        resetOrInitializeConfig("Team number cannot be more than 2 digits");
         return;
     }
-    else
-    {
-        teamNumber = value;
-    }
+    teamNumber = value;
 }
 
 void configManager::setLoadingGifPath(const std::string &value)
@@ -122,13 +125,11 @@ void configManager::setLoadingGifPath(const std::string &value)
     validateStringNotEmpty(value);
     if (value.length() > 20)
     {
-        logHandler("setLoadingGifPath", "GIF path cannot be more than 20 characters", Log::Level::Error, 5);
+        resetOrInitializeConfig("GIF path cannot be more than 20 characters");
         return;
     }
-    else
-    {
-        loadingGifPath = value;
-    }
+
+    loadingGifPath = value;
 }
 
 void configManager::setAutoGifPath(const std::string &value)
@@ -136,13 +137,11 @@ void configManager::setAutoGifPath(const std::string &value)
     validateStringNotEmpty(value);
     if (value.length() > 20)
     {
-        logHandler("setAutoGifPath", "GIF path cannot be more than 20 characters", Log::Level::Error, 5);
+        resetOrInitializeConfig("GIF path cannot be more than 20 characters");
         return;
     }
-    else
-    {
-        autoGifPath = value;
-    }
+
+    autoGifPath = value;
 }
 
 void configManager::setDriverGifPath(const std::string &value)
@@ -150,16 +149,12 @@ void configManager::setDriverGifPath(const std::string &value)
     validateStringNotEmpty(value);
     if (value.length() > 20)
     {
-        logHandler("setDriverGifPath", "GIF path cannot be more than 20 characters", Log::Level::Error, 5);
-        return;
+        resetOrInitializeConfig("GIF path cannot be more than 20 characters");
     }
-    else
-    {
-        driverGifPath = value;
-    }
+    driverGifPath = value;
 }
 
-int configManager::getMotorPort(const std::string &motorName) const
+int configManager::getMotorPort(const std::string &motorName)
 {
     auto it = motorPorts.find(motorName);
     if (it != motorPorts.end())
@@ -168,8 +163,8 @@ int configManager::getMotorPort(const std::string &motorName) const
     }
     else
     {
-        logHandler("configManager::getMotorPort", "Motor port not found: " + motorName, Log::Level::Error, 5);
-        return -1; // Return an invalid port number if not found
+        resetOrInitializeConfig("Motor port not found: " + motorName);
+        return it->second;
     }
 }
 

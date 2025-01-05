@@ -14,9 +14,9 @@
 <li>Maintenance reminders ✅</li>
 <li>Diagnostic mode ✅ </li>
 <li>Traction control &amp; Stability control ✅</li>
-<li>Hot swap of Ports (Requires rewrite of user_control, 🔃) </li>
+<li>Controller settings ✅ (Added deadzone settings 1/5/24)</li>
 <li>Odometer ☑️ (Tamper protection could not be completed)</li>
-<li>Controller settings ☑️ (Have to add deadzone settings)</li>
+<li>Hot swap of Ports (Requires rewrite of user_control, 🔃) </li>
 <li>Import code updates from internet (Requires rewrite of startup, need hardware ❌) </li>
 <li>Automatic Emergency Braking (Requires vision sensor or AI vision, need hardware ❌)<ul>
 <li>(Requires rewrite of User_Control | Prevent acceleration when a collision is imminent)</li>

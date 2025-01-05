@@ -94,8 +94,8 @@ public:
     std::string getGearRatio(const std::string &motorName) const;
     bool getMotorReversed(const std::string &motorName) const;
     vex::gearSetting getGearSetting(const std::string &ratio) const;
-    int getMotorPort(const std::string &motorName) const;
-    vex::triport::port *getTriPort(const std::string &portName) const;
+    int getMotorPort(const std::string &motorName);
+    vex::triport::port *getTriPort(const std::string &portName);
 
     void updateOdometer(const int &averagePosition);
     void checkServiceInterval();
@@ -103,6 +103,13 @@ public:
     ConfigType stringToConfigType(const std::string &str);
     Log::Level stringToLogLevel(const std::string &str);
 
+    // Getter and setter methods for deadzone settings
+    int getLeftDeadzone() const { return leftDeadzone; }
+    void setLeftDeadzone(int value) { leftDeadzone = value; }
+
+    int getRightDeadzone() const { return rightDeadzone; }
+    void setRightDeadzone(int value) { rightDeadzone = value; }
+    
 private:
     std::map<std::string, int> motorPorts;
     std::map<std::string, std::string> motorGearRatios;
@@ -128,6 +135,10 @@ private:
     int odometer;
     int lastService;
     int serviceInterval;
+
+    // New member variables for deadzone settings
+    int leftDeadzone;
+    int rightDeadzone;
 
     void readMaintenanceData();
     void writeMaintenanceData();

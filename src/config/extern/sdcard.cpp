@@ -2,10 +2,9 @@
 
 #include <fstream>
 
-// Method to reset or initialize the config file
 void configManager::resetOrInitializeConfig(std::string_view message)
 {
-    maxOptionSize = 4; // Example, already validated in setMaxOptionSize
+    maxOptionSize = 4; // Reset opt may not be ready yet so set to default
     std::string resetcfg = getUserOption(std::string(message), {"Yes", "No"});
     if (resetcfg == "Yes")
     {
@@ -59,6 +58,8 @@ void configManager::resetOrInitializeConfig(std::string_view message)
     DRIVEGIFPATH=drive.gif
     CUSTOMMESSAGE=test
     DRIVEMODE=Split
+    LEFTDEADZONE=10
+    RIGHTDEADZONE=10
     VERSION=)" << Version
                    << "\n";
         configFile.close();
@@ -280,6 +281,14 @@ void configManager::setValuesFromConfig()
                 else if (value == "Custom")
                     setDriveMode(DriveMode::Tank);
             }
+            else if (key == "LEFTDEADZONE")
+            {
+                setLeftDeadzone(stringToNumber<int>(value));
+            }
+            else if (key == "RIGHTDEADZONE")
+            {
+                setRightDeadzone(stringToNumber<int>(value));
+            }
             else if (key == "VERSION")
             {
                 if (value != Version)
@@ -384,6 +393,8 @@ void configManager::parseConfig()
         odometer = 0;
         lastService = 0;
         serviceInterval = 1000;
+        leftDeadzone = 10; // Default left deadzone
+        rightDeadzone = 10; // Default right deadzone
         logHandler("configParser", "No SD card installed. Using default values.", Log::Level::Info);
     }
     calibrateGyro();

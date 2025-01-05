@@ -122,6 +122,9 @@ void userControl()
     // Load drive mode from config
     configManager::DriveMode currentDriveMode = ConfigManager.getDriveMode();
 
+    int leftDeadzone = ConfigManager.getLeftDeadzone();
+    int rightDeadzone = ConfigManager.getRightDeadzone();
+
     while (Competition.isEnabled())
     {
         // Open configuration menu
@@ -140,27 +143,66 @@ void userControl()
         case configManager::DriveMode::LeftArcade:
             turnVolts = primaryController.Axis4.position() * 0.12; // -12 to 12
             forwardVolts = primaryController.Axis3.position() * 0.12;
+            // Apply deadzones
+            if (std::abs(primaryController.Axis3.position()) < leftDeadzone)
+            {
+                forwardVolts = 0;
+            }
+            if (std::abs(primaryController.Axis4.position()) < rightDeadzone)
+            {
+                turnVolts = 0;
+            }
             break;
 
         case configManager::DriveMode::RightArcade:
             turnVolts = primaryController.Axis1.position() * 0.12; // -12 to 12
             forwardVolts = primaryController.Axis2.position() * 0.12;
+            // Apply deadzones
+            if (std::abs(primaryController.Axis2.position()) < leftDeadzone)
+            {
+                forwardVolts = 0;
+            }
+            if (std::abs(primaryController.Axis1.position()) < rightDeadzone)
+            {
+                turnVolts = 0;
+            }
             break;
 
         case configManager::DriveMode::SplitArcade:
             turnVolts = primaryController.Axis1.position() * 0.12; // -12 to 12
             forwardVolts = primaryController.Axis3.position() * 0.12;
+            // Apply deadzones
+            if (std::abs(primaryController.Axis3.position()) < leftDeadzone)
+            {
+                forwardVolts = 0;
+            }
+            if (std::abs(primaryController.Axis1.position()) < rightDeadzone)
+            {
+                turnVolts = 0;
+            }
             break;
 
         case configManager::DriveMode::Tank:
             double leftVolts = primaryController.Axis3.position() * 0.12;  // -12 to 12
             double rightVolts = primaryController.Axis2.position() * 0.12; // -12 to 12
+
+            // Apply deadzones
+            if (std::abs(primaryController.Axis3.position()) < leftDeadzone)
+            {
+                leftVolts = 0;
+            }
+            if (std::abs(primaryController.Axis2.position()) < rightDeadzone)
+            {
+                rightVolts = 0;
+            }
+
             LeftDriveSmart.spin(vex::directionType::fwd, leftVolts, vex::voltageUnits::volt);
             RightDriveSmart.spin(vex::directionType::fwd, rightVolts, vex::voltageUnits::volt);
             break;
         }
         if (currentDriveMode != configManager::DriveMode::Tank)
         {
+
             // Apply traction control if enabled
             if (tractionControlEnabled)
             {
