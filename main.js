@@ -14,18 +14,17 @@ async function neutralizeInjectedScripts() {
         'getHardBlockPolicy', 'hardBlock', 'stopVideo', 'updateLocation',
         'initFlagScanning', 'loaderPolicy'
     ];
-
-    while (Date.now() - startTime < 1000) {
         console.clear();
         console.log("Neutralizing injected scripts...");
+    
+    while (Date.now() - startTime < 1000) {
 
         functionsToNeutralize.forEach(fn => {
             window[fn] = noOp;
         });
-
-        console.log("Injected scripts neutralized.");
         counter++;
     }
+    console.log("Injected scripts neutralized.");
     console.log(`Neutralization loop executed ${counter} times.`);
 }
 
