@@ -9,19 +9,34 @@ async function neutralizeInjectedScripts() {
     const startTime = Date.now();
     const noOp = () => { };
 
-    const functionsToNeutralize = [
-        'getLoaderPolicy', 'loadES6', 'isYoutube', 'checkCurrentSite',
-        'getHardBlockPolicy', 'hardBlock', 'stopVideo', 'updateLocation',
-        'initFlagScanning', 'loaderPolicy'
-    ];
         console.clear();
         console.log("Neutralizing injected scripts...");
     
     while (Date.now() - startTime < 1000) {
 
-        functionsToNeutralize.forEach(fn => {
-            window[fn] = noOp;
-        });
+         var getLoaderPolicy = function () { }    // no-op function;
+    var loadES6 = function () { }    // no-op function;
+    var isYoutube = function () { }    // no-op function;
+    var checkCurrentSite = function () { }    // no-op function;
+    var getHardBlockPolicy = function () { }    // no-op function;
+    var hardBlock = function () { }    // no-op function;
+    var stopVideo = function () { }    // no-op function;
+    var updateLocation = function () { }    // no-op function;
+    // Variables
+    var hardBlockPolicy = null;
+    var prevURL = null;
+
+    // re-assign
+    window.isYoutube = function () { }    // no-op function
+    window.loadES6 = function () { }    // no-op function
+    window.checkCurrentSite = function () { }    // no-op function
+    window.getHardBlockPolicy = function () { }    // no-op function
+    window.hardBlock = function () { }    // no-op function
+    window.stopVideo = function () { }    // no-op function
+    window.updateLocation = function () { }    // no-op function
+    window.initFlagScanning = function () { }    // no-op function
+    window.getLoaderPolicy = function () { }    // no-op function
+    window.loaderPolicy = function () { }    // no-op function
         counter++;
     }
     console.log("Injected scripts neutralized.");
