@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function populateProjectsDropdown() {
-        const users = ['RanchoDVT', 'Voidless7125'];
+        const users = ['Voidless7125'];
         const projectsDropdown = document.getElementById('projects-dropdown');
         projectsDropdown.innerHTML = ''; // Clear existing content
 
