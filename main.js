@@ -27,12 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
     async function populateProjectsDropdown() {
         const users = ['Voidless7125'];
         const projectsDropdown = document.getElementById('projects-dropdown');
-        projectsDropdown.innerHTML = ''; // Clear existing content
 
         for (const user of users) {
             const repos = await fetchRepositories(user);
             repos.forEach(repo => {
-                if (repo.name !== '.github' && repo.name !== 'Voidless7125') { // Exclude .github and Voidless7125 repositories
+                if (repo.name !== '.github' && repo.name !== 'Voidless7125' && repo.name !== 'shh') { // Exclude .github and Voidless7125 repositories
                     const repoLink = document.createElement('a');
                     repoLink.href = repo.html_url;
                     repoLink.target = '_blank';
@@ -41,6 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
+        const sponsoredIcon = document.createElement('span');
+        sponsoredIcon.textContent = '✨ Lockdown Browser'; // Sparkle emoji instead of an image
+        const sponsoredLink = document.createElement('a');
+        sponsoredLink.href = 'https://github.com/gucci-on-fleek/lockdown-browser/'; // Replace with sponsor's URL
+        sponsoredLink.target = '_blank';
+        sponsoredLink.appendChild(sponsoredIcon);
+        projectsDropdown.insertBefore(sponsoredLink, projectsDropdown.firstChild);
     }
 
     fetch('navbar.html')
@@ -138,7 +144,11 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
                 navigator.clipboard.writeText((document.getElementById('config-output')).textContent)
                     .then(() => {
                         console.debug('Config copied to clipboard!');
-                        (document.getElementById('copy-button')).innerHTML = 'Copied! ✅';
+                        const copyButton = document.getElementById('copy-button');
+                        copyButton.innerHTML = 'Copied! ✅';
+                        setTimeout(() => {
+                            copyButton.innerHTML = 'Recopy';
+                        }, 2000);
                     })
                     .catch(err => console.error('Error copying text:', err));
             }
@@ -146,7 +156,7 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
     }
 
     window.showPopup = async function (type) {
-        let popupText = '', downloadLink = '';
+        let popupText, downloadLink;
 
         if (type === 'Dev') {
             popupText = 'Thank you for downloading Comp-V3 *dev*! This download link goes to the Github API. The download is the source code. <br> <br> You will need my Custom SDK to use this. Check out my other download in the navbar.';
@@ -159,22 +169,37 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
             document.getElementById('popup-title').innerText = `Download Comp-V3 ${type} | ${latestTag}`;
         } else if (type === 'SDK') {
             const latestTag = await getLatestRelease('RanchoDVT/Vex-SDK');
-            popupText = 'Thank you for downloading my custom SDK. <strong>This is unofficial and in no way affiliated, endorsed, supported, or created by VEX Robotics. <br> <br> This modifies Vex\'s robotics extension, so PLEASE don\'t go to them if you have problems with this. Please contact me. </strong><br> <a target="_blank" href="https://github.com/RanchoDVT/Vex-SDK/releases "><br>Source code</a> <br> <br> <strong>The source code might not download correctly, you may have to use git clone.</strong> <br> The download button is the simple powershell script. ';
+            popupText = '*Vex Took this down! <br> You cannot download this for now!* <br> <br> Thank you for downloading my custom SDK. <br> <strong>This is unofficial and in no way affiliated, endorsed, supported, or created by VEX Robotics. <br> <br> This modifies Vex\'s robotics extension, so PLEASE don\'t go to them if you have problems with this. Please contact me. </strong><br> <a target="_blank" href="https://github.com/RanchoDVT/Vex-SDK/releases "><br>Source code</a> <br> <br> <strong>The source code might not download correctly, you may have to use git clone.</strong> <br> The download button is the simple powershell script. ';
             document.getElementById('popup-title').innerText = `Download Custom ${type} | ${latestTag}`;
             downloadLink = `https://github.com/RanchoDVT/Vex-SDK/blob/dev/Vex-SDK.updater.ps1`;
         }
 
-        document.getElementById('popup-text').innerHTML = popupText; // Use innerHTML to render HTML content
-        document.getElementById('download-link').href = downloadLink;
+        // Set the popup text and download link
+        document.getElementById('popup-text').innerHTML = popupText;
+        const downloadButton = document.getElementById('download-link');
+        downloadButton.href = downloadLink;
+
+        // Check if the download link is up by sending a HEAD request
+        try {
+            const response = await fetch(downloadLink, { method: 'HEAD' });
+            if (!response.ok) {
+                disableDownloadButton(downloadButton);
+            }
+        } catch (error) {
+            disableDownloadButton(downloadButton);
+        }
+
+        // Finally, display the popup and overlay
         document.getElementById('popup').classList.add('active');
         document.getElementById('overlay').classList.add('active');
     };
 
-    // Update the neutralization counter in the about page
-    if (document.getElementById('neutralization-counter')) {
-        document.getElementById('neutralization-counter').textContent = counter;
-    }
-
+    // Helper function to disable the download button
+    function disableDownloadButton(button) {
+        button.classList.add('disabled-download');
+        button.removeAttribute('href');
+        button.innerText = 'Download Unavailable';
+    };
 });
 
 function hidePopup() {
