@@ -42,6 +42,8 @@ li a:hover:not(.active) {
 
 nav li.dropdown {
     display: inline-block;
+    position: relative;
+
 }
 
 nav li:last-child a {
@@ -64,8 +66,12 @@ nav li:last-child a {
     text-decoration: none;
     display: block;
     text-align: left;
-    border: none;
-    /* Remove borders */
+    border-right: none;
+    border-bottom: 1px solid #ccc;
+}
+
+.dropdown-content a:first-child {
+    border-top: 1px solid #ccc;
 }
 
 .dropdown:hover .dropdown-content {

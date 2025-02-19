@@ -196,6 +196,7 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
     function disableDownloadButton(button) {
         button.classList.add('disabled-download');
         button.removeAttribute('href');
+        button.style.backgroundColor = 'gray';
         button.innerText = 'Download Unavailable';
     }
 });
