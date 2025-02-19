@@ -157,37 +157,35 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
 
     window.showPopup = async function (type) {
         let popupText, downloadLink;
+        const downloadButton = document.getElementById('download-link');
 
         if (type === 'Dev') {
-            popupText = 'Thank you for downloading Comp-V3 *dev*! This download link goes to the Github API. The download is the source code. <br> <br> You will need my Custom SDK to use this. Check out my other download in the navbar.';
+            popupText = 'Thank you for downloading Comp-V3 *dev*! This download link goes to the Github API. The download is the source code. <br><br>You will need my Custom SDK to use this. Check out my other download in the navbar.';
             downloadLink = 'https://github.com/RanchoDVT/Comp-V3/archive/refs/heads/dev.zip';
             document.getElementById('popup-title').innerText = `Download Comp-V3 ${type}`;
         } else if (type === 'Stable') {
             const latestTag = await getLatestRelease('RanchoDVT/Comp-V3');
-            popupText = 'Thank you for downloading Comp-V3 stable! This download link goes to the Github API. The download is the source code. <br> <br> You will need my Custom SDK to use this. Check out my other download in the navbar.';
-            downloadLink = `https://github.com/RanchoDVT/Comp-V3/archive/refs/tags/${latestTag}.zip`;
+            popupText = 'Thank you for downloading Comp-V3 stable! This download link goes to the Github API. The download is the source code. <br><br>You will need my Custom SDK to use this. Check out my other download in the navbar.';
             document.getElementById('popup-title').innerText = `Download Comp-V3 ${type} | ${latestTag}`;
+            downloadLink = `https://github.com/RanchoDVT/Comp-V3/archive/refs/tags/${latestTag}.zip`;
+            if (!latestTag || latestTag === 'Unknown') {
+                disableDownloadButton(downloadButton);
+                popupText = 'Release information not available. Please try again later.';
+            }
         } else if (type === 'SDK') {
             const latestTag = await getLatestRelease('RanchoDVT/Vex-SDK');
-            popupText = '*Vex Took this down! <br> You cannot download this for now!* <br> <br> Thank you for downloading my custom SDK. <br> <strong>This is unofficial and in no way affiliated, endorsed, supported, or created by VEX Robotics. <br> <br> This modifies Vex\'s robotics extension, so PLEASE don\'t go to them if you have problems with this. Please contact me. </strong><br> <a target="_blank" href="https://github.com/RanchoDVT/Vex-SDK/releases "><br>Source code</a> <br> <br> <strong>The source code might not download correctly, you may have to use git clone.</strong> <br> The download button is the simple powershell script. ';
-            document.getElementById('popup-title').innerText = `Download Custom ${type} | ${latestTag}`;
+            popupText = '*Vex Took this down! <br>You cannot download this for now!* <br><br>Thank you for downloading my custom SDK. <br><strong>This is unofficial and in no way affiliated with VEX Robotics. Please contact me for more info.</strong><br><a target="_blank" href="https://github.com/RanchoDVT/Vex-SDK/releases"><br>Source code</a><br><br><strong>The source code might not download correctly – you may have to use git clone.</strong><br>The download button is the simple powershell script.';
             downloadLink = `https://github.com/RanchoDVT/Vex-SDK/blob/dev/Vex-SDK.updater.ps1`;
+            document.getElementById('popup-title').innerText = `Download Custom ${type} | ${latestTag}`;
+            if (!latestTag || latestTag === 'Unknown') {
+                disableDownloadButton(downloadButton);
+                downloadLink = '#';
+            }
         }
 
         // Set the popup text and download link
         document.getElementById('popup-text').innerHTML = popupText;
-        const downloadButton = document.getElementById('download-link');
         downloadButton.href = downloadLink;
-
-        // Check if the download link is up by sending a HEAD request
-        try {
-            const response = await fetch(downloadLink, { method: 'HEAD' });
-            if (!response.ok) {
-                disableDownloadButton(downloadButton);
-            }
-        } catch (error) {
-            disableDownloadButton(downloadButton);
-        }
 
         // Finally, display the popup and overlay
         document.getElementById('popup').classList.add('active');
@@ -199,7 +197,7 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
         button.classList.add('disabled-download');
         button.removeAttribute('href');
         button.innerText = 'Download Unavailable';
-    };
+    }
 });
 
 function hidePopup() {
