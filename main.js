@@ -1,11 +1,18 @@
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("year").innerHTML = new Date().getFullYear();
+document.addEventListener("DOMContentLoaded", async () => {
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const cache = new Map(); // Cache responses to avoid redundant API calls
 
     async function fetchFile(url, targetElement) {
+        if (cache.has(url)) {
+            targetElement.innerHTML = cache.get(url);
+            return;
+        }
         try {
             const response = await fetch(url);
             if (!response.ok) throw new Error(`${url} not found`);
             const text = await response.text();
+            cache.set(url, text);
             targetElement.innerHTML = text;
         } catch (error) {
             console.error(`Error fetching ${url}:`, error);
@@ -13,100 +20,105 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function fetchRepositories(user) {
+        const url = `https://api.github.com/users/${user}/repos`;
+        if (cache.has(url)) {
+            return cache.get(url);
+        }
         try {
-            const response = await fetch(
-                `https://api.github.com/users/${user}/repos`
-            );
-            if (!response.ok)
-                throw new Error(`Error fetching repos for ${user}: ${response.status}`);
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Error fetching repos: ${response.status}`);
+            }
             const repos = await response.json();
+            cache.set(url, repos);
             return repos;
         } catch (error) {
-            console.error(`Error fetching repositories for ${user}:`, error);
+            console.error(`Error fetching repositories:`, error);
             return [];
         }
     }
 
-    // Language: javascript
     async function populateProjectsDropdown() {
         const users = ["Voidless7125"];
         const projectsDropdown = document.getElementById("projects-dropdown");
         const fragment = document.createDocumentFragment();
 
-        for (const user of users) {
-            const repos = await fetchRepositories(user);
-            repos.forEach((repo) => {
-                if (repo.name !== ".github" && repo.name !== "Voidless7125" && repo.name !== "shh") {
-                    const repoLink = document.createElement("a");
-                    repoLink.href = repo.html_url;
-                    repoLink.target = "_blank";
-                    repoLink.textContent = repo.name;
-                    fragment.appendChild(repoLink);
-                }
-            });
-        }
-        const sponsoredIcon = document.createElement("span");
-        sponsoredIcon.textContent = "✨ Lockdown Browser";
+        const repoRequests = users.map(fetchRepositories);
+        const userRepos = await Promise.all(repoRequests);
+
+        userRepos.flat().forEach((repo) => {
+            if (![".github", "Voidless7125", "shh"].includes(repo.name)) {
+                const repoLink = document.createElement("a");
+                repoLink.href = repo.html_url;
+                repoLink.target = "_blank";
+                repoLink.textContent = repo.name;
+                fragment.appendChild(repoLink);
+            }
+        });
+
         const sponsoredLink = document.createElement("a");
         sponsoredLink.href = "https://github.com/gucci-on-fleek/lockdown-browser/";
         sponsoredLink.target = "_blank";
-        sponsoredLink.appendChild(sponsoredIcon);
-        // Insert sponsored link at the beginning
+        sponsoredLink.innerHTML = "✨ Lockdown Browser";
         fragment.insertBefore(sponsoredLink, fragment.firstChild);
+
         projectsDropdown.appendChild(fragment);
     }
 
-    fetch("navbar.html")
-        .then((res) => res.text())
-        .then((text) => {
-            document.querySelector("div#navbar").innerHTML = text;
-            const currentPage =
-                window.location.pathname.split("/").pop() || "index.html";
-            document
-                .querySelector("div#navbar")
-                .querySelectorAll("nav a.nav-link")
-                .forEach((link) => {
-                    if (link.dataset.page === currentPage) {
-                        link.classList.add("active");
-                    }
-                });
-            populateProjectsDropdown();
-        });
-
     if (document.getElementById("readme-content"))
-        fetchFile(
+        await fetchFile(
             "https://raw.githubusercontent.com/RanchoDVT/Comp-V3/dev/README.md",
             document.getElementById("readme-content")
         );
     if (document.getElementById("changelog-content"))
-        fetchFile(
+        await fetchFile(
             "https://raw.githubusercontent.com/RanchoDVT/Comp-V3/dev/changelog.md",
             document.getElementById("changelog-content")
         );
 
     async function getLatestRelease(repo) {
+        const url = `https://api.github.com/repos/${repo}/releases/latest`;
+        if (cache.has(url)) {
+            return cache.get(url);
+        }
         try {
-            const response = await fetch(
-                `https://api.github.com/repos/${repo}/releases/latest`
-            );
+            const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`Error fetching release info: ${response.status}`);
             }
             const data = await response.json();
+            cache.set(url, data.tag_name);
             return data.tag_name;
         } catch (error) {
             return "Unknown";
         }
     }
 
-    if (document.getElementById("config-form")) {
-        document
-            .getElementById("config-form")
-            .addEventListener("submit", async function (event) {
-                event.preventDefault();
-                document.getElementById("submit").innerHTML = "Regenerate Config";
-                const formData = new FormData(document.getElementById("config-form"));
-                document.getElementById("config-output").textContent = `
+    async function loadContent() {
+        const navbar = document.querySelector("#navbar");
+        const readme = document.getElementById("readme-content");
+        const changelog = document.getElementById("changelog-content");
+
+        if (navbar) await fetchFile("navbar.html", navbar);
+        if (readme) await fetchFile("https://raw.githubusercontent.com/RanchoDVT/Comp-V3/dev/README.md", readme);
+        if (changelog) await fetchFile("https://raw.githubusercontent.com/RanchoDVT/Comp-V3/dev/changelog.md", changelog);
+
+        if (navbar) {
+            const currentPage = window.location.pathname.split("/").pop() || "index.html";
+            navbar.querySelectorAll("nav a.nav-link").forEach((link) => {
+                if (link.dataset.page === currentPage) link.classList.add("active");
+            });
+            populateProjectsDropdown();
+        }
+    }
+
+    const form = document.getElementById("config-form");
+    if (form) {
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            document.getElementById("config-output").textContent = `
 MOTOR_CONFIG {
     FRONT_LEFT_MOTOR { 
         PORT=${formData.get("front_left_port")} 
@@ -154,8 +166,8 @@ DRIVEGIFPATH=${formData.get("drive_gif_path")}
 CUSTOMMESSAGE=${formData.get("custom_message")}
 DRIVEMODE=${formData.get("drive_mode")}
 VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
-                document.getElementById("copy-button").style.display = "inline-block";
-            });
+            document.getElementById("copy-button").style.display = "inline-block";
+        });
     }
 
     if (document.getElementById("copy-button")) {
@@ -168,9 +180,9 @@ VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
                         .writeText(configOutput.textContent)
                         .then(() => {
                             const copyButton = document.getElementById("copy-button");
-                            copyButton.innerHTML = "Copied! ✅";
+                            copyButton.textContent = "Copied! ✅";
                             setTimeout(() => {
-                                copyButton.innerHTML = "Recopy";
+                                copyButton.textContent = "Recopy";
                             }, 2000);
                         })
                         .catch((err) => console.error("Error copying text:", err));
@@ -218,8 +230,8 @@ VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
         const popupText = document.getElementById("popup-text");
         const downloadLinkElem = document.getElementById("download-link");
 
-        popupTitle.innerText = popupTitleText;
-        popupText.innerHTML = popupBodyHTML;
+        popupTitle.textContent = popupTitleText;
+        popupText.innerHTML = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(popupBodyHTML) : popupBodyHTML;
         downloadLinkElem.href = downloadLink;
 
         if (downloadLink === "#") {
@@ -227,7 +239,7 @@ VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
         } else {
             downloadLinkElem.classList.remove("disabled-download");
             downloadLinkElem.style.backgroundColor = "";
-            downloadLinkElem.innerText = "Download";
+            downloadLinkElem.textContent = "Download";
         }
 
         document.getElementById("popup").classList.add("active");
@@ -238,7 +250,7 @@ VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
         button.classList.add("disabled-download");
         button.removeAttribute("href");
         button.style.backgroundColor = "gray";
-        button.innerText = "Download Unavailable";
+        button.textContent = "Download Unavailable";
     }
 
     window.hidePopup = () => {
@@ -359,7 +371,7 @@ VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
     function showTemporaryPopup(message) {
         const popup = document.createElement("div");
         popup.classList.add("temp-popup");
-        popup.innerText = message;
+        popup.textContent = message;
         document.body.appendChild(popup);
         setTimeout(() => {
             popup.remove();
@@ -374,18 +386,22 @@ VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
                 link.addEventListener("click", function (e) {
                     const dropdown = this.nextElementSibling;
                     if (dropdown && dropdown.classList.contains("dropdown-content")) {
-                        // If dropdown is not open, treat this as the first click.
-                        if (dropdown.style.display !== "block") {
+                        const isOpen = dropdown.dataset.open === "true";
+                        if (!isOpen) {
                             e.preventDefault();  // Prevent navigation on first click.
+                            dropdown.dataset.open = "true";
                             dropdown.style.display = "block";
                             showTemporaryPopup("Click again to open page...");
                             // Auto-close after 3 seconds if no second click.
                             setTimeout(() => {
                                 dropdown.style.display = "none";
+                                dropdown.dataset.open = "false";
                             }, 3000);
                         } else {
-                            // Second click: Allow navigation.
+                            // Second click: Hide the dropdown and navigate.
                             dropdown.style.display = "none";
+                            dropdown.dataset.open = "false";
+                            window.location.href = this.href;
                         }
                     }
                 });
@@ -402,5 +418,5 @@ VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
     }
 
     window.addEventListener("resize", debounce(enableMobileDropdowns, 200));
-    enableMobileDropdowns();
+    await loadContent();
 });

@@ -370,7 +370,7 @@ textarea {
 /* Temporary popup for mobile dropdown hint */
 .temp-popup {
     position: fixed;
-    top: 20px;
+    top: 50px;
     /* Top center */
     left: 50%;
     transform: translateX(-50%);
