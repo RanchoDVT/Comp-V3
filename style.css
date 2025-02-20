@@ -219,7 +219,6 @@ a {
     float: right;
 }
 
-
 .popup-header h2 {
     margin: 0;
     font-size: 18px;
@@ -234,18 +233,15 @@ a {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    color: white;
 }
 
 .download-btn {
     background-color: #4CAF50;
-    color: white;
-    text-decoration: none;
-    text-align: center;
 }
 
 .cancel-btn {
     background-color: #f44336;
-    color: white;
 }
 
 .overlay {
@@ -311,4 +307,39 @@ textarea {
     border-radius: 4px;
     font-size: 1rem;
     cursor: pointer;
+}
+
+.release {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+
+/* Program Banner common style */
+.program-banner {
+    background: transparent;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    display: none;
+    /* hide by default */
+}
+
+/* Program Banner common style */
+.program-banner {
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    display: none;
+    /* hide all banners by default */
+}
+
+/* Banner container (optional spacing) */
+#banner-container {
+    margin-bottom: 20px;
 }
