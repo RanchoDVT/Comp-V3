@@ -70,12 +70,13 @@ document.addEventListener('DOMContentLoaded', () => {
     async function getLatestRelease(repo) {
         try {
             const response = await fetch(`https://api.github.com/repos/${repo}/releases/latest`);
-            if (!response.ok) throw new Error(`Error fetching release info: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`Error fetching release info: ${response.status}`);
+            }
             const data = await response.json();
             return data.tag_name;
         } catch (error) {
-            console.error('Error fetching latest release:', error);
-            return 'Unknown';
+            return 'Unknown'; // This will already be logged, we dont need more errors
         }
     }
 
@@ -155,53 +156,51 @@ VERSION=${await getLatestRelease('RanchoDVT/Comp-V3')}`;
         });
     }
 
-    window.showPopup = async function (type) {
-        let popupText, downloadLink;
-        const downloadButton = document.getElementById('download-link');
+    // Popup and download logic
+    window.showPopup = async (type) => {
+        const popupTitle = document.getElementById('popup-title');
+        const popupText = document.getElementById('popup-text');
+        const downloadLinkElem = document.getElementById('download-link');
+        let downloadLink = '#';
 
         if (type === 'Dev') {
-            popupText = 'Thank you for downloading Comp-V3 *dev*! This download link goes to the Github API. The download is the source code. <br><br>You will need my Custom SDK to use this. Check out my other download in the navbar.';
+            popupTitle.innerText = 'Download Comp-V3 Dev';
+            popupText.innerHTML = 'Thank you for downloading Comp-V3 dev. This download is the source code. You will need my Custom SDK to use it.';
             downloadLink = 'https://github.com/RanchoDVT/Comp-V3/archive/refs/heads/dev.zip';
-            document.getElementById('popup-title').innerText = `Download Comp-V3 ${type}`;
         } else if (type === 'Stable') {
             const latestTag = await getLatestRelease('RanchoDVT/Comp-V3');
-            popupText = 'Thank you for downloading Comp-V3 stable! This download link goes to the Github API. The download is the source code. <br><br>You will need my Custom SDK to use this. Check out my other download in the navbar.';
-            document.getElementById('popup-title').innerText = `Download Comp-V3 ${type} | ${latestTag}`;
+            popupTitle.innerText = `Download Comp-V3 Stable | ${latestTag}`;
+            popupText.innerHTML = 'Thank you for downloading Comp-V3 stable. This download is the source code. You will need my Custom SDK to use it.';
             downloadLink = `https://github.com/RanchoDVT/Comp-V3/archive/refs/tags/${latestTag}.zip`;
             if (!latestTag || latestTag === 'Unknown') {
-                disableDownloadButton(downloadButton);
-                popupText = 'Release information not available. Please try again later.';
+                disableDownloadButton(downloadLinkElem);
+                downloadLink = '#';
             }
         } else if (type === 'SDK') {
             const latestTag = await getLatestRelease('RanchoDVT/Vex-SDK');
-            popupText = '*Vex Took this down! <br>You cannot download this for now!* <br><br>Thank you for downloading my custom SDK. <br><strong>This is unofficial and in no way affiliated with VEX Robotics. Please contact me for more info.</strong><br><a target="_blank" href="https://github.com/RanchoDVT/Vex-SDK/releases"><br>Source code</a><br><br><strong>The source code might not download correctly – you may have to use git clone.</strong><br>The download button is the simple powershell script.';
+            popupTitle.innerText = `Download Custom SDK | ${latestTag}`;
+            popupText.innerHTML = '*Vex Took this down! <br>You cannot download this for now!* <br><br>Thank you for downloading my custom SDK. <br><strong>This is unofficial and in no way affiliated with VEX Robotics. Please contact me for more info.</strong><br><a target="_blank" href="https://github.com/RanchoDVT/Vex-SDK/releases"><br>Source code</a><br><br><strong>The source code might not download correctly – you may have to use git clone.</strong><br>The download button is the simple powershell script.';
             downloadLink = `https://github.com/RanchoDVT/Vex-SDK/blob/dev/Vex-SDK.updater.ps1`;
-            document.getElementById('popup-title').innerText = `Download Custom ${type} | ${latestTag}`;
             if (!latestTag || latestTag === 'Unknown') {
-                disableDownloadButton(downloadButton);
+                disableDownloadButton(downloadLinkElem);
                 downloadLink = '#';
             }
         }
 
-        // Set the popup text and download link
-        document.getElementById('popup-text').innerHTML = popupText;
-        downloadButton.href = downloadLink;
-
-        // Finally, display the popup and overlay
+        downloadLinkElem.href = downloadLink;
         document.getElementById('popup').classList.add('active');
         document.getElementById('overlay').classList.add('active');
     };
 
-    // Helper function to disable the download button
     function disableDownloadButton(button) {
         button.classList.add('disabled-download');
         button.removeAttribute('href');
         button.style.backgroundColor = 'gray';
         button.innerText = 'Download Unavailable';
     }
-});
 
-function hidePopup() {
-    document.getElementById('popup').classList.remove('active');
-    document.getElementById('overlay').classList.remove('active');
-}
+    window.hidePopup = () => {
+        document.getElementById('popup').classList.remove('active');
+        document.getElementById('overlay').classList.remove('active');
+    };
+});

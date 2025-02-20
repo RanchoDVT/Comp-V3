@@ -42,8 +42,6 @@ li a:hover:not(.active) {
 
 nav li.dropdown {
     display: inline-block;
-    position: relative;
-
 }
 
 nav li:last-child a {
