@@ -130,6 +130,25 @@ a {
         flex: 1 1 calc(100% - 32px);
         /* Adjusts the width of the tiles for small screens */
     }
+
+    nav li.dropdown .dropdown-content {
+        display: none;
+        /* We'll toggle with JS */
+        position: relative;
+        /* Let them flow naturally */
+        min-width: 100%;
+        padding: 0;
+        border-radius: 0;
+    }
+
+    nav li.dropdown {
+        float: none;
+        /* Stack the dropdowns vertically */
+    }
+
+    nav li a {
+        border-right: none;
+    }
 }
 
 footer {
@@ -342,4 +361,18 @@ textarea {
 /* Banner container (optional spacing) */
 #banner-container {
     margin-bottom: 20px;
+}
+
+/* Temporary popup for mobile dropdown hint */
+.temp-popup {
+    position: fixed;
+    top: 20px;              /* Top center */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-size: 1rem;
+    z-index: 1000;
 }

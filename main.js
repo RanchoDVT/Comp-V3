@@ -354,5 +354,45 @@ VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
         }
     };
 
-    updateProjectView();
+    // Helper: Show temporary popup message (e.g., at the center of viewport)
+    function showTemporaryPopup(message) {
+        const popup = document.createElement("div");
+        popup.classList.add("temp-popup");
+        popup.innerText = message;
+        document.body.appendChild(popup);
+        setTimeout(() => {
+            popup.remove();
+        }, 2000);
+    }
+
+    function enableMobileDropdowns() {
+        // Only on small screens.
+        if (window.innerWidth <= 768) {
+            const dropdownLinks = document.querySelectorAll("nav li.dropdown > a.nav-link");
+            dropdownLinks.forEach(link => {
+                link.addEventListener("click", function (e) {
+                    const dropdown = this.nextElementSibling;
+                    if (dropdown && dropdown.classList.contains("dropdown-content")) {
+                        // If dropdown is not open, treat this as the first click.
+                        if (dropdown.style.display !== "block") {
+                            e.preventDefault();  // Prevent navigation on first click.
+                            dropdown.style.display = "block";
+                            showTemporaryPopup("Click again to open page...");
+                            // Auto-close after 3 seconds if no second click.
+                            setTimeout(() => {
+                                dropdown.style.display = "none";
+                            }, 3000);
+                        } else {
+                            // Second click: Allow navigation.
+                            // Immediately reset (hide dropdown) so future interactions will show popup again.
+                            dropdown.style.display = "none";
+                        }
+                    }
+                });
+            });
+        }
+    }
+
+    enableMobileDropdowns();
+    window.addEventListener("resize", enableMobileDropdowns);
 });
