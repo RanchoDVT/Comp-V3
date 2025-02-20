@@ -27,22 +27,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Language: javascript
     async function populateProjectsDropdown() {
         const users = ["Voidless7125"];
         const projectsDropdown = document.getElementById("projects-dropdown");
+        const fragment = document.createDocumentFragment();
+
         for (const user of users) {
             const repos = await fetchRepositories(user);
             repos.forEach((repo) => {
-                if (
-                    repo.name !== ".github" &&
-                    repo.name !== "Voidless7125" &&
-                    repo.name !== "shh"
-                ) {
+                if (repo.name !== ".github" && repo.name !== "Voidless7125" && repo.name !== "shh") {
                     const repoLink = document.createElement("a");
                     repoLink.href = repo.html_url;
                     repoLink.target = "_blank";
                     repoLink.textContent = repo.name;
-                    projectsDropdown.appendChild(repoLink);
+                    fragment.appendChild(repoLink);
                 }
             });
         }
@@ -52,7 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
         sponsoredLink.href = "https://github.com/gucci-on-fleek/lockdown-browser/";
         sponsoredLink.target = "_blank";
         sponsoredLink.appendChild(sponsoredIcon);
-        projectsDropdown.insertBefore(sponsoredLink, projectsDropdown.firstChild);
+        // Insert sponsored link at the beginning
+        fragment.insertBefore(sponsoredLink, fragment.firstChild);
+        projectsDropdown.appendChild(fragment);
     }
 
     fetch("navbar.html")
@@ -367,7 +368,7 @@ VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
 
     function enableMobileDropdowns() {
         // Only on small screens.
-        if (window.innerWidth <= 768) {
+        if (/Mobi|Android/i.test(navigator.userAgent)) {
             const dropdownLinks = document.querySelectorAll("nav li.dropdown > a.nav-link");
             dropdownLinks.forEach(link => {
                 link.addEventListener("click", function (e) {
@@ -384,7 +385,6 @@ VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
                             }, 3000);
                         } else {
                             // Second click: Allow navigation.
-                            // Immediately reset (hide dropdown) so future interactions will show popup again.
                             dropdown.style.display = "none";
                         }
                     }
@@ -393,6 +393,14 @@ VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
         }
     }
 
+    function debounce(func, wait) {
+        let timeout;
+        return function (...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    window.addEventListener("resize", debounce(enableMobileDropdowns, 200));
     enableMobileDropdowns();
-    window.addEventListener("resize", enableMobileDropdowns);
 });

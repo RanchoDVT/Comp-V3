@@ -126,28 +126,32 @@ a {
 }
 
 @media (max-width: 768px) {
-    .tile {
-        flex: 1 1 calc(100% - 32px);
-        /* Adjusts the width of the tiles for small screens */
+
+    .dropdown-content {
+        pointer-events: none;
     }
 
+    .dropdown-content a {
+        pointer-events: auto;
+    }
+
+    /* Make the nav menu scrollable horizontally */
+    nav>menu {
+        display: flex;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Adjust dropdown-content: position it absolutely rather than stacking in flow */
     nav li.dropdown .dropdown-content {
-        display: none;
-        /* We'll toggle with JS */
-        position: relative;
-        /* Let them flow naturally */
-        min-width: 100%;
-        padding: 0;
-        border-radius: 0;
-    }
-
-    nav li.dropdown {
-        float: none;
-        /* Stack the dropdowns vertically */
-    }
-
-    nav li a {
-        border-right: none;
+        position: absolute;
+        min-width: 160px;
+        padding: 8px 0;
+        background-color: grey;
+        border-radius: 8px;
+        z-index: 100;
     }
 }
 
@@ -366,7 +370,8 @@ textarea {
 /* Temporary popup for mobile dropdown hint */
 .temp-popup {
     position: fixed;
-    top: 20px;              /* Top center */
+    top: 20px;
+    /* Top center */
     left: 50%;
     transform: translateX(-50%);
     background: rgba(0, 0, 0, 0.8);
