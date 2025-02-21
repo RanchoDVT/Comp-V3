@@ -1,7 +1,7 @@
 html {
     background-color: rgb(10, 10, 13);
     color: white;
-    font-family: 'Segoe UI', Tahoma;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
     padding-bottom: 2%;
     box-sizing: border-box;
 }
@@ -10,7 +10,7 @@ html {
 menu {
     padding-inline-start: 0;
     list-style: none;
-    margin: 0
+    margin: 0;
 }
 
 nav {
@@ -36,7 +36,7 @@ nav li a,
     border-right: 1px solid #bbb;
 }
 
-li a:hover:not(.active) {
+nav li a:hover:not(.active) {
     background-color: grey;
 }
 
@@ -115,7 +115,7 @@ nav li:last-child a {
 
 a {
     text-decoration: none;
-    color: inherit;
+    color: #7bbaeb;
 }
 
 @media (max-width: 1200px) {
@@ -153,6 +153,12 @@ a {
         border-radius: 8px;
         z-index: 100;
     }
+
+    nav li:last-child>a {
+        border-left: none;
+        border-right: 1px solid #bbb;
+    }
+
 }
 
 footer {
@@ -173,9 +179,7 @@ hr.rounded {
 input {
     background: rgb(10, 10, 13);
     color: white;
-    border: white;
-    border-style: solid;
-    border-width: thin
+    border: 1px solid white;
 }
 
 select {
@@ -197,17 +201,8 @@ select {
 button {
     background: rgb(10, 10, 13);
     color: white;
-    border: white;
-    border-style: solid;
-    border-width: thin;
-}
-
-.form-group {
+    border: 1px solid white;
     margin-bottom: 15px;
-}
-
-a {
-    color: #7bbaeb;
 }
 
 .popup {
@@ -349,17 +344,6 @@ textarea {
     font-weight: bold;
     display: none;
     /* hide by default */
-}
-
-/* Program Banner common style */
-.program-banner {
-    color: #fff;
-    padding: 20px;
-    text-align: center;
-    font-size: 2rem;
-    font-weight: bold;
-    display: none;
-    /* hide all banners by default */
 }
 
 /* Banner container (optional spacing) */
