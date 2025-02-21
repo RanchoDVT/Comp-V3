@@ -386,22 +386,18 @@ VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
                 link.addEventListener("click", function (e) {
                     const dropdown = this.nextElementSibling;
                     if (dropdown && dropdown.classList.contains("dropdown-content")) {
-                        const isOpen = dropdown.dataset.open === "true";
-                        if (!isOpen) {
+                        // If dropdown is not open, treat this as the first click.
+                        if (dropdown.style.display !== "block") {
                             e.preventDefault();  // Prevent navigation on first click.
-                            dropdown.dataset.open = "true";
                             dropdown.style.display = "block";
                             showTemporaryPopup("Click again to open page...");
                             // Auto-close after 3 seconds if no second click.
                             setTimeout(() => {
                                 dropdown.style.display = "none";
-                                dropdown.dataset.open = "false";
                             }, 3000);
                         } else {
-                            // Second click: Hide the dropdown and navigate.
+                            // Second click: Allow navigation.
                             dropdown.style.display = "none";
-                            dropdown.dataset.open = "false";
-                            window.location.href = this.href;
                         }
                     }
                 });
@@ -419,4 +415,5 @@ VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
 
     window.addEventListener("resize", debounce(enableMobileDropdowns, 200));
     await loadContent();
+    enableMobileDropdowns();
 });
