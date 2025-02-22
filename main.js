@@ -10,7 +10,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         try {
             const response = await fetch(url);
-            if (!response.ok) throw new Error(`${url} not found`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+            }
             const text = await response.text();
             cache.set(url, text);
             targetElement.innerHTML = text;
@@ -27,13 +29,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const response = await fetch(url);
             if (!response.ok) {
-                throw new Error(`Error fetching repos: ${response.status}`);
+                throw new Error(`Failed to fetch repositories for user ${user}: ${response.statusText}`);
             }
             const repos = await response.json();
             cache.set(url, repos);
             return repos;
         } catch (error) {
-            console.error(`Error fetching repositories:`, error);
+            console.error(error);
             return [];
         }
     }
@@ -59,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const sponsoredLink = document.createElement("a");
         sponsoredLink.href = "https://github.com/gucci-on-fleek/lockdown-browser/";
         sponsoredLink.target = "_blank";
-        sponsoredLink.innerHTML = "✨ Lockdown Browser";
+        sponsoredLink.textContent = "✨ Lockdown Browser";
         fragment.insertBefore(sponsoredLink, fragment.firstChild);
 
         projectsDropdown.appendChild(fragment);
@@ -84,12 +86,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const response = await fetch(url);
             if (!response.ok) {
-                throw new Error(`Error fetching release info: ${response.status}`);
+                throw new Error(`Failed to fetch latest release for ${repo}: ${response.statusText}`);
             }
             const data = await response.json();
             cache.set(url, data.tag_name);
             return data.tag_name;
         } catch (error) {
+            console.error(error);
             return "Unknown";
         }
     }
