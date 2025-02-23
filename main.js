@@ -67,16 +67,74 @@ document.addEventListener("DOMContentLoaded", async () => {
         projectsDropdown.appendChild(fragment);
     }
 
+    // Remove the old changelog fetch call... 
+    // if (document.getElementById("changelog-content"))
+    //     await fetchFile("https://raw.githubusercontent.com/Voidless7125/Comp-V3/dev/changelog.md", document.getElementById("changelog-content"));
+
+    // New changelog loader: releases plus legacy changelog
+    async function loadChangelog() {
+        const changelogElem = document.getElementById("changelog-content");
+        if (!changelogElem) return;
+        let outputHTML = "";
+
+        // Fetch releases from GitHub API
+        try {
+            const releasesResponse = await fetch("https://api.github.com/repos/Voidless7125/Comp-V3/releases");
+            if (!releasesResponse.ok) {
+                throw new Error("Failed to load releases");
+            }
+            const releasesData = await releasesResponse.json();
+            if (releasesData.length > 0) {
+                outputHTML += `<section>
+      <h2>Releases</h2>`;
+                releasesData.forEach(release => {
+                    const releaseBody = release.body ? marked.parse(release.body) : "<p>No release notes.</p>";
+                    outputHTML += `<div class="release">
+          <h3>${release.name || release.tag_name}</h3>
+          ${releaseBody}
+        </div>`;
+                });
+                outputHTML += `</section>`;
+            } else {
+                outputHTML += `<section>
+      <h2>Releases</h2>
+      <p>No releases available.</p>
+    </section>`;
+            }
+        } catch (err) {
+            console.error(err);
+            outputHTML += `<section>
+      <h2>Releases</h2>
+      <p>Unable to load releases.</p>
+    </section>`;
+        }
+
+        // Fetch legacy changelog content
+        try {
+            const legacyResponse = await fetch("https://raw.githubusercontent.com/Voidless7125/Comp-V3/dev/legacy_changelog.md");
+            if (!legacyResponse.ok) {
+                throw new Error("Failed to load legacy changelog");
+            }
+            const legacyText = await legacyResponse.text();
+            outputHTML += `<section>
+      <h2>Legacy Changelog</h2>
+      ${marked.parse(legacyText)}
+    </section>`;
+        } catch (err) {
+            console.error(err);
+            outputHTML += `<section>
+      <h2>Legacy Changelog</h2>
+      <p>Unable to load legacy changelog.</p>
+    </section>`;
+        }
+
+        changelogElem.innerHTML = outputHTML;
+    }
+
     if (document.getElementById("readme-content"))
-        await fetchFile(
-            "https://raw.githubusercontent.com/Voidless7125/Comp-V3/dev/README.md",
-            document.getElementById("readme-content")
-        );
+        await fetchFile("https://raw.githubusercontent.com/Voidless7125/Comp-V3/dev/README.md", document.getElementById("readme-content"));
     if (document.getElementById("changelog-content"))
-        await fetchFile(
-            "https://raw.githubusercontent.com/Voidless7125/Comp-V3/dev/changelog.md",
-            document.getElementById("changelog-content")
-        );
+        await loadChangelog();
 
     async function getLatestRelease(repo) {
         const url = `https://api.github.com/repos/${repo}/releases/latest`;
@@ -100,11 +158,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function loadContent() {
         const navbar = document.querySelector("#navbar");
         const readme = document.getElementById("readme-content");
-        const changelog = document.getElementById("changelog-content");
 
         if (navbar) await fetchFile("navbar.html", navbar);
         if (readme) await fetchFile("https://raw.githubusercontent.com/Voidless7125/Comp-V3/dev/README.md", readme);
-        if (changelog) await fetchFile("https://raw.githubusercontent.com/Voidless7125/Comp-V3/dev/changelog.md", changelog);
 
         if (navbar) {
             const currentPage = window.location.pathname.split("/").pop() || "index.html";
@@ -419,4 +475,8 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
     window.addEventListener("resize", debounce(enableMobileDropdowns, 200));
     await loadContent();
     enableMobileDropdowns();
+    // Call updateProjectView to set the default view (comp-v3)
+    if (document.getElementById("project")) {
+        window.updateProjectView();
+    }
 });
