@@ -69,12 +69,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (document.getElementById("readme-content"))
         await fetchFile(
-            "https://raw.githubusercontent.com/RanchoDVT/Comp-V3/dev/README.md",
+            "https://raw.githubusercontent.com/Voidless7125/Comp-V3/dev/README.md",
             document.getElementById("readme-content")
         );
     if (document.getElementById("changelog-content"))
         await fetchFile(
-            "https://raw.githubusercontent.com/RanchoDVT/Comp-V3/dev/changelog.md",
+            "https://raw.githubusercontent.com/Voidless7125/Comp-V3/dev/changelog.md",
             document.getElementById("changelog-content")
         );
 
@@ -103,8 +103,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const changelog = document.getElementById("changelog-content");
 
         if (navbar) await fetchFile("navbar.html", navbar);
-        if (readme) await fetchFile("https://raw.githubusercontent.com/RanchoDVT/Comp-V3/dev/README.md", readme);
-        if (changelog) await fetchFile("https://raw.githubusercontent.com/RanchoDVT/Comp-V3/dev/changelog.md", changelog);
+        if (readme) await fetchFile("https://raw.githubusercontent.com/Voidless7125/Comp-V3/dev/README.md", readme);
+        if (changelog) await fetchFile("https://raw.githubusercontent.com/Voidless7125/Comp-V3/dev/changelog.md", changelog);
 
         if (navbar) {
             const currentPage = window.location.pathname.split("/").pop() || "index.html";
@@ -168,7 +168,7 @@ AUTOGIFPATH=${formData.get("auto_gif_path")}
 DRIVEGIFPATH=${formData.get("drive_gif_path")}
 CUSTOMMESSAGE=${formData.get("custom_message")}
 DRIVEMODE=${formData.get("drive_mode")}
-VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
+VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
             document.getElementById("copy-button").style.display = "inline-block";
         });
     }
@@ -203,22 +203,22 @@ VERSION=${await getLatestRelease("RanchoDVT/Comp-V3")}`;
             popupBodyHTML =
                 "Thank you for downloading Comp-V3 dev. This download is the source code. You will need my Custom SDK to use it.";
             downloadLink =
-                "https://github.com/RanchoDVT/Comp-V3/archive/refs/heads/dev.zip";
+                "https://github.com/Voidless7125/Comp-V3/archive/refs/heads/dev.zip";
         } else if (type === "Stable") {
-            const latestTag = await getLatestRelease("RanchoDVT/Comp-V3");
+            const latestTag = await getLatestRelease("Voidless7125/Comp-V3");
             popupTitleText = `Download Comp-V3 Stable | ${latestTag}`;
             popupBodyHTML =
                 "Thank you for downloading Comp-V3 stable. This download is the source code. You will need my Custom SDK to use it.";
-            downloadLink = `https://github.com/RanchoDVT/Comp-V3/archive/refs/tags/${latestTag}.zip`;
+            downloadLink = `https://github.com/Comp-V3/archive/refs/tags/${latestTag}.zip`;
             if (!latestTag || latestTag === "Unknown") {
                 downloadLink = "#";
             }
         } else if (type === "SDK") {
-            const latestTag = await getLatestRelease("RanchoDVT/Vex-SDK");
+            const latestTag = await getLatestRelease("Voidless7125/Vex-SDK");
             popupTitleText = `Download Custom SDK | ${latestTag}`;
             popupBodyHTML =
-                '*Vex Took this down! <br>You cannot download this for now!* <br><br>Thank you for downloading my custom SDK. <br><strong>This is unofficial and in no way affiliated with VEX Robotics. Please contact me for more info.</strong><br><a target="_blank" href="https://github.com/RanchoDVT/Vex-SDK/releases"><br>Source code</a><br><br><strong>The source code might not download correctly – you may have to use git clone.</strong><br>The download button is the simple powershell script.';
-            downloadLink = `https://github.com/RanchoDVT/Vex-SDK/blob/dev/Vex-SDK.updater.ps1`;
+                'Thank you for downloading my custom SDK. <br><strong>This is unofficial and in no way affiliated with VEX Robotics. Please contact me for more info.</strong><br><a target="_blank" href="https://github.com/Voidless7125/Vex-SDK"><br>Source code</a><br><br><strong>The source code might not download correctly – you may have to use git clone.</strong><br>The download button is the simple powershell script.';
+            downloadLink = `https://github.com/Voidless7125/Vex-SDK/blob/dev/Vex-SDK.updater.ps1`;
             if (!latestTag || latestTag === "Unknown") {
                 downloadLink = "#";
             }
