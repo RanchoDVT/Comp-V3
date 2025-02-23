@@ -3,7 +3,7 @@
 <ol>
 <li>Install VScode</li>
 <li>Download and install these extensions:<br>(<a href="https://marketplace.visualstudio.com/items?itemName=VEXRobotics.vexcode">VEX Robotics</a>, <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools">C/C++</a>, <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.makefile-tools">Makefile Tools</a>)  </li>
-<li>Install my <a href="https://github.com/RanchoDVT/Vex-SDK">Custom SDK</a></li>
+<li>Install my <a href="[https://github.com/Voidless7125/Vex-SDK](https://github.com/Voidless7125/Vex-SDK)">Custom SDK</a></li>
 </ol>
 <h2 id="rewrite-3-0-">Rewrite (3.0)</h2>
 <p>Here we go! This is a rewritten version of Comp_V2 (with some exceptions).<br>We are at b2; I need Vex V5 Hardware to test with. (I don&#39;t have it; it will be long before I can get the hardware.)</p>
@@ -39,6 +39,6 @@
 <ol>
 <li>Use the newest version of Clang and GCC. ✅</li>
 <li>Use Vex&#39;s API. ✅</li>
-<li>Support for V5, IQ2, EXP 🔃</li>
+<li>Support for V5, IQ2, EXP ✅</li>
 <li>Better templates and makefiles. 🔃</li>
 </ol>
