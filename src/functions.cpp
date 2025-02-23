@@ -1,5 +1,15 @@
 #include "vex.h"
 
+/**
+ * @brief Calibrates the InertialGyro sensor.
+ *
+ * This function initiates the calibration process for the InertialGyro sensor and waits
+ * until the calibration is complete. It periodically sleeps the thread for a short duration
+ * to allow the sensor to finish calibrating. Once the calibration completes, a log entry is
+ * made to indicate success.
+ *
+ * @note Ensure that the InertialGyro sensor is properly initialized before calling this function.
+ */
 void calibrateGyro()
 {
     InertialGyro.calibrate();
@@ -11,6 +21,27 @@ void calibrateGyro()
     return;
 }
 
+/**
+ * @brief Monitors and records the durations of button presses on a controller.
+ *
+ * This function checks the press state of each button on the provided controller and logs
+ * the duration of each press. When a button is pressed, it records the start time; when released,
+ * it logs the duration based on the elapsed time measured by an internal timer.
+ *
+ * During a competition (i.e., when Competition.isEnabled() returns true), it logs an error message.
+ * Otherwise, it continues to poll the controller's buttons until either competition mode is enabled 
+ * or a 30-second timeout is reached.
+ *
+ * Each button's press durations are stored in a map with the button name as the key and a vector of 
+ * integers as the value. A placeholder value of -1 is used to mark the beginning of a press event.
+ *
+ * @param controller A constant reference to a vex::controller object, representing the controller to monitor.
+ *
+ * @return std::map<std::string, std::vector<int>> A map from button names to vectors of press durations in milliseconds.
+ *
+ * @note The polling rate for button state checks is determined by the value returned from 
+ *       ConfigManager.getCtrlr1PollingRate(), and the function uses local timers to measure durations.
+ */
 std::map<std::string, std::vector<int>> controllerButtonsPressed(const vex::controller &controller)
 {
     if (Competition.isEnabled())
@@ -70,6 +101,25 @@ std::string formatMotorTemps(const std::array<int, 4> &motorTemps, double batter
                        motorTemps[0], motorTemps[1], motorTemps[2], motorTemps[3], batteryVoltage);
 }
 
+/**
+ * @brief Monitors motor temperatures and battery voltage during a competition run.
+ *
+ * This function continuously monitors the temperatures of the front left, front right,
+ * rear left, and rear right motors. It logs a warning if any motor's temperature exceeds
+ * 55°C by calling the logHandler() with an appropriate message. Every 10 seconds, it checks the
+ * battery voltage and, if the voltage is below 12V, logs a critical warning and formats the
+ * current motor temperatures along with the battery voltage.
+ *
+ * Additionally, it updates the odometer reading based on the average position of the left and
+ * right drive motors, logs inertial measurements from a gyro sensor (pitch, roll, and yaw), and
+ * updates the display on both the primary and partner controllers with the latest motor and battery data.
+ *
+ * @note This function runs inside a loop that continues while Competition.isEnabled() returns true.
+ *
+ * @see logHandler()
+ * @see formatMotorTemps()
+ * @see ConfigManager::updateOdometer()
+ */
 void motorMonitor()
 {
     logHandler("motorMonitor", "motorMonitor is starting up...", Log::Level::Trace);

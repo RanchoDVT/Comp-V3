@@ -92,7 +92,6 @@ public:
     void setDriveMode(const DriveMode &mode);
     void SetVsyncGif(const bool &value);
 
-    // Complex return types
     std::string getGearRatio(const std::string &motorName) const;
     bool getMotorReversed(const std::string &motorName) const;
     vex::gearSetting getGearSetting(const std::string &ratio) const;
@@ -105,7 +104,6 @@ public:
     ConfigType stringToConfigType(const std::string &str);
     Log::Level stringToLogLevel(const std::string &str);
 
-    // Getter and setter methods for deadzone settings
     int getLeftDeadzone() const { return leftDeadzone; }
     void setLeftDeadzone(int value) { leftDeadzone = value; }
 
@@ -139,7 +137,6 @@ private:
     int lastService;
     int serviceInterval;
     bool serviceWarningLogged;
-    // New member variables for deadzone settings
     int leftDeadzone;
     int rightDeadzone;
 

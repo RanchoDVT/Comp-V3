@@ -1,7 +1,27 @@
 #include "vex.h"
-
 #include <fstream>
 
+/**
+ * @brief Resets or initializes the configuration file based on user input.
+ *
+ * This function prompts the user with a custom message to decide whether to reset the configuration.
+ * If the user selects "Yes", it outputs a notification on the screen, attempts to open the configuration
+ * file for writing, and writes a default configuration to it. The default configuration includes various
+ * system and motor settings, such as motor ports, gear ratios, reversal statuses, and other system parameters.
+ *
+ * @param message A std::string_view containing the message to display when asking the user
+ *                if they want to reset the configuration.
+ *
+ * @details
+ * - Resets the maximum size option (maxOptionSize) to 4, as a safeguard before reconfiguring.
+ * - Uses the getUserOption function to obtain the user decision with "Yes" or "No" options.
+ * - If "Yes" is selected:
+ *   - Notifies the user via the primary screen that the configuration is being reset.
+ *   - Attempts to create/open the configuration file. If unsuccessful, logs a warning and exits.
+ *   - Writes the default configuration settings into the file, ending with the current version.
+ *   - Logs a debug message indicating a successful reset.
+ * - If the user selects "No", no changes are made.
+ */
 void configManager::resetOrInitializeConfig(std::string_view message)
 {
     maxOptionSize = 4; // Reset opt may not be ready yet so set to default
@@ -68,6 +88,17 @@ void configManager::resetOrInitializeConfig(std::string_view message)
     }
 }
 
+/**
+ * @brief Writes maintenance data to a file.
+ *
+ * This function opens the file specified by the maintenanceFileName, and if the file is successfully opened,
+ * it writes the current maintenance values as key/value pairs. The keys include:
+ * - ODOMETER
+ * - LAST_SERVICE
+ * - SERVICE_INTERVAL
+ *
+ * Each key is followed by its corresponding value and a newline character. Finally, the file is closed.
+ */
 void configManager::writeMaintenanceData()
 {
     std::ofstream maintenanceFile(maintenanceFileName);
@@ -80,6 +111,19 @@ void configManager::writeMaintenanceData()
     }
 }
 
+/**
+ * @brief Updates the drive mode setting for the configManager.
+ *
+ * This function sets the in-memory drive mode and persists the change by appending
+ * the corresponding mode value to the configuration file. The drive mode is written
+ * as a string representing the corresponding DriveMode enumeration value.
+ *
+ * @param mode The drive mode to be set. Valid values are:
+ *             - DriveMode::LeftArcade
+ *             - DriveMode::RightArcade
+ *             - DriveMode::SplitArcade
+ *             - DriveMode::Tank
+ */
 void configManager::setDriveMode(const configManager::DriveMode &mode)
 {
     driveMode = mode; // Update in-memory
@@ -109,6 +153,20 @@ void configManager::setDriveMode(const configManager::DriveMode &mode)
     }
 }
 
+/**
+ * @brief Reads maintenance data from the specified file.
+ *
+ * This function opens the maintenance file using the filename stored in 'maintenanceFileName'.
+ * It reads the file line by line, expecting each line to be in the format "KEY=VALUE".
+ * For each line, it parses the key and its associated value, and based on the key,
+ * converts the value to the appropriate numeric type using the 'stringToNumber' template:
+ *
+ *   - "ODOMETER": Converts the value to an int and assigns it to 'odometer'.
+ *   - "LAST_SERVICE": Converts the value to a long and assigns it to 'lastService'.
+ *   - "SERVICE_INTERVAL": Converts the value to a long and assigns it to 'serviceInterval'.
+ *
+ * The file is closed after processing is complete.
+ */
 void configManager::readMaintenanceData()
 {
     std::ifstream maintenanceFile(maintenanceFileName);
@@ -140,6 +198,17 @@ void configManager::readMaintenanceData()
 }
 
 // Method to convert a string to boolean
+/**
+ * @brief Converts a string view to a boolean value.
+ *
+ * This function interprets the input string view as a boolean. If the string is empty,
+ * an error is logged and the function returns false. Valid true values are "true" and "1",
+ * while valid false values are "false" and "0". For any string that does not match these values,
+ * an error is logged and the function returns false.
+ *
+ * @param str The string view representing a boolean value.
+ * @return bool Returns true if the string is "true" or "1", false otherwise.
+ */
 bool configManager::stringToBool(std::string_view str)
 {
     if (str.empty())
@@ -164,6 +233,24 @@ bool configManager::stringToBool(std::string_view str)
 }
 
 // Method to convert a string to a number
+/**
+ * @brief Converts a string representation to a numeric value of type T.
+ *
+ * This template function attempts to convert a given string view into the numeric type T.
+ * The conversion supports the following types:
+ *   - int: Uses std::stoi.
+ *   - long: Uses std::stol.
+ *   - double: Uses std::stod.
+ *   - std::size_t: Uses std::stoul (with a static_cast to std::size_t).
+ *
+ * If the input string is empty, the function logs an error and returns a default-constructed value of T.
+ * In case of conversion errors (invalid_argument or out_of_range), the function catches the exception,
+ * logs the error, and returns a default-constructed value of T.
+ *
+ * @tparam T The numeric type for the conversion.
+ * @param str The string view containing the number to be converted.
+ * @return A value of type T converted from the string, or a default-constructed T on failure.
+ */
 template <typename T>
 T configManager::stringToNumber(std::string_view str)
 {
@@ -205,6 +292,30 @@ T configManager::stringToNumber(std::string_view str)
 }
 
 // Method to set values from the config file and parse complex config sections
+/**
+ * @brief Reads and applies configuration values from a config file.
+ *
+ * This function opens the configuration file specified by the internal variable (configFileName) and
+ * iterates over each line to parse and apply configuration settings. It handles key-value pairs separated
+ * by '=' and processes several recognized configuration keys such as:
+ *   - ConfigType: Sets the configuration type by converting the string value.
+ *   - TeamNumber: Sets the team number.
+ *   - LoadingGifPath, AutoGifPath, DriverGifPath: Set file paths for various GIF resources.
+ *   - VsyncGif, PRINTLOGO, LOGTOFILE: Convert string values to bool and store the settings.
+ *   - MAXOPTIONSSIZE, POLLINGRATE, CTRLR1POLLINGRATE: Convert string values to numeric types.
+ *   - LOGLEVEL: Converts the value to a log level type.
+ *   - DRIVEMODE: Maps string values ("Arcade", "SplitArcade", "Tank", "Custom") to corresponding drive modes.
+ *   - LEFTDEADZONE, RIGHTDEADZONE: Set deadzone values for controllers.
+ *   - VERSION: Checks for a version mismatch between the configuration file and code.
+ *
+ * Additionally, it processes configuration sections (e.g., MOTOR_CONFIG, INERTIAL, TRIPORT_CONFIG) by:
+ *   - Reading section-specific keys and values surrounded by braces.
+ *   - Setting motor configurations (ports, gear ratios, reversed flags), inertial ports, and tri-port configurations.
+ *
+ * If the configuration file cannot be opened, or if an invalid or unrecognized key/line is encountered,
+ * appropriate warnings are logged. The function may also trigger a config reset or initialization process
+ * when encountering invalid lines.
+ */
 void configManager::setValuesFromConfig()
 {
     std::ifstream configFile(configFileName);
@@ -365,6 +476,27 @@ void configManager::setValuesFromConfig()
 }
 
 // Method to parse the config file
+/**
+ * @brief Parses the system configuration.
+ *
+ * This function initializes the system configuration by:
+ * - Logging the current version and build date.
+ * - Displaying a startup message on the screen.
+ * - Checking for an inserted SD card.
+ *   - If an SD card is present, verifies the existence of the configuration file.
+ *     - If the file does not exist, prompts the user to reset or initialize the configuration.
+ *     - Otherwise, loads configuration values from the file.
+ *   - If no SD card is detected, sets default configuration values, such as polling rates, log settings,
+ *     drive mode, deadzones, and service intervals.
+ * - Calibrating the gyro sensor.
+ * - Playing a GIF using the Vsync GIF.
+ * - Setting the drivetrain's stopping mode to 'coast'.
+ *
+ * @note This function interacts with external components like Brain, primaryController, Drivetrain,
+ *       and logging mechanisms to perform its tasks.
+ *
+ * @see calibrateGyro(), gifplayer(), getVsyncGif()
+ */
 void configManager::parseConfig()
 {
     logHandler("main", std::format("Version: {} | Build date: {}", Version, BuildDate), Log::Level::Info);
