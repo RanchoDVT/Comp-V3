@@ -2,35 +2,39 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("year").textContent = new Date().getFullYear();
     const cache = new Map();
 
-    async function fetchFile(url, targetElement) {
-        if (cache.has(url)) {
-            targetElement.innerHTML = cache.get(url);
-            return;
-        }
-        try {
-            const response = await fetch(url, { cache: "no-store" });
-            if (!response.ok) throw new Error(`Failed to fetch ${url}`);
-            const text = await response.text();
-            cache.set(url, text);
-            targetElement.innerHTML = text;
-        } catch (error) {
-            console.error(`Error fetching ${url}:`, error);
-        }
-    }
-
-    async function fetchRepositories(user) {
-        const url = `https://api.github.com/users/${user}/repos`;
+    // New helper function to handle caching and fetch processing.
+    async function cachedFetch(url, processFn) {
         if (cache.has(url)) return cache.get(url);
         try {
             const response = await fetch(url, { cache: "no-store" });
-            if (!response.ok) throw new Error(`Failed to fetch repositories for ${user}`);
-            const repos = await response.json();
-            cache.set(url, repos);
-            return repos;
-        } catch (error) {
-            console.error(error);
-            return [];
+            if (!response.ok) throw new Error(`Failed to fetch ${url}`);
+            const data = await processFn(response);
+            cache.set(url, data);
+            return data;
+        } catch (err) {
+            console.error(`Error fetching ${url}:`, err);
+            return null;
         }
+    }
+
+    // Modified fetchFile using cachedFetch.
+    async function fetchFile(url, targetElement) {
+        const text = await cachedFetch(url, r => r.text());
+        if (text !== null) targetElement.innerHTML = text;
+    }
+
+    // Modified fetchRepositories using cachedFetch.
+    async function fetchRepositories(user) {
+        const url = `https://api.github.com/users/${user}/repos`;
+        const repos = await cachedFetch(url, r => r.json());
+        return repos || [];
+    }
+
+    // Modified getLatestRelease using cachedFetch.
+    async function getLatestRelease(repo) {
+        const url = `https://api.github.com/repos/${repo}/releases/latest`;
+        const releaseData = await cachedFetch(url, r => r.json());
+        return releaseData ? releaseData.tag_name : "Unknown";
     }
 
     async function populateProjectsDropdown() {
@@ -113,25 +117,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     if (document.getElementById("changelog-content")) {
         await loadChangelog();
-    }
-
-    async function getLatestRelease(repo) {
-        const url = `https://api.github.com/repos/${repo}/releases/latest`;
-        if (cache.has(url)) {
-            return cache.get(url);
-        }
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch latest release for ${repo}: ${response.statusText}`);
-            }
-            const data = await response.json();
-            cache.set(url, data.tag_name);
-            return data.tag_name;
-        } catch (error) {
-            console.error(error);
-            return "Unknown";
-        }
     }
 
     async function loadContent() {
