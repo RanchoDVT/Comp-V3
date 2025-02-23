@@ -17,7 +17,7 @@ const char *LogToString(const Log::Level &str)
     case Log::Level::Warn:
         return "Warn";
     case Log::Level::Error:
-        return "Error";
+        return "Unknown";
     case Log::Level::Fatal:
         return "Fatal";
     default:
@@ -32,7 +32,7 @@ const char *consoleColors[] = {
     "\033[38;5;216m[Warn]",
     "\033[31m[Error]",
     "\033[32m[Fatal]",
-    "\033[31m[Error]" // Default
+    "\033[37m[Unknown]" // Default
 };
 
 const int rtfColors[] = {
@@ -46,10 +46,16 @@ const int rtfColors[] = {
 
 const char *LogToColor(const Log::Level &str)
 {
-    return consoleColors[static_cast<int>(str)];
+    int index = static_cast<int>(str);
+    size_t colorsSize = sizeof(consoleColors) / sizeof(consoleColors[0]);
+    if (index < 0 || static_cast<size_t>(index) >= colorsSize)
+    {
+        void scrollText(const std::string &text, vex::controller &controller, const float &timeOfDisplay, const int &sleepDuration = 30);
+    }
+    return consoleColors[index];
 }
 
-void scrollText(const std::string &text, vex::controller &controller, const float &timeOfDisplay)
+void scrollText(const std::string &text, vex::controller &controller, const float &timeOfDisplay, const int &sleepDuration = 30)
 {
     const int displayLength = 20;
     int startIndex = 0;
@@ -75,13 +81,12 @@ void scrollText(const std::string &text, vex::controller &controller, const floa
         else
         {
             if (--startIndex <= 0)
-            {
-                forward = true;
-            }
+                vex::this_thread::sleep_for(sleepDuration);
+            forward = true;
         }
-
-        vex::this_thread::sleep_for(30);
     }
+
+    vex::this_thread::sleep_for(30);
 }
 
 // Display messages on controller screens
@@ -91,8 +96,8 @@ void displayControllerMessage(const std::string &functionName, const std::string
     primaryController.Screen.clearScreen();
     primaryController.Screen.setCursor(1, 1);
     partnerController.Screen.clearScreen();
-    partnerController.Screen.setCursor(1, 1);
-    primaryController.Screen.print(std::format("Check logs.\nModule: {}\n", functionName).c_str());
+    scrollText(message, primaryController, timeOfDisplay, 30);
+    scrollText(message, partnerController, timeOfDisplay, 30);
     partnerController.Screen.print(std::format("{}\nCheck logs.\nModule: {}\n", message, functionName).c_str());
     if (message.length() > 20)
     {
@@ -125,13 +130,21 @@ void logHandler(const std::string &functionName, const std::string &message, con
 
 void SD_Card_Logging(const Log::Level &level, const std::string &functionName, const std::string &message)
 {
+    static bool logFileCreationFailed = false;
+    if (logFileCreationFailed)
+    {
+        return;
+    }
+
     std::ofstream LogFile("log.rtf", std::ios_base::out | std::ios_base::app);
     if (ConfigManager.getLogToFile())
     {
         if (!LogFile)
         {
+            logFileCreationFailed = true;
             logHandler("logHandler", "Could not create logfile.", Log::Level::Warn, 3);
             ConfigManager.setLogToFile(false);
+            return;
         }
         LogFile << "{\\rtf1\\ansi\\deff0 {\\colortbl;\\red0\\green0\\blue0;\\red255\\green0\\blue0;\\red0\\green255\\blue0;\\red0\\green0\\blue255;\\red255\\green255\\blue0;\\red255\\green0\\blue255;\\red0\\green255\\blue255;}\n";
         LogFile << "\\cf" << rtfColors[static_cast<int>(level)] << " ";

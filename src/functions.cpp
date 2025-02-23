@@ -7,7 +7,7 @@ void calibrateGyro()
     {
         vex::this_thread::sleep_for(20);
     }
-    logHandler("calibrateGyro", "Finished calibrating Inertial Giro.", Log::Level::Trace);
+    logHandler("calibrateGyro", "Finished calibrating Inertial Gyro.", Log::Level::Trace);
     return;
 }
 
@@ -21,7 +21,7 @@ std::map<std::string, std::vector<int>> controllerButtonsPressed(const vex::cont
     std::map<std::string, std::vector<int>> buttonPressTimes;
     vex::timer pressTimer;
 
-    std::array<ControllerButtonInfo, 12> AllControllerButtons = createControllerButtonArray(controller);
+    static std::array<ControllerButtonInfo, 12> AllControllerButtons = createControllerButtonArray(controller);
 
     auto checkButtonPress = [&](const ControllerButtonInfo &info)
     {
@@ -42,7 +42,8 @@ std::map<std::string, std::vector<int>> controllerButtonsPressed(const vex::cont
         }
     };
 
-    while (!Competition.isEnabled())
+    vex::timer timeoutTimer;
+    while (!Competition.isEnabled() && timeoutTimer.time() < 30000) // 30 seconds timeout
     {
         for (const auto &buttonInfo : AllControllerButtons)
         {
@@ -63,6 +64,12 @@ std::map<std::string, std::vector<int>> controllerButtonsPressed(const vex::cont
     return buttonPressTimes;
 }
 
+std::string formatMotorTemps(const std::array<int, 4> &motorTemps, double batteryVoltage)
+{
+    return std::format("\n | LeftTemp: {}°\n | RightTemp: {}°\n | RearLeftTemp: {}°\n | RearRightTemp: {}°\n | Battery Voltage: {}V\n",
+                       motorTemps[0], motorTemps[1], motorTemps[2], motorTemps[3], batteryVoltage);
+}
+
 void motorMonitor()
 {
     logHandler("motorMonitor", "motorMonitor is starting up...", Log::Level::Trace);
@@ -74,7 +81,8 @@ void motorMonitor()
             logHandler("motorMonitor", std::format("{} overheat: {}°", motorName, temperature), Log::Level::Warn, 3);
         }
     };
-
+    vex::timer monitorTimer;
+    vex::timer voltageCheckTimer;
     while (Competition.isEnabled())
     {
         std::array motorTemps = {
@@ -90,38 +98,45 @@ void motorMonitor()
             logOverheat(motorNames[i], motorTemps[i]);
         }
 
-        if (Brain.Battery.voltage() < 12)
+        if (voltageCheckTimer.time() > 10000) // Check voltage every 10 seconds
         {
-            logHandler("motorMonitor", "Brain voltage at a critical level!", Log::Level::Warn, 3);
+            std::string motorTempsStr;
+
+            if (Brain.Battery.voltage() < 12)
+            {
+                logHandler("motorMonitor", "Brain voltage at a critical level!", Log::Level::Warn, 3);
+                motorTempsStr = formatMotorTemps(motorTemps, Brain.Battery.voltage());
+            }
+
+            int leftMotorPosition = LeftDriveSmart.position(vex::rotationUnits::deg);
+            int rightMotorPosition = RightDriveSmart.position(vex::rotationUnits::deg);
+            int averagePosition = (leftMotorPosition + rightMotorPosition) / 2;
+            ConfigManager.updateOdometer(averagePosition);
+
+            // Update motorTempsStr with fresh data
+            motorTempsStr = std::format(
+                "\n | LeftTemp: {}°\n | RightTemp: {}°\n | RearLeftTemp: {}°\n | RearRightTemp: {}°\n | Battery Voltage: {}V\n",
+                motorTemps[0], motorTemps[1], motorTemps[2], motorTemps[3], Brain.Battery.voltage());
+            logHandler("motorMonitor", motorTempsStr, Log::Level::Info);
+
+            std::string dataBuffer = std::format("\nX Axis: {}\nY Axis: {}\nZ Axis: {}",
+                                                 InertialGyro.pitch(vex::rotationUnits::deg),
+                                                 InertialGyro.roll(vex::rotationUnits::deg),
+                                                 InertialGyro.yaw(vex::rotationUnits::deg));
+            logHandler("motorMonitor", dataBuffer, Log::Level::Info);
+
+            primaryController.Screen.clearScreen();
+            primaryController.Screen.setCursor(1, 1);
+            partnerController.Screen.clearScreen();
+            partnerController.Screen.setCursor(1, 1);
+
+            std::string display = std::format("FLM: {}° | FRM: {}°\nRLM: {}° | RRM: {}°\nBattery: {:.1f}V",
+                                              motorTemps[0], motorTemps[1], motorTemps[2], motorTemps[3], Brain.Battery.voltage());
+
+            primaryController.Screen.print(display.c_str());
+            partnerController.Screen.print(display.c_str());
+            vex::this_thread::sleep_for(5000);
         }
-
-        int leftMotorPosition = LeftDriveSmart.position(vex::rotationUnits::deg);
-        int rightMotorPosition = RightDriveSmart.position(vex::rotationUnits::deg);
-        int averagePosition = (leftMotorPosition + rightMotorPosition) / 2;
-
-        ConfigManager.updateOdometer(averagePosition);
-
-        std::string motorTempsStr = std::format("\n | LeftTemp: {}°\n | RightTemp: {}°\n | RearLeftTemp: {}°\n | RearRightTemp: {}°\n | Battery Voltage: {}V\n",
-                                                motorTemps[0], motorTemps[1], motorTemps[2], motorTemps[3], Brain.Battery.voltage());
-        logHandler("motorMonitor", motorTempsStr, Log::Level::Info);
-
-        std::string dataBuffer = std::format("\nX Axis: {}\nY Axis: {}\nZ Axis: {}",
-                                             InertialGyro.pitch(vex::rotationUnits::deg),
-                                             InertialGyro.roll(vex::rotationUnits::deg),
-                                             InertialGyro.yaw(vex::rotationUnits::deg));
-        logHandler("motorMonitor", dataBuffer, Log::Level::Info);
-
-        primaryController.Screen.clearScreen();
-        primaryController.Screen.setCursor(1, 1);
-        partnerController.Screen.clearScreen();
-        partnerController.Screen.setCursor(1, 1);
-
-        std::string display = std::format("FLM: {}° | FRM: {}°\nRLM: {}° | RRM: {}°\nBattery: {:.1f}V",
-                                          motorTemps[0], motorTemps[1], motorTemps[2], motorTemps[3], Brain.Battery.voltage());
-
-        primaryController.Screen.print(display.c_str());
-        partnerController.Screen.print(display.c_str());
-        vex::this_thread::sleep_for(5000);
     }
 }
 
@@ -131,32 +146,29 @@ void gifplayer(bool enableVsync)
     {
         return;
     }
-
-    if (enableVsync)
-    {
-        Brain.Screen.waitForRefresh();
-    }
-
-    if (!Competition.isEnabled())
-    {
-        vex::Gif gif("assets/loading.gif", 0, 0);
-        while (!Competition.isEnabled())
-        {
-            Brain.Screen.print("");
-        }
-    }
     else if (Competition.isAutonomous())
     {
         vex::Gif gif("assets/auto.gif", 0, 0);
         while (Competition.isAutonomous())
         {
             Brain.Screen.print("");
+            vex::this_thread::sleep_for(20); // Add a small delay to prevent blocking
+        }
+    }
+    else if (Competition.isDriverControl())
+    {
+        vex::Gif gif("assets/driver.gif", 0, 0);
+        while (Competition.isDriverControl())
+        {
+            Brain.Screen.print("");
+            vex::this_thread::sleep_for(20); // Add a small delay to prevent blocking
         }
     }
     else
     {
-        vex::Gif gif("assets/driver.gif", 0, 0);
-        while (Competition.isDriverControl())
+        vex::Gif gif("assets/auto.gif", 0, 0);
+        vex::timer timeoutTimer;
+        while (Competition.isAutonomous() && timeoutTimer.time() < 30000) // 30 seconds timeout
         {
             Brain.Screen.print("");
         }

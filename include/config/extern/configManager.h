@@ -138,7 +138,7 @@ private:
     int odometer;
     int lastService;
     int serviceInterval;
-
+    bool serviceWarningLogged;
     // New member variables for deadzone settings
     int leftDeadzone;
     int rightDeadzone;

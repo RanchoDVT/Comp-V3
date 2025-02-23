@@ -1,5 +1,4 @@
 #include "vex.h"
-
 #include <numeric>
 
 // define some more colors
@@ -17,7 +16,11 @@ void displayMotorData(vex::motor &m)
     int xpos = m.index() * 48;
 
     // There's no C++ API to get motor command value, use C API, this returns rpm
-    int v1 = vexMotorVelocityGet(m.index());
+    int v1 = 0;
+    if (m.installed())
+    {
+        v1 = vexMotorVelocityGet(m.index());
+    }
 
     // The actual velocity of the motor in rpm
     int v2 = m.velocity(vex::velocityUnits::rpm);
@@ -52,8 +55,8 @@ void displayMotorData(vex::motor &m)
     {
         Brain.Screen.setFillColor(dgrey);
     }
-
-    // Draw outline for motor info
+    int width = (m.index() < 9) ? 49 : 48;
+    Brain.Screen.drawRectangle(xpos, ypos, width, 79);
     Brain.Screen.setPenColor(vex::white);
     int w = (m.index() < 9) ? 49 : 48;
     Brain.Screen.drawRectangle(xpos, ypos, w, 79);
@@ -115,7 +118,7 @@ void displayTask()
         Brain.Screen.render();
 
         // Check if the exit button is pressed
-        if (Brain.Screen.pressing() && Brain.Screen.xPosition() < 50 && Brain.Screen.yPosition() < 50)
+        if (Brain.Screen.pressing() && Brain.Screen.xPosition() >= 0 && Brain.Screen.xPosition() < 50 && Brain.Screen.yPosition() >= 0 && Brain.Screen.yPosition() < 50)
         {
             logHandler("displayTask", "Exit button pressed, terminating program.", Log::Level::Fatal);
             vex::task::stopAll();
@@ -144,11 +147,13 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
         return "DEFAULT";
     }
 
-    std::string optmessage = "Options: " + std::accumulate(std::next(options.begin()), options.end(), options[0],
-                                                           [](const std::string &a, const std::string &b)
-                                                           {
-                                                               return a + ", " + b;
-                                                           });
+    std::ostringstream oss;
+    oss << "Options: " << options[0];
+    for (auto it = std::next(options.begin()); it != options.end(); ++it)
+    {
+        oss << ", " << *it;
+    }
+    std::string optmessage = oss.str();
 
     logHandler("getUserOption", optmessage, Log::Level::Debug);
 
@@ -274,6 +279,14 @@ std::string getUserOption(const std::string &settingName, const std::vector<std:
     primaryController.Screen.clearScreen();
     primaryController.Screen.setCursor(1, 1);
     partnerController.Screen.clearScreen();
-    partnerController.Screen.setCursor(1, 1);
+    if (Index < options.size())
+    {
+        return options[Index];
+    }
+    else
+    {
+        logHandler("getUserOption", "Index out of bounds, returning default option.", Log::Level::Error);
+        return "DEFAULT";
+    }
     return options[Index];
 }

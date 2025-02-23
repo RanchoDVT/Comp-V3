@@ -177,15 +177,15 @@ void vexCodeInit()
             logHandler("startup", message + "%", Log::Level::Info, 3);
         }
 
-        auto autorun = getUserOption("Run Autonomous?", {"Yes", "No"});
-        if (autorun == "Yes")
+        auto autoRun = getUserOption("Run Autonomous?", {"Yes", "No"});
+        if (autoRun == "Yes")
         {
             logHandler("startup", "Starting autonomous from setup.", Log::Level::Trace);
             primaryController.Screen.print("Running autonomous.");
-            
+
             logHandler("startup", "Finished autonomous.", Log::Level::Trace);
         }
-        else if (autorun == "No")
+        else if (autoRun == "No")
         {
             primaryController.Screen.print("Skipped autonomous.");
             logHandler("startup", "Skipped autonomous.", Log::Level::Trace);

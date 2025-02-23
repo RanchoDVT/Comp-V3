@@ -1,5 +1,4 @@
 #include "vex.h"
-
 #include <fstream>
 
 std::array<ControllerButtonInfo, 12> createControllerButtonArray(const vex::controller &controller)
@@ -28,10 +27,22 @@ configManager ConfigManager("config.cfg", "maintenance.txt");
 
 // Constructor
 configManager::configManager(const std::string &configFileName, const std::string &maintenanceFileName)
-    : driveMode(DriveMode::SplitArcade), configFileName(configFileName), maintenanceFileName(maintenanceFileName), maxOptionSize(4), logToFile(true),
-      POLLINGRATE(5), PRINTLOGO(true), CTRLR1POLLINGRATE(25), logLevel(Log::Level::Info), vsyncGif(true), odometer(0), lastService(0), serviceInterval(1000)
+    : driveMode(DriveMode::SplitArcade),
+      configFileName(configFileName),
+      maintenanceFileName(maintenanceFileName),
+      maxOptionSize(4),
+      logToFile(true),
+      POLLINGRATE(5),
+      PRINTLOGO(true),
+      CTRLR1POLLINGRATE(25),
+      logLevel(Log::Level::Info),
+      vsyncGif(true),
+      odometer(0),
+      lastService(0),
+      serviceInterval(1000)
 {
     readMaintenanceData();
+    serviceWarningLogged = false;
 
     // Initialize triPorts with pointers to Brain.ThreeWirePort
     triPorts["A"] = &Brain.ThreeWirePort.A;
@@ -116,7 +127,10 @@ void configManager::setLogLevel(const Log::Level &value)
 
 void configManager::setTeamNumber(const std::string &value)
 {
-    validateStringNotEmpty(value);
+    if (!validateStringNotEmpty(value))
+    {
+        return;
+    }
     if (value.length() > 2)
     {
         resetOrInitializeConfig("Team number cannot be more than 2 digits");
@@ -139,7 +153,10 @@ void configManager::setLoadingGifPath(const std::string &value)
 
 void configManager::setAutoGifPath(const std::string &value)
 {
-    validateStringNotEmpty(value);
+    if (!validateStringNotEmpty(value))
+    {
+        return;
+    }
     if (value.length() > 20)
     {
         resetOrInitializeConfig("GIF path cannot be more than 20 characters");
@@ -151,10 +168,14 @@ void configManager::setAutoGifPath(const std::string &value)
 
 void configManager::setDriverGifPath(const std::string &value)
 {
-    validateStringNotEmpty(value);
+    if (!validateStringNotEmpty(value))
+    {
+        return;
+    }
     if (value.length() > 20)
     {
         resetOrInitializeConfig("GIF path cannot be more than 20 characters");
+        return;
     }
     driverGifPath = value;
 }
@@ -225,7 +246,17 @@ vex::gearSetting configManager::getGearSetting(const std::string &ratio) const
 void configManager::updateOdometer(const int &averagePosition)
 {
     odometer += averagePosition;
-    writeMaintenanceData();
+    // Removed unused writeThreshold and accumulatedDistance.
+
+    if (odometer - lastService >= serviceInterval && !serviceWarningLogged)
+    {
+        logHandler("Service", "Service needed! Distance: " + std::to_string(odometer), Log::Level::Warn, 5);
+        serviceWarningLogged = true;
+    }
+    else if (odometer - lastService < serviceInterval)
+    {
+        serviceWarningLogged = false;
+    }
 }
 
 void configManager::checkServiceInterval()
@@ -233,41 +264,48 @@ void configManager::checkServiceInterval()
     if (odometer - lastService >= serviceInterval)
     {
         logHandler("Service", "Service needed! Distance: " + std::to_string(odometer), Log::Level::Warn, 5);
+        lastService = odometer;
     }
 }
 
 configManager::ConfigType configManager::stringToConfigType(const std::string &str)
 {
-    if (str == "Brain")
+    switch (str[0])
     {
-        return ConfigType::Brain;
-    }
-    else if (str == "Controller")
-    {
-        return ConfigType::Controller;
-    }
-    else
-    {
+    case 'B':
+        if (str == "Brain")
+            return ConfigType::Brain;
+        break;
+    case 'C':
+        if (str == "Controller")
+            return ConfigType::Controller;
+        break;
+    default:
         logHandler("configManager::stringToConfigType", "Invalid config type", Log::Level::Error, 5);
         return ConfigType::Brain; // Default return to avoid compilation error
     }
+    logHandler("configManager::stringToConfigType", "Invalid config type", Log::Level::Error, 5);
+    return ConfigType::Brain; // Default return to avoid compilation error
 }
 
 Log::Level configManager::stringToLogLevel(const std::string &str)
 {
-    if (str == "Trace")
+    switch (str[0])
+    {
+    case 'T':
         return Log::Level::Trace;
-    else if (str == "Debug")
+    case 'D':
         return Log::Level::Debug;
-    else if (str == "Info")
+    case 'I':
         return Log::Level::Info;
-    else if (str == "Warn")
+    case 'W':
         return Log::Level::Warn;
-    else if (str == "Error")
+    case 'E':
         return Log::Level::Error;
-    else if (str == "Fatal")
+    case 'F':
         return Log::Level::Fatal;
-    else
+    default:
         logHandler("configManager::stringToLogLevel", "Invalid log level", Log::Level::Error, 5);
-    return Log::Level::Info; // Default return to avoid compilation error
+        return Log::Level::Info; // Default return to avoid compilation error
+    }
 }
