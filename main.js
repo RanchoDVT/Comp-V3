@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("year").textContent = new Date().getFullYear();
-
-    const cache = new Map(); // Cache responses to avoid redundant API calls
+    const cache = new Map();
 
     async function fetchFile(url, targetElement) {
         if (cache.has(url)) {
@@ -9,10 +8,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
         try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
-            }
+            const response = await fetch(url, { cache: "no-store" });
+            if (!response.ok) throw new Error(`Failed to fetch ${url}`);
             const text = await response.text();
             cache.set(url, text);
             targetElement.innerHTML = text;
@@ -23,14 +20,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function fetchRepositories(user) {
         const url = `https://api.github.com/users/${user}/repos`;
-        if (cache.has(url)) {
-            return cache.get(url);
-        }
+        if (cache.has(url)) return cache.get(url);
         try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch repositories for user ${user}: ${response.statusText}`);
-            }
+            const response = await fetch(url, { cache: "no-store" });
+            if (!response.ok) throw new Error(`Failed to fetch repositories for ${user}`);
             const repos = await response.json();
             cache.set(url, repos);
             return repos;
@@ -46,9 +39,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         const fragment = document.createDocumentFragment();
 
         const repoRequests = users.map(fetchRepositories);
-        const userRepos = await Promise.all(repoRequests);
+        const userRepos = (await Promise.all(repoRequests)).flat();
 
-        userRepos.flat().forEach((repo) => {
+        userRepos.forEach(repo => {
             if (![".github", "Voidless7125", "shh"].includes(repo.name)) {
                 const repoLink = document.createElement("a");
                 repoLink.href = repo.html_url;
@@ -67,10 +60,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         projectsDropdown.appendChild(fragment);
     }
 
-    // Remove the old changelog fetch call... 
-    // if (document.getElementById("changelog-content"))
-    //     await fetchFile("https://raw.githubusercontent.com/Voidless7125/Comp-V3/dev/changelog.md", document.getElementById("changelog-content"));
-
     // New changelog loader: releases plus legacy changelog
     async function loadChangelog() {
         const changelogElem = document.getElementById("changelog-content");
@@ -79,34 +68,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Fetch releases from GitHub API
         try {
-            const releasesResponse = await fetch("https://api.github.com/repos/Voidless7125/Comp-V3/releases");
+            const releasesResponse = await fetch("https://api.github.com/repos/Voidless7125/Comp-V3/releases", { cache: "no-store" });
+            const releasesData = await releasesResponse.json();
             if (!releasesResponse.ok) {
                 throw new Error("Failed to load releases");
             }
-            const releasesData = await releasesResponse.json();
-            if (releasesData.length > 0) {
-                outputHTML += `<section>
-      <h2>Releases</h2>`;
-                releasesData.forEach(release => {
-                    const releaseBody = release.body ? marked.parse(release.body) : "<p>No release notes.</p>";
-                    outputHTML += `<div class="release">
-          <h3>${release.name || release.tag_name}</h3>
-          ${releaseBody}
-        </div>`;
-                });
-                outputHTML += `</section>`;
-            } else {
-                outputHTML += `<section>
-      <h2>Releases</h2>
-      <p>No releases available.</p>
-    </section>`;
-            }
+            outputHTML += `<section><h2>Releases</h2>`;
+            releasesData.forEach(release => {
+                outputHTML += `<div class="release">
+                    <h3>${release.name || release.tag_name}</h3>
+                    ${release.body ? marked.parse(release.body) : "<p>No release notes.</p>"}
+                </div>`;
+            });
+            outputHTML += `</section>`;
         } catch (err) {
             console.error(err);
-            outputHTML += `<section>
-      <h2>Releases</h2>
-      <p>Unable to load releases.</p>
-    </section>`;
+            outputHTML += `<section><h2>Releases</h2><p>Unable to load releases.</p></section>`;
         }
 
         // Fetch legacy changelog content
@@ -131,10 +108,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         changelogElem.innerHTML = outputHTML;
     }
 
-    if (document.getElementById("readme-content"))
+    if (document.getElementById("readme-content")) {
         await fetchFile("https://raw.githubusercontent.com/Voidless7125/Comp-V3/dev/README.md", document.getElementById("readme-content"));
-    if (document.getElementById("changelog-content"))
+    }
+    if (document.getElementById("changelog-content")) {
         await loadChangelog();
+    }
 
     async function getLatestRelease(repo) {
         const url = `https://api.github.com/repos/${repo}/releases/latest`;
@@ -157,12 +136,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function loadContent() {
         const navbar = document.querySelector("#navbar");
-        const readme = document.getElementById("readme-content");
-
-        if (navbar) await fetchFile("navbar.html", navbar);
-        if (readme) await fetchFile("https://raw.githubusercontent.com/Voidless7125/Comp-V3/dev/README.md", readme);
 
         if (navbar) {
+            await fetchFile("navbar.html", navbar);
             const currentPage = window.location.pathname.split("/").pop() || "index.html";
             navbar.querySelectorAll("nav a.nav-link").forEach((link) => {
                 if (link.dataset.page === currentPage) link.classList.add("active");
