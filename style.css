@@ -4,6 +4,10 @@ html {
     font-family: 'Segoe UI', Tahoma, sans-serif;
     padding-bottom: 2%;
     box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: #555 #2a2a2a;
+    scroll-behavior: smooth;
+    scrollbar-base-color: #4CAF50;
 }
 
 /* Start of nav */
@@ -364,4 +368,28 @@ textarea {
     border-radius: 4px;
     font-size: 1rem;
     z-index: 1000;
+}
+
+/* Custom Scrollbar Styles */
+
+/* Firefox */
+html {
+    scrollbar-width: thin;
+    scrollbar-color: #555 #2a2a2a;
+}
+
+/* WebKit browsers (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #2a2a2a;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 6px;
+    border: 3px solid #2a2a2a;
 }
