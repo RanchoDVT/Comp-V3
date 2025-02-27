@@ -396,6 +396,9 @@ html {
 /* Glowing purple text */
 .glow {
     color: #bb00ff;
+    font-family: 'Chakra Petch', sans-serif;
+    color: white;
+    text-shadow: 0 0 10px #bb00ff;
 }
 
 /* Link styling */
