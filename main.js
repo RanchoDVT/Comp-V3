@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function cachedFetch(url, processFn) {
         if (cache.has(url)) return cache.get(url);
         try {
-            const response = await fetch(url, { cache: "no-store" });
+            const response = await fetch(url, { cache: "force-cache" });
             if (!response.ok) throw new Error(`Failed to fetch ${url}`);
             const data = await processFn(response);
             cache.set(url, data);
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Fetch releases from GitHub API
         try {
-            const releasesResponse = await fetch("https://api.github.com/repos/Voidless7125/Comp-V3/releases", { cache: "no-store" });
+            const releasesResponse = await fetch("https://api.github.com/repos/Voidless7125/Comp-V3/releases", { cache: "force-cache" });
             const releasesData = await releasesResponse.json();
             if (!releasesResponse.ok) {
                 throw new Error("Failed to load releases");
