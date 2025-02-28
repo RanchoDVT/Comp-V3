@@ -405,3 +405,108 @@ html {
 a.glow {
     text-decoration: none;
 }
+
+/* Blob cursor styles */
+#cursor-blob {
+    background: linear-gradient(to right,
+            aquamarine, mediumpurple);
+    height: 300px;
+    aspect-ratio: 1;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    border-radius: 50%;
+    animation: blob-spin 20s infinite;
+    filter: blur(80px);
+    opacity: 0.7;
+    z-index: -1;
+    /* Keep it behind content */
+    pointer-events: none;
+    /* Make sure clicks pass through the blob */
+    display: block;
+}
+
+/* Optional blur overlay - Not used right now. */
+#cursor-blur-overlay {
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: -2;
+}
+
+/* Animation for blob rotation and morphing */
+@keyframes blob-spin {
+    from {
+        rotate: 0deg;
+        scale: 1;
+    }
+
+    25% {
+        scale: 1 1.3;
+    }
+
+    50% {
+        scale: 1.2 1;
+    }
+
+    75% {
+        scale: 1 1.3;
+    }
+
+    to {
+        rotate: 360deg;
+        scale: 1;
+    }
+}
+
+/* Hide default cursor when over the page | DISABLED */
+body.has-custom-cursor {
+    cursor: none;
+}
+
+/* But show pointer cursor when over interactive elements */
+body.has-custom-cursor a,
+body.has-custom-cursor button,
+body.has-custom-cursor input,
+body.has-custom-cursor select,
+body.has-custom-cursor [role="button"],
+body.has-custom-cursor label {
+    cursor: pointer;
+}
+
+/* Navbar glow effect styles */
+#navbar a,
+.dropdown-content a {
+    transition: text-shadow 0.3s ease, color 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+/* Optional: Add a subtle initial glow to navbar items */
+#navbar a:hover,
+.dropdown-content a:hover {
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+}
+
+#navbar {
+    transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+/* Animated transitions for all text elements*/
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span,
+label,
+a,
+li {
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}

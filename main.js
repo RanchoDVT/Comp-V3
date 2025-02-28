@@ -440,4 +440,193 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
     if (document.getElementById("project")) {
         window.updateProjectView();
     }
+
+    function initGlowCursor() {
+        const blob = document.createElement('div');
+        blob.id = 'cursor-blob';
+        document.body.appendChild(blob);
+
+        const blurOverlay = document.createElement('div');
+        blurOverlay.id = 'cursor-blur-overlay';
+        document.body.appendChild(blurOverlay);
+
+        // Set initial position to center of screen
+        const initialX = window.innerWidth / 2;
+        const initialY = window.innerHeight / 2;
+
+        // Position the blob initially
+        blob.style.left = `${initialX}px`;
+        blob.style.top = `${initialY}px`;
+
+        blob.style.opacity = '1';
+        blob.style.display = 'block';
+
+        document.body.onpointermove = event => {
+            const { clientX, clientY } = event;
+
+            blob.animate({
+                left: `${clientX}px`,
+                top: `${clientY}px`
+            }, {
+                duration: 3000,
+                fill: "forwards"
+            });
+
+            // Store current mouse position for other functions to use
+            window.currentMouseX = clientX;
+            window.currentMouseY = clientY;
+            window.lastMouseMoveTime = Date.now();
+
+            checkNavbarGlow(clientX, clientY);
+            enhanceTextContrast(clientX, clientY);
+        };
+
+        function checkNavbarGlow(cursorX, cursorY) {
+            const navbar = document.querySelector('#navbar');
+            if (!navbar) return;
+
+            // For background glow effect
+            const navbarRect = navbar.getBoundingClientRect();
+            const navbarCenterX = navbarRect.left + navbarRect.width / 2;
+            const navbarCenterY = navbarRect.top + navbarRect.height / 2;
+
+            const navDistance = Math.sqrt(
+                Math.pow(cursorX - navbarCenterX, 2) +
+                Math.pow(cursorY - navbarCenterY, 2)
+            );
+
+            const backgroundGlowThreshold = 300;
+
+            if (navDistance < backgroundGlowThreshold) {
+                const bgIntensity = 1 - (navDistance / backgroundGlowThreshold);
+                const glowColor = `rgba(60, 100, 255, ${bgIntensity * 0.15})`;
+                navbar.style.boxShadow = `0 0 ${Math.floor(40 * bgIntensity)}px ${glowColor}`;
+                navbar.style.backgroundColor = `rgba(30, 40, 60, ${0.7 + (bgIntensity * 0.3)})`;
+                navbar.style.transition = 'box-shadow 0.3s ease, background-color 0.3s ease';
+            } else {
+                navbar.style.boxShadow = '';
+                navbar.style.backgroundColor = '';
+            }
+
+            // Select all navbar links for text glow
+            const navbarItems = document.querySelectorAll('#navbar a, #navbar .nav-link, .dropdown-content a');
+
+            // The distance threshold for the text glow effect (px)
+            const textGlowThreshold = 200;
+
+            navbarItems.forEach(item => {
+                const rect = item.getBoundingClientRect();
+
+                // Calculate distance from cursor to center of element
+                const itemCenterX = rect.left + rect.width / 2;
+                const itemCenterY = rect.top + rect.height / 2;
+
+                // Calculate distance using Pythagorean theorem
+                const distance = Math.sqrt(
+                    Math.pow(cursorX - itemCenterX, 2) +
+                    Math.pow(cursorY - itemCenterY, 2)
+                );
+
+                if (distance < textGlowThreshold) {
+                    // (stronger when closer)
+                    const intensity = 1 - (distance / textGlowThreshold);
+
+                    const glowColor = `rgba(255, 255, 255, ${intensity * 0.8})`;
+                    const glowSize = Math.max(5, Math.floor(20 * intensity));
+
+                    item.style.textShadow = `0 0 ${glowSize}px ${glowColor}`;
+                    item.style.transition = 'text-shadow 0.3s ease, color 0.3s ease';
+
+                    // For stronger effect, also change text color slightly
+                    const colorBoost = Math.floor(intensity * 50);
+                    item.style.color = `rgb(${255 - colorBoost}, ${255 - colorBoost}, 255)`;
+                } else {
+                    // Remove glow effect when cursor is far away
+                    item.style.textShadow = '';
+                    item.style.color = '';
+                }
+            });
+        }
+
+        function enhanceTextContrast(cursorX, cursorY) {
+            const textElements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, label, li');
+            const contrastThreshold = 150;
+
+            textElements.forEach(element => {
+                const rect = element.getBoundingClientRect();
+
+                // Skip elements not visible in viewport
+                if (rect.bottom < 0 || rect.top > window.innerHeight ||
+                    rect.right < 0 || rect.left > window.innerWidth) {
+                    return;
+                }
+
+                // Calculate if cursor is near or over text element
+                if (cursorX >= rect.left && cursorX <= rect.right &&
+                    cursorY >= rect.top && cursorY <= rect.bottom) {
+
+                    // Direct hover - maximum contrast
+                    element.style.color = 'rgb(255, 255, 255)'; // Brighten text
+                    element.style.textShadow = '0 0 2px rgba(0, 0, 0, 0.5)'; // Add subtle shadow for readability
+                    element.style.transition = 'color 0.2s ease, text-shadow 0.2s ease';
+                }
+                else {
+                    // Calculate distance from cursor to center of element
+                    const elementCenterX = rect.left + rect.width / 2;
+                    const elementCenterY = rect.top + rect.height / 2;
+
+                    const distance = Math.sqrt(
+                        Math.pow(cursorX - elementCenterX, 2) +
+                        Math.pow(cursorY - elementCenterY, 2)
+                    );
+
+                    if (distance < contrastThreshold) {
+                        const intensity = 1 - (distance / contrastThreshold);
+
+                        // Calculate enhanced brightness based on distance (brighter when closer)
+                        const brightness = 180 + Math.floor(intensity * 75); // Range from 180 to 255
+
+                        element.style.color = `rgb(${brightness}, ${brightness}, ${brightness})`;
+                        element.style.textShadow = `0 0 ${Math.floor(intensity * 2)}px rgba(0, 0, 0, 0.3)`;
+                        element.style.transition = 'color 0.3s ease, text-shadow 0.3s ease';
+                    } else {
+                        // Reset to default when far from cursor
+                        element.style.color = '';
+                        element.style.textShadow = '';
+                    }
+                }
+            });
+        }
+
+        // Keep blob visible even when cursor leaves window
+        document.addEventListener('mouseleave', () => {
+            // Don't hide the blob when cursor leaves window
+        });
+
+        // Handle window resize to keep blob visible
+        window.addEventListener('resize', () => {
+            // If no recent mouse movement, center the blob in the viewport
+            if (!window.lastMouseMoveTime || (Date.now() - window.lastMouseMoveTime > 5000)) {
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+
+                blob.animate({
+                    left: `${centerX}px`,
+                    top: `${centerY}px`
+                }, {
+                    duration: 1000,
+                    fill: "forwards"
+                });
+            }
+        });
+
+        setInterval(() => {
+            if (window.currentMouseX && window.currentMouseY) {
+                checkNavbarGlow(window.currentMouseX, window.currentMouseY);
+                enhanceTextContrast(window.currentMouseX, window.currentMouseY);
+            }
+        }, 150);
+    }
+
+    initGlowCursor();
 });
