@@ -509,7 +509,8 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
         function refreshElementCache() {
             navbar = document.querySelector('#navbar');
             if (navbar) {
-                navbarItems = Array.from(document.querySelectorAll('#navbar a, #navbar .nav-link, .dropdown-content a'));
+                // Modified selector to better capture ALL dropdown items
+                navbarItems = Array.from(document.querySelectorAll('nav a, nav .nav-link, .dropdown-content a'));
             }
 
             // Only track elements currently visible in viewport (big performance win)
@@ -546,10 +547,14 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
         let effectCounter = 0;
 
         function updateCursor() {
-            // Animate the blob position
+            // Get the blob's dimensions
+            const blobWidth = blob.offsetWidth;
+            const blobHeight = blob.offsetHeight;
+
+            // Animate the blob position, centering it on the cursor
             blob.animate({
-                left: `${pendingCursorX}px`,
-                top: `${pendingCursorY}px`
+                left: `${pendingCursorX - (blobWidth / 2)}px`,
+                top: `${pendingCursorY - (blobHeight / 2)}px`
             }, {
                 duration: 3000,
                 fill: "forwards"
@@ -632,7 +637,8 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
         }
 
         function enhanceTextContrast(cursorX, cursorY) {
-            const contrastThreshold = 150;
+            // Increase threshold to widen the area of effect
+            const contrastThreshold = 300;
 
             for (let i = 0; i < visibleTextElements.length; i++) {
                 const element = visibleTextElements[i];
@@ -644,32 +650,35 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
                     continue;
                 }
 
-                // Direct hover - maximum contrast
+                // Get distance to element center
+                const elementCenterX = rect.left + rect.width / 2;
+                const elementCenterY = rect.top + rect.height / 2;
+
+                const distance = Math.sqrt(
+                    Math.pow(cursorX - elementCenterX, 2) +
+                    Math.pow(cursorY - elementCenterY, 2)
+                );
+
+                // Direct hover - less dark than before
                 if (cursorX >= rect.left && cursorX <= rect.right &&
                     cursorY >= rect.top && cursorY <= rect.bottom) {
-                    element.style.color = 'rgb(255, 255, 255)';
-                    element.style.textShadow = '0 0 2px rgba(0, 0, 0, 0.5)';
-                } else {
-                    // Near hover - gradual contrast
-                    const elementCenterX = rect.left + rect.width / 2;
-                    const elementCenterY = rect.top + rect.height / 2;
+                    // Make this less aggressively black (60 instead of 30)
+                    element.style.color = 'rgb(60, 60, 60)';
+                    element.style.textShadow = '0 0 2px rgba(255, 255, 255, 0.3)';
+                } else if (distance < contrastThreshold) {
+                    // More gradual darkening using cubic easing for smoother transition
+                    const intensity = 1 - (distance / contrastThreshold);
+                    const easedIntensity = Math.pow(intensity, 2); // Squared for gentler start
 
-                    const distance = Math.sqrt(
-                        Math.pow(cursorX - elementCenterX, 2) +
-                        Math.pow(cursorY - elementCenterY, 2)
-                    );
+                    // Start from brighter (230) and don't go as dark (only to 100)
+                    const brightness = 230 - Math.floor(easedIntensity * 130);
 
-                    if (distance < contrastThreshold) {
-                        const intensity = 1 - (distance / contrastThreshold);
-                        const brightness = 180 + Math.floor(intensity * 75);
-
-                        element.style.color = `rgb(${brightness}, ${brightness}, ${brightness})`;
-                        element.style.textShadow = `0 0 ${Math.floor(intensity * 2)}px rgba(0, 0, 0, 0.3)`;
-                    } else if (element.style.color || element.style.textShadow) {
-                        // Only reset if these were previously set
-                        element.style.color = '';
-                        element.style.textShadow = '';
-                    }
+                    element.style.color = `rgb(${brightness}, ${brightness}, ${brightness})`;
+                    element.style.textShadow = `0 0 ${Math.floor(intensity * 2)}px rgba(255, 255, 255, 0.3)`;
+                } else if (element.style.color || element.style.textShadow) {
+                    // Only reset if these were previously set
+                    element.style.color = '';
+                    element.style.textShadow = '';
                 }
             }
         }
@@ -689,7 +698,7 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
                     left: `${centerX}px`,
                     top: `${centerY}px`
                 }, {
-                    duration: 1000,
+                    duration: 3000,
                     fill: "forwards"
                 });
 

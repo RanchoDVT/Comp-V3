@@ -1,5 +1,5 @@
 // Cache version - change this when you update content
-const CACHE_NAME = '0.9.5 | BETA New fetures';
+const CACHE_NAME = '0.9.5.1 | Fix for the blob and contrast issues';
 
 // Assets to cache (add your critical files here)
 const urlsToCache = [
