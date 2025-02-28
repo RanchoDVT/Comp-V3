@@ -292,6 +292,9 @@ button {
     background-color: rgb(10, 10, 13);
     border-radius: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 5;
+    /* Higher than cursor blob */
 }
 
 .contact-form h2 {
@@ -408,23 +411,23 @@ a.glow {
 
 /* Blob cursor styles */
 #cursor-blob {
-    background: linear-gradient(to right,
-            aquamarine, mediumpurple);
+    background: linear-gradient(to right, aquamarine, mediumpurple);
     height: 300px;
-    aspect-ratio: 1;
+    width: 300px;
+    /* Explicitly set width equal to height for roundness */
     position: fixed;
-    left: 50%;
-    top: 50%;
-    translate: -50% -50%;
+    left: 0;
+    top: 0;
     border-radius: 50%;
     animation: blob-spin 20s infinite;
     filter: blur(80px);
     opacity: 0.7;
-    z-index: -1;
-    /* Keep it behind content */
+    z-index: 1;
+    /* Lower than all content */
     pointer-events: none;
-    /* Make sure clicks pass through the blob */
-    display: block;
+    transform-origin: center center;
+    will-change: transform;
+    /* Optimize for animations */
 }
 
 /* Optional blur overlay - Not used right now. */
@@ -446,15 +449,18 @@ a.glow {
     }
 
     25% {
-        scale: 1 1.3;
+        scale: 1.1 1.1;
+        /* More equal scaling */
     }
 
     50% {
-        scale: 1.2 1;
+        scale: 1.2 1.2;
+        /* Keep it round */
     }
 
     75% {
-        scale: 1 1.3;
+        scale: 1.1 1.1;
+        /* More equal scaling */
     }
 
     to {
@@ -509,4 +515,33 @@ label,
 a,
 li {
     transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.roadmap-container {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background-color: rgb(20, 20, 25);
+}
+
+.roadmap-link {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.roadmap-link:hover {
+    background-color: #3e8e41;
+}
+
+.wiki-features-section {
+    margin-top: 40px;
+    padding: 20px;
+    border-top: 1px solid #444;
 }

@@ -1,5 +1,5 @@
 // Cache version - change this when you update content
-const CACHE_NAME = '0.9.4.3 | Patch';
+const CACHE_NAME = '0.9.5 | BETA New fetures';
 
 // Assets to cache (add your critical files here)
 const urlsToCache = [

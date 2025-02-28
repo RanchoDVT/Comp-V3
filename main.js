@@ -45,9 +45,31 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Modified fetchRepositories using cachedFetch.
     async function fetchRepositories(user) {
-        const url = `https://api.github.com/users/${user}/repos`;
-        const repos = await cachedFetch(url, r => r.json());
-        return repos || [];
+        try {
+            const url = `https://api.github.com/users/${user}/repos`;
+            const response = await fetch(url, { cache: "force-cache" });
+
+            if (response.status === 403) {
+                // GitHub API rate limit exceeded
+                const projectsDropdown = document.getElementById("projects-dropdown");
+                if (projectsDropdown) {
+                    const warningEl = document.createElement("div");
+                    warningEl.className = "rate-limit-warning";
+                    warningEl.textContent = "⚠️ GitHub API rate limit exceeded. Some repositories may not be shown.";
+                    warningEl.style.padding = "10px";
+                    warningEl.style.color = "#ffcc00";
+                    warningEl.style.backgroundColor = "rgba(50,50,50,0.9)";
+                    projectsDropdown.prepend(warningEl);
+                }
+                return [];
+            }
+
+            if (!response.ok) throw new Error(`Failed to fetch ${url}`);
+            return await response.json();
+        } catch (err) {
+            console.error(`Error fetching repositories for ${user}:`, err);
+            return [];
+        }
     }
 
     // Modified getLatestRelease using cachedFetch.
@@ -387,10 +409,16 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
         const banners = document.querySelectorAll(".program-banner");
         banners.forEach(banner => banner.style.display = "none");
 
+        // Hide roadmap by default
+        const roadmapSection = document.getElementById("comp-v3-roadmap");
+        if (roadmapSection) roadmapSection.style.display = "none";
+
         if (selected === "comp-v3") {
             // Show the Comp V3 banner & config form
             document.getElementById("comp-v3-banner").style.display = "block";
             document.querySelector(".content").style.display = "block";
+            // Show roadmap for Comp V3
+            if (roadmapSection) roadmapSection.style.display = "block";
             // Clear any project info
             document.getElementById("project-info").innerHTML = "";
         } else {
@@ -419,26 +447,19 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
     }
 
     function enableMobileDropdowns() {
-        // Only on small screens.
+        // Only on mobile devices
         if (/Mobi|Android/i.test(navigator.userAgent)) {
             const dropdownLinks = document.querySelectorAll("nav li.dropdown > a.nav-link");
             dropdownLinks.forEach(link => {
                 link.addEventListener("click", function (e) {
                     const dropdown = this.nextElementSibling;
                     if (dropdown && dropdown.classList.contains("dropdown-content")) {
-                        // If dropdown is not open, treat this as the first click.
-                        if (dropdown.style.display !== "block") {
-                            e.preventDefault();  // Prevent navigation on first click.
-                            dropdown.style.display = "block";
-                            showTemporaryPopup("Click again to open page...");
-                            // Auto-close after 3 seconds if no second click.
-                            setTimeout(() => {
-                                dropdown.style.display = "none";
-                            }, 3000);
-                        } else {
-                            // Second click: Allow navigation.
-                            dropdown.style.display = "none";
+                        // Only prevent default if this is a dropdown toggle WITHOUT href
+                        if (!this.getAttribute("href") || this.getAttribute("href") === "#") {
+                            e.preventDefault();
+                            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
                         }
+                        // If it has an href, let the browser handle navigation normally
                     }
                 });
             });
@@ -682,7 +703,54 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
     }
 
     initGlowCursor();
+
+
+    // Add this to your DOMContentLoaded event handler
+    if (document.getElementById("wiki-features")) {
+        loadWikiFeatures();
+    }
+
+    // Add this to your DOMContentLoaded event handler
+    if (document.getElementById("comp-v3-roadmap")) {
+        loadCompV3Roadmap();
+    }
 });
+
+// Add this function to fetch and display wiki content
+async function loadWikiFeatures() {
+    const wikiContainer = document.getElementById("wiki-features");
+    if (!wikiContainer) return;
+
+    try {
+        // Fetch wiki content from GitHub API
+        const response = await fetch("https://api.github.com/repos/Voidless7125/Comp-V3/wiki");
+        if (!response.ok) throw new Error("Failed to load wiki data");
+
+        const wikiPages = await response.json();
+        const featuresPage = wikiPages.find(page => page.title.toLowerCase().includes("features"));
+
+        if (featuresPage) {
+            // Fetch the content of the features wiki page
+            const contentResponse = await fetch(featuresPage.html_url + ".md");
+            if (!contentResponse.ok) throw new Error("Failed to load wiki content");
+
+            const content = await contentResponse.text();
+            wikiContainer.innerHTML = `
+                <h2>Additional Features from Wiki</h2>
+                <div class="wiki-content">
+                    ${marked.parse(content)}
+                </div>
+            `;
+        } else {
+            wikiContainer.innerHTML = `<p>No features wiki page found. <a href="https://github.com/Voidless7125/Comp-V3/wiki" target="_blank">View all wiki pages</a>.</p>`;
+        }
+    } catch (error) {
+        console.error("Error loading wiki features:", error);
+        wikiContainer.innerHTML = `
+            <p>Could not load features from wiki. <a href="https://github.com/Voidless7125/Comp-V3/wiki" target="_blank">View wiki directly</a>.</p>
+        `;
+    }
+}
 
 // Add this function to your main.js file
 async function checkForWebsiteUpdate() {
@@ -739,6 +807,28 @@ async function checkForWebsiteUpdate() {
         }
     } catch (error) {
         console.error('Error checking for website update:', error);
+    }
+}
+
+// Add this function to fetch and display roadmap
+async function loadCompV3Roadmap() {
+    const roadmapContainer = document.getElementById("comp-v3-roadmap");
+    if (!roadmapContainer) return;
+
+    try {
+        // Since the GitHub Projects API requires authentication,
+        // we'll provide a link instead of trying to embed it
+        roadmapContainer.innerHTML = `
+            <h3>Comp V3 Development Roadmap</h3>
+            <p>View the complete development roadmap and progress on GitHub:</p>
+            <a href="https://github.com/users/Voidless7125/projects/2" 
+               target="_blank" 
+               class="roadmap-link">
+                Open Comp V3 Roadmap on GitHub
+            </a>
+        `;
+    } catch (error) {
+        console.error("Error with roadmap:", error);
     }
 }
 
