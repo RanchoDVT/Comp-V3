@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Register service worker for better caching
     if ('serviceWorker' in navigator) {
         try {
-            const registration = await navigator.serviceWorker.register('/service-worker.js');
+            const registration = await navigator.serviceWorker.register('/Comp-V3/service-worker.js');
             console.log('ServiceWorker registration successful with scope:', registration.scope);
         } catch (error) {
             console.error('ServiceWorker registration failed:', error);

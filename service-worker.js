@@ -1,5 +1,5 @@
 // Cache version - change this when you update content
-const CACHE_NAME = '0.9.4.2 | Fix cache issue and improve blob performance';
+const CACHE_NAME = '0.9.4.3 | Patch';
 
 // Assets to cache (add your critical files here)
 const urlsToCache = [
