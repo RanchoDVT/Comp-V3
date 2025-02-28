@@ -466,43 +466,86 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
         blob.id = 'cursor-blob';
         document.body.appendChild(blob);
 
-        const blurOverlay = document.createElement('div');
-        blurOverlay.id = 'cursor-blur-overlay';
-        document.body.appendChild(blurOverlay);
-
-        // Set initial position to center of screen
+        // Position the blob initially at center of screen
         const initialX = window.innerWidth / 2;
         const initialY = window.innerHeight / 2;
-
-        // Position the blob initially
         blob.style.left = `${initialX}px`;
         blob.style.top = `${initialY}px`;
-
         blob.style.opacity = '1';
         blob.style.display = 'block';
 
-        document.body.onpointermove = event => {
-            const { clientX, clientY } = event;
+        // Performance optimization: Store DOM elements and track animation state
+        let isAnimating = false;
+        let pendingCursorX = initialX;
+        let pendingCursorY = initialY;
 
+        // Cache DOM elements for better performance
+        let navbar = null;
+        let navbarItems = [];
+        let visibleTextElements = [];
+
+        // Initial element caching
+        function refreshElementCache() {
+            navbar = document.querySelector('#navbar');
+            if (navbar) {
+                navbarItems = Array.from(document.querySelectorAll('#navbar a, #navbar .nav-link, .dropdown-content a'));
+            }
+
+            // Only track elements currently visible in viewport (big performance win)
+            visibleTextElements = Array.from(document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, label, li')).filter(el => {
+                const rect = el.getBoundingClientRect();
+                return !(rect.bottom < 0 || rect.top > window.innerHeight ||
+                    rect.right < 0 || rect.left > window.innerWidth);
+            });
+        }
+
+        // Initial cache population
+        refreshElementCache();
+
+        // Refresh element cache occasionally and on key events
+        window.addEventListener('resize', debounce(refreshElementCache, 200));
+        window.addEventListener('scroll', debounce(refreshElementCache, 200));
+        setInterval(refreshElementCache, 5000); // Refresh every 5 seconds
+
+        // Performance-optimized pointer move handler
+        document.addEventListener('pointermove', event => {
+            pendingCursorX = event.clientX;
+            pendingCursorY = event.clientY;
+            window.currentMouseX = pendingCursorX;
+            window.currentMouseY = pendingCursorY;
+            window.lastMouseMoveTime = Date.now();
+
+            if (!isAnimating) {
+                isAnimating = true;
+                requestAnimationFrame(updateCursor);
+            }
+        });
+
+        // Counter to reduce frequency of effect updates
+        let effectCounter = 0;
+
+        function updateCursor() {
+            // Animate the blob position
             blob.animate({
-                left: `${clientX}px`,
-                top: `${clientY}px`
+                left: `${pendingCursorX}px`,
+                top: `${pendingCursorY}px`
             }, {
                 duration: 3000,
                 fill: "forwards"
             });
 
-            // Store current mouse position for other functions to use
-            window.currentMouseX = clientX;
-            window.currentMouseY = clientY;
-            window.lastMouseMoveTime = Date.now();
+            // Only apply effects every 3rd frame for better performance
+            effectCounter++;
+            if (effectCounter % 3 === 0) {
+                checkNavbarGlow(pendingCursorX, pendingCursorY);
+                enhanceTextContrast(pendingCursorX, pendingCursorY);
+            }
 
-            checkNavbarGlow(clientX, clientY);
-            enhanceTextContrast(clientX, clientY);
-        };
+            // Allow next animation frame
+            isAnimating = false;
+        }
 
         function checkNavbarGlow(cursorX, cursorY) {
-            const navbar = document.querySelector('#navbar');
             if (!navbar) return;
 
             // For background glow effect
@@ -522,76 +565,71 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
                 const glowColor = `rgba(60, 100, 255, ${bgIntensity * 0.15})`;
                 navbar.style.boxShadow = `0 0 ${Math.floor(40 * bgIntensity)}px ${glowColor}`;
                 navbar.style.backgroundColor = `rgba(30, 40, 60, ${0.7 + (bgIntensity * 0.3)})`;
-                navbar.style.transition = 'box-shadow 0.3s ease, background-color 0.3s ease';
             } else {
                 navbar.style.boxShadow = '';
                 navbar.style.backgroundColor = '';
             }
 
-            // Select all navbar links for text glow
-            const navbarItems = document.querySelectorAll('#navbar a, #navbar .nav-link, .dropdown-content a');
-
-            // The distance threshold for the text glow effect (px)
+            // Apply text glow effect to navbar items
             const textGlowThreshold = 200;
 
-            navbarItems.forEach(item => {
+            for (let i = 0; i < navbarItems.length; i++) {
+                const item = navbarItems[i];
                 const rect = item.getBoundingClientRect();
 
-                // Calculate distance from cursor to center of element
+                // Skip if not in viewport
+                if (rect.bottom < 0 || rect.top > window.innerHeight ||
+                    rect.right < 0 || rect.left > window.innerWidth) {
+                    continue;
+                }
+
                 const itemCenterX = rect.left + rect.width / 2;
                 const itemCenterY = rect.top + rect.height / 2;
 
-                // Calculate distance using Pythagorean theorem
                 const distance = Math.sqrt(
                     Math.pow(cursorX - itemCenterX, 2) +
                     Math.pow(cursorY - itemCenterY, 2)
                 );
 
                 if (distance < textGlowThreshold) {
-                    // (stronger when closer)
                     const intensity = 1 - (distance / textGlowThreshold);
-
                     const glowColor = `rgba(255, 255, 255, ${intensity * 0.8})`;
                     const glowSize = Math.max(5, Math.floor(20 * intensity));
 
                     item.style.textShadow = `0 0 ${glowSize}px ${glowColor}`;
-                    item.style.transition = 'text-shadow 0.3s ease, color 0.3s ease';
 
-                    // For stronger effect, also change text color slightly
                     const colorBoost = Math.floor(intensity * 50);
                     item.style.color = `rgb(${255 - colorBoost}, ${255 - colorBoost}, 255)`;
                 } else {
-                    // Remove glow effect when cursor is far away
-                    item.style.textShadow = '';
-                    item.style.color = '';
+                    // Only reset if previously set
+                    if (item.style.textShadow || item.style.color) {
+                        item.style.textShadow = '';
+                        item.style.color = '';
+                    }
                 }
-            });
+            }
         }
 
         function enhanceTextContrast(cursorX, cursorY) {
-            const textElements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, label, li');
             const contrastThreshold = 150;
 
-            textElements.forEach(element => {
+            for (let i = 0; i < visibleTextElements.length; i++) {
+                const element = visibleTextElements[i];
                 const rect = element.getBoundingClientRect();
 
-                // Skip elements not visible in viewport
+                // Skip if element is no longer visible
                 if (rect.bottom < 0 || rect.top > window.innerHeight ||
                     rect.right < 0 || rect.left > window.innerWidth) {
-                    return;
+                    continue;
                 }
 
-                // Calculate if cursor is near or over text element
+                // Direct hover - maximum contrast
                 if (cursorX >= rect.left && cursorX <= rect.right &&
                     cursorY >= rect.top && cursorY <= rect.bottom) {
-
-                    // Direct hover - maximum contrast
-                    element.style.color = 'rgb(255, 255, 255)'; // Brighten text
-                    element.style.textShadow = '0 0 2px rgba(0, 0, 0, 0.5)'; // Add subtle shadow for readability
-                    element.style.transition = 'color 0.2s ease, text-shadow 0.2s ease';
-                }
-                else {
-                    // Calculate distance from cursor to center of element
+                    element.style.color = 'rgb(255, 255, 255)';
+                    element.style.textShadow = '0 0 2px rgba(0, 0, 0, 0.5)';
+                } else {
+                    // Near hover - gradual contrast
                     const elementCenterX = rect.left + rect.width / 2;
                     const elementCenterY = rect.top + rect.height / 2;
 
@@ -602,20 +640,17 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
 
                     if (distance < contrastThreshold) {
                         const intensity = 1 - (distance / contrastThreshold);
-
-                        // Calculate enhanced brightness based on distance (brighter when closer)
-                        const brightness = 180 + Math.floor(intensity * 75); // Range from 180 to 255
+                        const brightness = 180 + Math.floor(intensity * 75);
 
                         element.style.color = `rgb(${brightness}, ${brightness}, ${brightness})`;
                         element.style.textShadow = `0 0 ${Math.floor(intensity * 2)}px rgba(0, 0, 0, 0.3)`;
-                        element.style.transition = 'color 0.3s ease, text-shadow 0.3s ease';
-                    } else {
-                        // Reset to default when far from cursor
+                    } else if (element.style.color || element.style.textShadow) {
+                        // Only reset if these were previously set
                         element.style.color = '';
                         element.style.textShadow = '';
                     }
                 }
-            });
+            }
         }
 
         // Keep blob visible even when cursor leaves window
@@ -625,7 +660,6 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
 
         // Handle window resize to keep blob visible
         window.addEventListener('resize', () => {
-            // If no recent mouse movement, center the blob in the viewport
             if (!window.lastMouseMoveTime || (Date.now() - window.lastMouseMoveTime > 5000)) {
                 const centerX = window.innerWidth / 2;
                 const centerY = window.innerHeight / 2;
@@ -637,19 +671,17 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
                     duration: 1000,
                     fill: "forwards"
                 });
+
+                pendingCursorX = centerX;
+                pendingCursorY = centerY;
             }
         });
 
-        setInterval(() => {
-            if (window.currentMouseX && window.currentMouseY) {
-                checkNavbarGlow(window.currentMouseX, window.currentMouseY);
-                enhanceTextContrast(window.currentMouseX, window.currentMouseY);
-            }
-        }, 150);
+        // Remove the performance-killing interval
+        // Instead rely on requestAnimationFrame
     }
 
     initGlowCursor();
-    await checkForWebsiteUpdate();
 });
 
 // Add this function to your main.js file
@@ -709,3 +741,90 @@ async function checkForWebsiteUpdate() {
         console.error('Error checking for website update:', error);
     }
 }
+
+// Cache version - change this when you update content
+const CACHE_NAME = 'comp-v3-cache-v1';
+
+// Assets to cache (add your critical files here)
+const urlsToCache = [
+    '/',
+    '/index.html',
+    '/style.css',
+    '/main.js',
+    '/navbar.html',
+    // Add other important assets
+];
+
+// Install event - cache critical assets
+self.addEventListener('install', event => {
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                return cache.addAll(urlsToCache);
+            })
+    );
+});
+
+// Fetch event - serve from cache, fallback to network
+self.addEventListener('fetch', event => {
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => {
+                // Cache hit - return response
+                if (response) {
+                    return response;
+                }
+
+                // Clone the request because it's a one-time use stream
+                const fetchRequest = event.request.clone();
+
+                return fetch(fetchRequest).then(response => {
+                    // Check if we received a valid response
+                    if (!response || response.status !== 200 || response.type !== 'basic') {
+                        return response;
+                    }
+
+                    // Clone the response because it's a one-time use stream
+                    const responseToCache = response.clone();
+
+                    caches.open(CACHE_NAME)
+                        .then(cache => {
+                            // Don't cache API calls
+                            if (!event.request.url.includes('/api/')) {
+                                cache.put(event.request, responseToCache);
+                            }
+                        });
+
+                    return response;
+                });
+            })
+    );
+});
+
+// Activate event - clean up old caches
+self.addEventListener('activate', event => {
+    const cacheWhitelist = [CACHE_NAME];
+
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheWhitelist.indexOf(cacheName) === -1) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
+    );
+});
+
+// Listen for message to clear cache
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'CLEAR_CACHE') {
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => caches.delete(cacheName))
+            );
+        });
+    }
+});
