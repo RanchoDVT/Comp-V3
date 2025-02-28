@@ -1,16 +1,20 @@
+// Add this at the top of your file (outside the event listener)
+let siteCache;
+
 document.addEventListener("DOMContentLoaded", async () => {
 
     document.getElementById("year").textContent = new Date().getFullYear();
-    const cache = new Map();
+    // Change this line to assign to the global variable
+    siteCache = new Map();
 
     // New helper function to handle caching and fetch processing.
     async function cachedFetch(url, processFn) {
-        if (cache.has(url)) return cache.get(url);
+        if (siteCache.has(url)) return siteCache.get(url);
         try {
             const response = await fetch(url, { cache: "force-cache" });
             if (!response.ok) throw new Error(`Failed to fetch ${url}`);
             const data = await processFn(response);
-            cache.set(url, data);
+            siteCache.set(url, data);
             return data;
         } catch (err) {
             console.error(`Error fetching ${url}:`, err);
@@ -623,6 +627,14 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
     if (document.getElementById("comp-v3-roadmap")) {
         loadCompV3Roadmap();
     }
+
+    // Add this inside the DOMContentLoaded event handler
+    window.clearAllSiteData = function () {
+        const message = clearSiteData();
+        if (confirm(message)) {
+            window.location.reload();
+        }
+    };
 });
 
 // Add this function to fetch and display wiki content
@@ -681,4 +693,41 @@ async function loadCompV3Roadmap() {
     } catch (error) {
         console.error("Error with roadmap:", error);
     }
+}
+
+// Add this function to your existing code
+function clearSiteData() {
+    // Clear the in-memory cache Map
+    if (siteCache) {
+        siteCache.clear();
+        console.log("In-memory cache cleared");
+    } else {
+        console.warn("Cache not available");
+    }
+
+    // Clear all cookies for this domain
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i];
+        const eqPos = cookie.indexOf("=");
+        const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+    }
+    console.log("Cookies cleared");
+
+    // Clear localStorage and sessionStorage
+    if (window.localStorage) {
+        localStorage.clear();
+        console.log("Local storage cleared");
+    }
+
+    if (window.sessionStorage) {
+        sessionStorage.clear();
+        console.log("Session storage cleared");
+    }
+
+    // Force reload the page to apply changes
+    localStorage.setItem('dataCleared', 'true');
+    window.location.reload(true); // Force reload from server, not cache
+    return "Site data cleared. Reloading page...";
 }
