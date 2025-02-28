@@ -1,4 +1,17 @@
 document.addEventListener("DOMContentLoaded", async () => {
+    // Register service worker for better caching
+    if ('serviceWorker' in navigator) {
+        try {
+            const registration = await navigator.serviceWorker.register('/service-worker.js');
+            console.log('ServiceWorker registration successful with scope:', registration.scope);
+        } catch (error) {
+            console.error('ServiceWorker registration failed:', error);
+        }
+    }
+
+    // Check for website updates
+    await checkForWebsiteUpdate();
+
     document.getElementById("year").textContent = new Date().getFullYear();
     const cache = new Map();
 
@@ -17,9 +30,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    // Add this function to append version query parameters to assets
+    function getVersionedAssetUrl(assetPath) {
+        const commitHash = document.cookie.match(/compV3CommitHash=([^;]+)/)?.[1] || Date.now();
+        return `${assetPath}?v=${commitHash}`;
+    }
+
     // Modified fetchFile using cachedFetch.
     async function fetchFile(url, targetElement) {
-        const text = await cachedFetch(url, r => r.text());
+        const versionedUrl = getVersionedAssetUrl(url);
+        const text = await cachedFetch(versionedUrl, r => r.text());
         if (text !== null) targetElement.innerHTML = text;
     }
 
@@ -629,4 +649,63 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
     }
 
     initGlowCursor();
+    await checkForWebsiteUpdate();
 });
+
+// Add this function to your main.js file
+async function checkForWebsiteUpdate() {
+    // Function to get current commit hash from cookie
+    function getStoredCommitHash() {
+        const match = document.cookie.match(/compV3CommitHash=([^;]+)/);
+        return match ? match[1] : null;
+    }
+
+    // Function to save commit hash to cookie (expires in 30 days)
+    function storeCommitHash(hash) {
+        const expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + 30);
+        document.cookie = `compV3CommitHash=${hash};expires=${expiryDate.toUTCString()};path=/`;
+    }
+
+    try {
+        // Get latest commit from GitHub API for the main branch
+        const response = await fetch('https://api.github.com/repos/Voidless7125/Comp-V3/commits/dev', {
+            cache: 'no-store' // Bypass cache for this request
+        });
+
+        if (!response.ok) {
+            console.log('Could not check for website updates:', response.status);
+            return;
+        }
+
+        const data = await response.json();
+        const latestCommitHash = data.sha;
+
+        // Get the stored commit hash
+        const storedCommitHash = getStoredCommitHash();
+
+        // If we have no stored hash or hash has changed, we need to update
+        if (!storedCommitHash || storedCommitHash !== latestCommitHash) {
+            console.log('Website update detected! Reloading with fresh cache...');
+
+            // Store the new commit hash
+            storeCommitHash(latestCommitHash);
+
+            // Clear cache and reload
+            if ('caches' in window) {
+                // Delete all caches that match our site
+                const cachesToDelete = await caches.keys();
+                await Promise.all(
+                    cachesToDelete.map(cacheName => caches.delete(cacheName))
+                );
+            }
+
+            // Force reload from server
+            window.location.reload(true);
+        } else {
+            console.log('Website is up to date!');
+        }
+    } catch (error) {
+        console.error('Error checking for website update:', error);
+    }
+}
