@@ -1,16 +1,4 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    // Register service worker for better caching
-    if ('serviceWorker' in navigator) {
-        try {
-            const registration = await navigator.serviceWorker.register('/Comp-V3/service-worker.js');
-            console.log('ServiceWorker registration successful with scope:', registration.scope);
-        } catch (error) {
-            console.error('ServiceWorker registration failed:', error);
-        }
-    }
-
-    // Check for website updates
-    await checkForWebsiteUpdate();
 
     document.getElementById("year").textContent = new Date().getFullYear();
     const cache = new Map();
@@ -173,10 +161,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             populateProjectsDropdown();
         }
     }
-
     const form = document.getElementById("config-form");
     if (form) {
-
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
             const formData = new FormData(form);
@@ -229,6 +215,12 @@ CUSTOMMESSAGE=${formData.get("custom_message")}
 DRIVEMODE=${formData.get("drive_mode")}
 VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
             document.getElementById("copy-button").style.display = "inline-block";
+
+            // Change the submit button text to "Regenerate Config"
+            const submitButton = form.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.textContent = "Regenerate Config";
+            }
         });
     }
 
@@ -435,17 +427,6 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
         }
     };
 
-    // Helper: Show temporary popup message (e.g., at the center of viewport)
-    function showTemporaryPopup(message) {
-        const popup = document.createElement("div");
-        popup.classList.add("temp-popup");
-        popup.textContent = message;
-        document.body.appendChild(popup);
-        setTimeout(() => {
-            popup.remove();
-        }, 2000);
-    }
-
     function enableMobileDropdowns() {
         // Only on mobile devices
         if (/Mobi|Android/i.test(navigator.userAgent)) {
@@ -503,7 +484,6 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
         // Cache DOM elements for better performance
         let navbar = null;
         let navbarItems = [];
-        let visibleTextElements = [];
 
         // Initial element caching
         function refreshElementCache() {
@@ -544,7 +524,6 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
         });
 
         // Counter to reduce frequency of effect updates
-        let effectCounter = 0;
 
         function updateCursor() {
             // Get the blob's dimensions
@@ -560,12 +539,7 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
                 fill: "forwards"
             });
 
-            // Only apply effects every 3rd frame for better performance
-            effectCounter++;
-            if (effectCounter % 3 === 0) {
-                checkNavbarGlow(pendingCursorX, pendingCursorY);
-                enhanceTextContrast(pendingCursorX, pendingCursorY);
-            }
+            checkNavbarGlow(pendingCursorX, pendingCursorY);
 
             // Allow next animation frame
             isAnimating = false;
@@ -634,81 +608,7 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
                     }
                 }
             }
-        }
-
-        function enhanceTextContrast(cursorX, cursorY) {
-            // Increase threshold to widen the area of effect
-            const contrastThreshold = 300;
-
-            for (let i = 0; i < visibleTextElements.length; i++) {
-                const element = visibleTextElements[i];
-                const rect = element.getBoundingClientRect();
-
-                // Skip if element is no longer visible
-                if (rect.bottom < 0 || rect.top > window.innerHeight ||
-                    rect.right < 0 || rect.left > window.innerWidth) {
-                    continue;
-                }
-
-                // Get distance to element center
-                const elementCenterX = rect.left + rect.width / 2;
-                const elementCenterY = rect.top + rect.height / 2;
-
-                const distance = Math.sqrt(
-                    Math.pow(cursorX - elementCenterX, 2) +
-                    Math.pow(cursorY - elementCenterY, 2)
-                );
-
-                // Direct hover - less dark than before
-                if (cursorX >= rect.left && cursorX <= rect.right &&
-                    cursorY >= rect.top && cursorY <= rect.bottom) {
-                    // Make this less aggressively black (60 instead of 30)
-                    element.style.color = 'rgb(60, 60, 60)';
-                    element.style.textShadow = '0 0 2px rgba(255, 255, 255, 0.3)';
-                } else if (distance < contrastThreshold) {
-                    // More gradual darkening using cubic easing for smoother transition
-                    const intensity = 1 - (distance / contrastThreshold);
-                    const easedIntensity = Math.pow(intensity, 2); // Squared for gentler start
-
-                    // Start from brighter (230) and don't go as dark (only to 100)
-                    const brightness = 230 - Math.floor(easedIntensity * 130);
-
-                    element.style.color = `rgb(${brightness}, ${brightness}, ${brightness})`;
-                    element.style.textShadow = `0 0 ${Math.floor(intensity * 2)}px rgba(255, 255, 255, 0.3)`;
-                } else if (element.style.color || element.style.textShadow) {
-                    // Only reset if these were previously set
-                    element.style.color = '';
-                    element.style.textShadow = '';
-                }
-            }
-        }
-
-        // Keep blob visible even when cursor leaves window
-        document.addEventListener('mouseleave', () => {
-            // Don't hide the blob when cursor leaves window
-        });
-
-        // Handle window resize to keep blob visible
-        window.addEventListener('resize', () => {
-            if (!window.lastMouseMoveTime || (Date.now() - window.lastMouseMoveTime > 5000)) {
-                const centerX = window.innerWidth / 2;
-                const centerY = window.innerHeight / 2;
-
-                blob.animate({
-                    left: `${centerX}px`,
-                    top: `${centerY}px`
-                }, {
-                    duration: 3000,
-                    fill: "forwards"
-                });
-
-                pendingCursorX = centerX;
-                pendingCursorY = centerY;
-            }
-        });
-
-        // Remove the performance-killing interval
-        // Instead rely on requestAnimationFrame
+        };
     }
 
     initGlowCursor();
@@ -761,64 +661,6 @@ async function loadWikiFeatures() {
     }
 }
 
-// Add this function to your main.js file
-async function checkForWebsiteUpdate() {
-    // Function to get current commit hash from cookie
-    function getStoredCommitHash() {
-        const match = document.cookie.match(/compV3CommitHash=([^;]+)/);
-        return match ? match[1] : null;
-    }
-
-    // Function to save commit hash to cookie (expires in 30 days)
-    function storeCommitHash(hash) {
-        const expiryDate = new Date();
-        expiryDate.setDate(expiryDate.getDate() + 30);
-        document.cookie = `compV3CommitHash=${hash};expires=${expiryDate.toUTCString()};path=/`;
-    }
-
-    try {
-        // Get latest commit from GitHub API for the main branch
-        const response = await fetch('https://api.github.com/repos/Voidless7125/Comp-V3/commits/website', {
-            cache: 'no-store' // Bypass cache for this request
-        });
-
-        if (!response.ok) {
-            console.log('Could not check for website updates:', response.status);
-            return;
-        }
-
-        const data = await response.json();
-        const latestCommitHash = data.sha;
-
-        // Get the stored commit hash
-        const storedCommitHash = getStoredCommitHash();
-
-        // If we have no stored hash or hash has changed, we need to update
-        if (!storedCommitHash || storedCommitHash !== latestCommitHash) {
-            console.log('Website update detected! Reloading with fresh cache...');
-
-            // Store the new commit hash
-            storeCommitHash(latestCommitHash);
-
-            // Clear cache and reload
-            if ('caches' in window) {
-                // Delete all caches that match our site
-                const cachesToDelete = await caches.keys();
-                await Promise.all(
-                    cachesToDelete.map(cacheName => caches.delete(cacheName))
-                );
-            }
-
-            // Force reload from server
-            window.location.reload(true);
-        } else {
-            console.log('Website is up to date!');
-        }
-    } catch (error) {
-        console.error('Error checking for website update:', error);
-    }
-}
-
 // Add this function to fetch and display roadmap
 async function loadCompV3Roadmap() {
     const roadmapContainer = document.getElementById("comp-v3-roadmap");
@@ -840,90 +682,3 @@ async function loadCompV3Roadmap() {
         console.error("Error with roadmap:", error);
     }
 }
-
-// Cache version - change this when you update content
-const CACHE_NAME = 'comp-v3-cache-v1';
-
-// Assets to cache (add your critical files here)
-const urlsToCache = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/main.js',
-    '/navbar.html',
-    // Add other important assets
-];
-
-// Install event - cache critical assets
-self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => {
-                return cache.addAll(urlsToCache);
-            })
-    );
-});
-
-// Fetch event - serve from cache, fallback to network
-self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                // Cache hit - return response
-                if (response) {
-                    return response;
-                }
-
-                // Clone the request because it's a one-time use stream
-                const fetchRequest = event.request.clone();
-
-                return fetch(fetchRequest).then(response => {
-                    // Check if we received a valid response
-                    if (!response || response.status !== 200 || response.type !== 'basic') {
-                        return response;
-                    }
-
-                    // Clone the response because it's a one-time use stream
-                    const responseToCache = response.clone();
-
-                    caches.open(CACHE_NAME)
-                        .then(cache => {
-                            // Don't cache API calls
-                            if (!event.request.url.includes('/api/')) {
-                                cache.put(event.request, responseToCache);
-                            }
-                        });
-
-                    return response;
-                });
-            })
-    );
-});
-
-// Activate event - clean up old caches
-self.addEventListener('activate', event => {
-    const cacheWhitelist = [CACHE_NAME];
-
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheWhitelist.indexOf(cacheName) === -1) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
-    );
-});
-
-// Listen for message to clear cache
-self.addEventListener('message', event => {
-    if (event.data && event.data.type === 'CLEAR_CACHE') {
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => caches.delete(cacheName))
-            );
-        });
-    }
-});
