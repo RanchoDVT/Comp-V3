@@ -669,7 +669,7 @@ async function checkForWebsiteUpdate() {
 
     try {
         // Get latest commit from GitHub API for the main branch
-        const response = await fetch('https://api.github.com/repos/Voidless7125/Comp-V3/commits/dev', {
+        const response = await fetch('https://api.github.com/repos/Voidless7125/Comp-V3/commits/website', {
             cache: 'no-store' // Bypass cache for this request
         });
 
