@@ -512,17 +512,23 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
         window.addEventListener('scroll', debounce(refreshElementCache, 200));
         setInterval(refreshElementCache, 5000); // Refresh every 5 seconds
 
-        // Performance-optimized pointer move handler
+        // Performance-optimized pointer move handler with popup check
         document.addEventListener('pointermove', event => {
-            pendingCursorX = event.clientX;
-            pendingCursorY = event.clientY;
-            window.currentMouseX = pendingCursorX;
-            window.currentMouseY = pendingCursorY;
-            window.lastMouseMoveTime = Date.now();
+            // Check if popup is open
+            const popupIsOpen = document.getElementById('popup').classList.contains('active');
 
-            if (!isAnimating) {
-                isAnimating = true;
-                requestAnimationFrame(updateCursor);
+            // Only update cursor position if popup is not open
+            if (!popupIsOpen) {
+                pendingCursorX = event.clientX;
+                pendingCursorY = event.clientY;
+                window.currentMouseX = pendingCursorX;
+                window.currentMouseY = pendingCursorY;
+                window.lastMouseMoveTime = Date.now();
+
+                if (!isAnimating) {
+                    isAnimating = true;
+                    requestAnimationFrame(updateCursor);
+                }
             }
         });
 

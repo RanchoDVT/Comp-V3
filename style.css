@@ -436,8 +436,8 @@ a.glow {
 /* Blob cursor styles */
 #cursor-blob {
     background: linear-gradient(to right, aquamarine, mediumpurple);
-    height: 300px;
-    width: 300px;
+    height: 250px;
+    width: 250px;
     /* Explicitly set width equal to height for roundness */
     position: fixed;
     left: 0;
