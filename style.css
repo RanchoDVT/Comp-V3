@@ -58,29 +58,53 @@ nav li:last-child a {
     position: absolute;
     min-width: 160px;
     padding: 8px 0px;
-    background-color: grey;
+    background-color: transparent;
+    /* Changed from grey to transparent */
     border-radius: 8px;
 }
 
 .dropdown-content a {
-    background-color: grey;
+    background-color: rgba(50, 50, 50, 0.9);
+    /* Changed to match warning style */
+    color: white;
+    /* Keep text color white for better readability */
     padding: 12px 16px;
     text-decoration: none;
     display: block;
     text-align: left;
     border-right: none;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #444;
+    /* Darkened border color */
+    margin-bottom: 2px;
+    /* Add slight spacing between items */
 }
 
 .dropdown-content a:first-child {
-    border-top: 1px solid #ccc;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-top: none;
+    /* Remove the top border from first item */
+}
+
+.dropdown-content a:last-child {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-bottom: none;
+    /* Remove the bottom border from last item */
+}
+
+/* Update hover state for dropdown items */
+.dropdown-content a:hover {
+    background-color: rgba(70, 70, 70, 0.9);
+    /* Slightly lighter on hover */
 }
 
 .dropdown:hover .dropdown-content {
     display: block;
     position: absolute;
     padding: 8px 0px;
-    background-color: grey;
+    background-color: transparent;
+    /* Changed from grey to transparent */
     border-radius: 8px;
 }
 

@@ -1,4 +1,3 @@
-// Add this at the top of your file (outside the event listener)
 let siteCache;
 
 document.addEventListener("DOMContentLoaded", async () => {
