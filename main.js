@@ -453,11 +453,6 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
     }
 
     // Add this to your DOMContentLoaded event handler
-    if (document.getElementById("wiki-features")) {
-        loadWikiFeatures();
-    }
-
-    // Add this to your DOMContentLoaded event handler
     if (document.getElementById("comp-v3-roadmap")) {
         loadCompV3Roadmap();
     }
@@ -563,42 +558,6 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
     // Call the setup function
     setupBannerSelectors();
 });
-
-// Add this function to fetch and display wiki content
-async function loadWikiFeatures() {
-    const wikiContainer = document.getElementById("wiki-features");
-    if (!wikiContainer) return;
-
-    try {
-        // Fetch wiki content from GitHub API
-        const response = await fetch("https://api.github.com/repos/Voidless7125/Comp-V3/wiki");
-        if (!response.ok) throw new Error("Failed to load wiki data");
-
-        const wikiPages = await response.json();
-        const featuresPage = wikiPages.find(page => page.title.toLowerCase().includes("features"));
-
-        if (featuresPage) {
-            // Fetch the content of the features wiki page
-            const contentResponse = await fetch(featuresPage.html_url + ".md");
-            if (!contentResponse.ok) throw new Error("Failed to load wiki content");
-
-            const content = await contentResponse.text();
-            wikiContainer.innerHTML = `
-                <h2>Additional Features from Wiki</h2>
-                <div class="wiki-content">
-                    ${marked.parse(content)}
-                </div>
-            `;
-        } else {
-            wikiContainer.innerHTML = `<p>No features wiki page found. <a href="https://github.com/Voidless7125/Comp-V3/wiki" target="_blank">View all wiki pages</a>.</p>`;
-        }
-    } catch (error) {
-        console.error("Error loading wiki features:", error);
-        wikiContainer.innerHTML = `
-            <p>Could not load features from wiki. <a href="https://github.com/Voidless7125/Comp-V3/wiki" target="_blank">View wiki directly</a>.</p>
-        `;
-    }
-}
 
 // Add this function to fetch and display roadmap
 async function loadCompV3Roadmap() {

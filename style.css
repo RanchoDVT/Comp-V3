@@ -239,11 +239,24 @@ nav li.dropdown {
     transition: transform var(--transition-normal) ease,
         box-shadow var(--transition-normal) ease;
     box-sizing: border-box;
+    overflow: hidden;
+    /* Add this to contain content */
+    max-height: 100%;
+    /* Ensure height is controlled */
+    transform-origin: center top;
+    /* Change transform origin to top */
+    position: relative;
+    /* Add this for proper positioning */
+    z-index: 1;
+    /* Base z-index */
 }
 
 .tile:hover {
-    transform: translateY(-5px) scale(1.03);
+    transform: translateY(-5px);
+    /* Remove scale to prevent overflow */
     box-shadow: var(--shadow-elevated);
+    z-index: 2;
+    /* Higher z-index when hovered */
 }
 
 .tile h3 {
@@ -914,4 +927,55 @@ button[type="submit"]:hover {
     margin-top: 0;
     padding-bottom: var(--space-sm);
     border-bottom: 1px solid var(--color-divider);
+}
+
+/* Add new styles for the wiki button */
+.wiki-button-container {
+    text-align: center;
+    margin: var(--space-xl) 0;
+    padding: var(--space-lg);
+    border-top: 1px solid var(--color-divider);
+}
+
+.wiki-button {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--color-surface-raised);
+    color: var(--color-text);
+    text-decoration: none;
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    font-size: 1.2rem;
+    transition: transform var(--transition-fast) ease,
+        box-shadow var(--transition-fast) ease,
+        background-color var(--transition-fast) ease;
+    box-shadow: var(--shadow-card);
+    margin-bottom: var(--space-md);
+}
+
+.wiki-button:hover {
+    background-color: var(--color-primary);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-elevated);
+}
+
+.wiki-icon {
+    font-size: 1.4rem;
+    margin-right: var(--space-md);
+}
+
+.wiki-description {
+    color: var(--color-text-muted);
+    font-style: italic;
+    margin-top: var(--space-md);
+}
+
+/* Make pre and code blocks responsive */
+pre,
+code {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
