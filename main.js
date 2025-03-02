@@ -400,17 +400,25 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
         const projectSelect = document.getElementById("project");
         const selected = projectSelect.value;
 
-        // Hide all banners first
-        const banners = document.querySelectorAll(".program-banner");
-        banners.forEach(banner => banner.style.display = "none");
+        // Update active state on banners
+        const banners = document.querySelectorAll('.program-banner');
+        banners.forEach(banner => {
+            if (banner.dataset.project === selected) {
+                banner.classList.add('active');
+                banner.style.display = "block";
+            } else {
+                banner.classList.remove('active');
+                // Hide other banners when one is selected
+                banner.style.display = "none";
+            }
+        });
 
         // Hide roadmap by default
         const roadmapSection = document.getElementById("comp-v3-roadmap");
         if (roadmapSection) roadmapSection.style.display = "none";
 
         if (selected === "comp-v3") {
-            // Show the Comp V3 banner & config form
-            document.getElementById("comp-v3-banner").style.display = "block";
+            // Show the config form
             document.querySelector(".content").style.display = "block";
             // Show roadmap for Comp V3
             if (roadmapSection) roadmapSection.style.display = "block";
@@ -419,12 +427,6 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
         } else {
             // Hide Comp V3 config form
             document.querySelector(".content").style.display = "none";
-            // Show the banner matching the selected program
-            const bannerId = selected + "-banner";
-            const bannerElem = document.getElementById(bannerId);
-            if (bannerElem) {
-                bannerElem.style.display = "block";
-            }
             // Load the project info (GitHub releases + README)
             window.loadProjectInfo(selected, "project-info");
         }
@@ -640,6 +642,99 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
             window.location.reload();
         }
     };
+
+    // Add interactive banner functionality
+    function setupBannerSelectors() {
+        const banners = document.querySelectorAll('.program-banner');
+
+        banners.forEach(banner => {
+            // Add text content if missing
+            if (!banner.textContent.trim()) {
+                const projectName = banner.id.replace('-banner', '').replace(/-/g, ' ');
+                banner.textContent = projectName.charAt(0).toUpperCase() + projectName.slice(1);
+            }
+
+            banner.addEventListener('click', function (e) {
+                // Ignore clicks on the status button (those are handled separately)
+                if (e.target.classList.contains('status-btn')) {
+                    return;
+                }
+
+                const projectValue = this.dataset.project;
+
+                if (this.classList.contains('active') && !showingAllBanners) {
+                    // If clicking on the active banner and not showing all banners,
+                    // show all banners
+                    showingAllBanners = true;
+                    showAllBanners();
+                } else {
+                    // Otherwise select this banner and hide others
+                    showingAllBanners = false;
+                    selectBanner(projectValue);
+                }
+            });
+        });
+    }
+
+    // Add these new functions
+    function showAllBanners() {
+        const banners = document.querySelectorAll('.program-banner');
+        banners.forEach(banner => {
+            banner.style.display = "block";
+        });
+    }
+
+    function selectBanner(projectValue) {
+        const banners = document.querySelectorAll('.program-banner');
+
+        banners.forEach(banner => {
+            if (banner.dataset.project === projectValue) {
+                banner.classList.add('active');
+                banner.style.display = "block";
+
+                // Load project info
+                loadProjectContent(projectValue);
+            } else {
+                banner.classList.remove('active');
+                banner.style.display = "none";
+            }
+        });
+
+        // Remove any back buttons if present
+        const backButtons = document.querySelectorAll('#banner-container .program-banner:not([data-project])');
+        backButtons.forEach(btn => btn.remove());
+    }
+
+    // New function to load appropriate content based on selected project
+    function loadProjectContent(project) {
+        // Hide/show the appropriate content sections
+        const contentDiv = document.querySelector(".content");
+        const projectInfoDiv = document.getElementById("project-info");
+
+        if (project === "comp-v3") {
+            contentDiv.style.display = "block";
+            projectInfoDiv.innerHTML = "";
+        } else {
+            contentDiv.style.display = "none";
+            window.loadProjectInfo(project, "project-info");
+        }
+    }
+
+    // Replace the updateProjectView function with this simpler version
+    window.updateProjectView = function () {
+        // This function is now just a compatibility wrapper
+        // for the banner-based navigation
+        const activeBanner = document.querySelector('.program-banner.active');
+        if (activeBanner) {
+            selectBanner(activeBanner.dataset.project);
+        } else {
+            // Default to comp-v3 if no active banner
+            selectBanner("comp-v3");
+        }
+    };
+
+    // Call the setup function
+    setupBannerSelectors();
 });
 
 // Add this function to fetch and display wiki content
@@ -735,4 +830,132 @@ function clearSiteData() {
     localStorage.setItem('dataCleared', 'true');
     window.location.reload(true); // Force reload from server, not cache
     return "Site data cleared. Reloading page...";
+}
+
+// Add this function to show project status
+
+window.showProjectStatus = function (project, event) {
+    // Stop event propagation to prevent banner click
+    if (event) {
+        event.stopPropagation();
+    }
+
+    // Create popup content based on project
+    let statusTitle = "Project Status";
+    let statusContent = "";
+
+    switch (project) {
+        case 'comp-v3':
+            statusTitle = "Comp V3 Status";
+            statusContent = `
+                <h3>Comp V3 Development Status</h3>
+                <div class="status-info">
+                    <p><strong>Status:</strong> Active Development</p>
+                    <p><strong>Version:</strong> ${getLatestVersion("comp-v3") || "Loading..."}</p>
+                    <p><a href="https://github.com/users/Voidless7125/projects/2" target="_blank">View Full Project Board</a></p>
+                </div>
+            `;
+            break;
+
+        case 'lockdown-browser':
+            statusTitle = "Lockdown Browser Status";
+            statusContent = `
+                <h3>Lockdown Browser Status</h3>
+                <div class="status-info">
+                    <p><strong>Status:</strong> Stable Release</p>
+                    <p><strong>Version:</strong> ${getLatestVersion("lockdown-browser") || "Loading..."}</p>
+                    <p><a href="https://github.com/gucci-on-fleek/lockdown-browser/" target="_blank">View on GitHub</a></p>
+                </div>
+            `;
+            break;
+
+        case 'ois-rewrite':
+            statusTitle = "OIS-Rewrite Status";
+            statusContent = `
+                <h3>OIS-Rewrite Status</h3>
+                <div class="status-info">
+                    <p><strong>Status:</strong> In Development</p>
+                    <p><strong>Version:</strong> ${getLatestVersion("ois-rewrite") || "Loading..."}</p>
+                    <p><a href="https://github.com/Voidless7125/OIS-Rewrite" target="_blank">View on GitHub</a></p>
+                </div>
+            `;
+            break;
+
+        case 'ois-decompile':
+            statusTitle = "OIS-Decompile Status";
+            statusContent = `
+                <h3>OIS-Decompile Status</h3>
+                <div class="status-info">
+                    <p><strong>Status:</strong> Archive</p>
+                    <p><strong>Version:</strong> ${getLatestVersion("ois-decompile") || "Loading..."}</p>
+                    <p><a href="https://github.com/Voidless7125/OIS-Decompile" target="_blank">View on GitHub</a></p>
+                </div>
+            `;
+            break;
+    }
+
+    // Set popup content
+    document.getElementById("popup-title").textContent = statusTitle;
+    document.getElementById("popup-text").innerHTML = statusContent;
+
+    // Show popup
+    document.getElementById("popup").classList.add("active");
+    document.getElementById("overlay").classList.add("active");
+
+    // Use appropriate function for the download button or hide it
+    const downloadBtn = document.getElementById("download-link");
+    downloadBtn.style.display = "none"; // Hide download button for status popup
+};
+
+// Helper function to get latest version
+function getLatestVersion(project) {
+    // Return from cache if available
+    if (window.projectVersions && window.projectVersions[project]) {
+        return window.projectVersions[project];
+    }
+
+    // Initialize cache if not exists
+    if (!window.projectVersions) {
+        window.projectVersions = {};
+    }
+
+    // Get repo path based on project
+    let repoPath = "";
+    switch (project) {
+        case 'comp-v3':
+            repoPath = "Voidless7125/Comp-V3";
+            break;
+        case 'lockdown-browser':
+            repoPath = "gucci-on-fleek/lockdown-browser";
+            break;
+        case 'ois-rewrite':
+            repoPath = "Voidless7125/OIS-Rewrite";
+            break;
+        case 'ois-decompile':
+            repoPath = "Voidless7125/OIS-Decompile";
+            break;
+    }
+
+    // Fetch latest version
+    if (repoPath) {
+        fetch(`https://api.github.com/repos/${repoPath}/releases/latest`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.tag_name) {
+                    window.projectVersions[project] = data.tag_name;
+
+                    // Update version in popup if currently open
+                    const popup = document.getElementById("popup");
+                    if (popup.classList.contains("active")) {
+                        const versionElement = popup.querySelector(".status-info p:nth-child(2)");
+                        if (versionElement) {
+                            versionElement.innerHTML = `<strong>Version:</strong> ${data.tag_name}`;
+                        }
+                    }
+                }
+            })
+            .catch(err => console.error("Error fetching version:", err));
+    }
+
+    return "Checking...";
 }

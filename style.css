@@ -1,16 +1,112 @@
+:root {
+    /* Core color palette - matte versions */
+    --color-background: rgb(15, 15, 20);
+    --color-surface: rgb(25, 25, 30);
+    --color-surface-raised: rgb(35, 35, 40);
+    --color-text: rgb(230, 230, 230);
+    --color-text-muted: rgb(180, 180, 180);
+    --color-primary: rgb(65, 160, 70);
+    --color-primary-hover: rgb(55, 140, 60);
+    --color-secondary: rgb(150, 85, 35);
+    --color-secondary-hover: rgb(130, 75, 30);
+    --color-partner-highlight: #bb00ff;
+    /* Partner color */
+
+    /* UI element colors */
+    --color-nav-bg: rgb(30, 30, 35);
+    --color-dropdown-bg: rgba(40, 40, 45, 0.95);
+    --color-dropdown-hover: rgba(50, 50, 55, 0.95);
+    --color-border: rgb(70, 70, 75);
+    --color-border-light: rgb(100, 100, 105);
+    --color-error: rgb(180, 60, 60);
+    --color-success: rgb(60, 160, 80);
+    --color-link: rgb(100, 160, 220);
+    --color-link-hover: rgb(120, 180, 240);
+    --color-divider: rgba(255, 255, 255, 0.1);
+    /* Added for separators */
+
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 40px;
+    --page-margin: var(--space-md);
+    /* Added for consistent page margins */
+
+    /* Border radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 16px;
+    --radius-pill: 9999px;
+
+    /* Shadows */
+    --shadow-default: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --shadow-elevated: 0 8px 16px rgba(0, 0, 0, 0.25);
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    /* Animation timings */
+    --transition-fast: 150ms;
+    --transition-normal: 300ms;
+    --transition-slow: 500ms;
+}
+
+/***************************************
+ * BASE STYLES
+ ***************************************/
 html {
-    background-color: rgb(10, 10, 13);
-    color: white;
+    background-color: var(--color-background);
+    color: var(--color-text);
     font-family: 'Segoe UI', Tahoma, sans-serif;
     padding-bottom: 2%;
     box-sizing: border-box;
     scrollbar-width: thin;
-    scrollbar-color: #555 #2a2a2a;
+    scrollbar-color: var(--color-border) var(--color-surface);
     scroll-behavior: smooth;
-    scrollbar-base-color: #4CAF50;
 }
 
-/* Start of nav */
+body {
+    margin: 0;
+    padding: 0 var(--page-margin);
+    /* Added side padding to entire body */
+    min-height: 100vh;
+}
+
+main {
+    padding: 0;
+    /* Removed padding since body already has it */
+}
+
+section {
+    margin-bottom: var(--space-lg);
+}
+
+hr,
+.divider {
+    border: 0;
+    height: 1px;
+    background-color: var(--color-divider);
+    margin: var(--space-md) 0;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+a {
+    color: var(--color-link);
+    transition: color var(--transition-fast) ease;
+}
+
+a:hover {
+    color: var(--color-link-hover);
+}
+
+/***************************************
+ * NAVIGATION
+ ***************************************/
 menu {
     padding-inline-start: 0;
     list-style: none;
@@ -19,9 +115,27 @@ menu {
 
 nav {
     list-style: none;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     overflow: hidden;
-    background-color: rgb(40, 40, 43);
+    background-color: var(--color-nav-bg);
+    margin: var(--space-md) 0;
+    /* Changed to 0 horizontal margin since body has padding */
+    margin-bottom: var(--space-lg);
+    /* Fixed unwanted glowing by ensuring overflow is properly contained */
+    box-shadow: none;
+    /* Remove any potential shadow causing glow */
+}
+
+nav li:first-child a {
+    border-top-left-radius: var(--radius-md);
+    border-bottom-left-radius: var(--radius-md);
+}
+
+nav li:last-child a {
+    border-left: 1px solid var(--color-border);
+    border-right: none;
+    border-top-right-radius: var(--radius-md);
+    border-bottom-right-radius: var(--radius-md);
 }
 
 nav li {
@@ -30,27 +144,24 @@ nav li {
 
 nav li a,
 .nav-link.dropbtn {
-    /* Add .nav-link.dropbtn */
     display: inline-block;
     cursor: pointer;
-    color: white;
+    color: var(--color-text);
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
-    border-right: 1px solid #bbb;
+    border-right: 1px solid var(--color-border);
+    transition: background-color var(--transition-fast) ease;
+    /* Removed text-shadow transition to prevent unwanted glow */
 }
 
 nav li a:hover:not(.active) {
-    background-color: grey;
+    background-color: var(--color-surface-raised);
+    /* Removed text-shadow on hover to eliminate glow */
 }
 
 nav li.dropdown {
     display: inline-block;
-}
-
-nav li:last-child a {
-    border-left: 1px solid #bbb;
-    border-right: none;
 }
 
 .dropdown-content {
@@ -59,179 +170,396 @@ nav li:last-child a {
     min-width: 160px;
     padding: 8px 0px;
     background-color: transparent;
-    /* Changed from grey to transparent */
-    border-radius: 8px;
+    border-radius: var(--radius-md);
+    z-index: 100;
+    overflow: hidden;
 }
 
 .dropdown-content a {
-    background-color: rgba(50, 50, 50, 0.9);
-    /* Changed to match warning style */
-    color: white;
-    /* Keep text color white for better readability */
+    background-color: var(--color-dropdown-bg);
+    color: var(--color-text);
     padding: 12px 16px;
     text-decoration: none;
     display: block;
     text-align: left;
     border-right: none;
-    border-bottom: 1px solid #444;
-    /* Darkened border color */
+    border-bottom: 1px solid var(--color-border);
     margin-bottom: 2px;
-    /* Add slight spacing between items */
 }
 
+/* Fix border-radius for dropdown corners - remove spaces in var() */
 .dropdown-content a:first-child {
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+    border-top-left-radius: var(--radius-md);
+    border-top-right-radius: var(--radius-md);
     border-top: none;
-    /* Remove the top border from first item */
 }
 
 .dropdown-content a:last-child {
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: var(--radius-md);
+    border-bottom-right-radius: var(--radius-md);
     border-bottom: none;
-    /* Remove the bottom border from last item */
-}
-
-/* Update hover state for dropdown items */
-.dropdown-content a:hover {
-    background-color: rgba(70, 70, 70, 0.9);
-    /* Slightly lighter on hover */
 }
 
 .dropdown:hover .dropdown-content {
     display: block;
     position: absolute;
-    padding: 8px 0px;
-    background-color: transparent;
-    /* Changed from grey to transparent */
-    border-radius: 8px;
 }
 
 .active {
-    background-color: rgb(170, 96, 36);
+    background-color: var(--color-secondary);
 }
 
-/* End of nav */
+/***************************************
+ * CARDS & CONTAINERS
+ ***************************************/
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+    /* Adjusted padding to remove horizontal padding */
+    margin: 0;
+}
+
+.section-container {
+    padding: var(--space-md);
+    margin: var(--space-md) 0;
+    /* Adjusted to remove horizontal margin */
+    background-color: var(--color-surface);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+}
 
 .tile {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 16px;
-    margin: 16px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-card);
     cursor: pointer;
-    transition: transform 0.2s;
-    flex: 1 1 calc(33.333% - 32px);
-    /* Adjusts the width of the tiles */
+    transition: transform var(--transition-normal) ease,
+        box-shadow var(--transition-normal) ease;
     box-sizing: border-box;
 }
 
 .tile:hover {
-    transform: scale(1.05);
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: var(--shadow-elevated);
 }
 
 .tile h3 {
     margin-top: 0;
 }
 
-.container {
+/* Added white line separators for content sections */
+.section-title {
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-divider);
+    margin-bottom: var(--space-md);
+}
+
+.content-section {
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--color-divider);
+}
+
+.content-section:last-child {
+    border-bottom: none;
+}
+
+.roadmap-container {
+    margin: 20px 0;
+    /* Adjusted to remove horizontal margin */
+    padding: var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+}
+
+/* Release notes with white line separators */
+.release-item {
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--color-divider);
+}
+
+.release-item:last-child {
+    border-bottom: none;
+}
+
+/* Add white outline to releases */
+.release {
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+    background-color: var(--color-surface);
+}
+
+.release h3 {
+    border-bottom: 1px solid var(--color-divider);
+    padding-bottom: var(--space-sm);
+    margin-top: 0;
+}
+
+/***************************************
+ * CONFIG FILE GENERATOR
+ ***************************************/
+/* New section for the Config File Generator */
+.config-generator {
+    margin: var(--space-md) 0;
+    /* Adjusted to remove horizontal margin */
+    padding: var(--space-lg);
+    background-color: var(--color-surface);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+}
+
+.motor-config-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    margin: var(--space-md) 0;
+}
+
+.config-group {
+    margin-bottom: var(--space-md);
+    padding: var(--space-md);
+    background-color: var(--color-surface-raised);
+    border-radius: var(--radius-sm);
+    transition: transform var(--transition-normal) ease,
+        box-shadow var(--transition-normal) ease;
+}
+
+.config-group:hover {
+    box-shadow: var(--shadow-card);
+    transform: translateY(-2px);
+}
+
+.config-item {
+    margin-bottom: var(--space-md);
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
+    flex-direction: column;
+    gap: var(--space-xs);
 }
 
-a {
-    color: #7bbaeb;
+.config-item label {
+    font-weight: 500;
+    margin-bottom: var(--space-xs);
 }
 
-@media (max-width: 1200px) {
-    .tile {
-        flex: 1 1 calc(50% - 32px);
-        /* Adjusts the width of the tiles for medium screens */
-    }
+/* Fix for config form bottom border */
+#config-form {
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-md);
+    border-bottom: none;
 }
 
-@media (max-width: 768px) {
-
-    .dropdown-content {
-        pointer-events: none;
-    }
-
-    .dropdown-content a {
-        pointer-events: auto;
-    }
-
-    /* Make the nav menu scrollable horizontally */
-    nav>menu {
-        display: flex;
-        flex-wrap: nowrap;
-        white-space: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    /* Adjust dropdown-content: position it absolutely rather than stacking in flow */
-    nav li.dropdown .dropdown-content {
-        position: absolute;
-        min-width: 160px;
-        padding: 8px 0;
-        background-color: grey;
-        border-radius: 8px;
-        z-index: 100;
-    }
-
-    nav li:last-child>a {
-        border-left: none;
-        border-right: 1px solid #bbb;
-    }
-
+/* Create a wrapper for form and output */
+.config-form-container {
+    margin-bottom: var(--space-lg);
 }
 
-footer {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    backdrop-filter: blur(10px);
-    color: white;
-    text-align: center;
-}
-
-hr.rounded {
-    border-top: 4px solid #bbb;
-    border-radius: 5px;
-}
-
-input {
-    background: rgb(10, 10, 13);
-    color: white;
-    border: 1px solid white;
-}
-
-select {
-    background: rgb(10, 10, 13);
-    color: white;
-}
-
-.config-output {
-    border-bottom: 1px solid white;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-    white-space: pre-wrap;
-    /* Ensures text wraps properly (Who thought this was a good idea???)*/
+/* Add output styling with bottom border */
+#config-output {
+    margin-top: var(--space-md);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--color-divider);
+    background-color: var(--color-surface-raised);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
     overflow-x: auto;
-    /* Handles horizontal overflow (Same with this!!!)*/
+}
+
+/* Add styles for program banners */
+.program-banner {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-md);
+    border-radius: var(--radius-md);
+    font-size: 1.6rem;
+    /* Increased size */
+    font-weight: bold;
+    text-align: center;
+    box-shadow: var(--shadow-card);
+    transition: transform var(--transition-normal) ease,
+        box-shadow var(--transition-normal) ease,
+        background-color var(--transition-normal) ease;
+    cursor: pointer;
+    /* Show pointer cursor */
+    user-select: none;
+    /* Prevent text selection */
+    position: relative;
+    /* Added to position the status button */
+    overflow: hidden;
+    /* Add this line to make the banner more distinct when active */
+    border-width: 1px;
+}
+
+.program-banner:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-elevated);
+    background-color: var(--color-surface-raised);
+}
+
+.program-banner.active {
+    background-color: var(--color-surface-raised);
+    box-shadow: var(--shadow-elevated);
+    transform: translateY(-2px);
+    border-width: 2px;
+    /* Add a subtle glow effect to indicate it's the active banner */
+    box-shadow: 0 0 15px rgba(100, 100, 255, 0.3);
+}
+
+/* Add highlight effect when clicked */
+.program-banner:active {
+    transform: translateY(1px);
+    box-shadow: var(--shadow-default);
+}
+
+/* Maintain colored borders */
+#comp-v3-banner {
+    border-left: 4px solid var(--color-primary);
+}
+
+#lockdown-browser-banner {
+    border-left: 4px solid var(--color-secondary);
+}
+
+#ois-rewrite-banner {
+    border-left: 4px solid var(--color-partner-highlight);
+}
+
+#ois-decompile-banner {
+    border-left: 4px solid var(--color-link);
+}
+
+/* Status button styling */
+.status-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: var(--color-surface-raised);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity var(--transition-fast) ease,
+        background-color var(--transition-fast) ease;
+}
+
+.status-btn:hover {
+    opacity: 1;
+    background-color: var(--color-primary);
+}
+
+/***************************************
+ * FORMS & INPUTS
+ ***************************************/
+input,
+select,
+textarea,
+button {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm);
+    transition: border-color var(--transition-fast) ease,
+        box-shadow var(--transition-fast) ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--color-primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(65, 160, 70, 0.25);
 }
 
 button {
-    background: rgb(10, 10, 13);
-    color: white;
-    border: 1px solid white;
-    margin-bottom: 15px;
+    cursor: pointer;
+    padding: var(--space-sm) var(--space-md);
+    margin-bottom: var(--space-md);
+    transition: background-color var(--transition-fast) ease;
 }
 
+button:hover {
+    background-color: var(--color-surface-raised);
+}
+
+.submit-button {
+    background-color: var(--color-primary);
+    color: var(--color-text);
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color var(--transition-fast) ease;
+}
+
+.submit-button:hover {
+    background-color: var(--color-primary-hover);
+}
+
+/***************************************
+ * CONTACT FORM
+ ***************************************/
+.contact-form {
+    padding: 40px 0;
+    margin: 0;
+    /* Adjusted to remove horizontal margin */
+}
+
+.form-container {
+    max-width: 90%;
+    margin: 0 auto;
+    padding: var(--space-lg);
+    background-color: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-elevated);
+    position: relative;
+    z-index: 10;
+    /* Higher than cursor blob */
+    border: 1px solid var(--color-border);
+    backdrop-filter: blur(8px);
+    /* Add blur effect to separate from blob */
+}
+
+.form-group {
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-md);
+    /* Add separator */
+}
+
+.form-group:last-child {
+    border-bottom: none;
+}
+
+.form-container label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: var(--space-xs);
+}
+
+.form-container input,
+.form-container textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 1rem;
+    resize: vertical;
+    background-color: var(--color-surface-raised);
+}
+
+/***************************************
+ * POPUP STYLES
+ ***************************************/
 .popup {
     display: none;
     position: fixed;
@@ -239,54 +567,63 @@ button {
     top: 50%;
     transform: translate(-50%, -50%);
     width: 400px;
-    border: 1px solid #ccc;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 2;
-    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    padding: var(--space-md);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-elevated);
+    z-index: 20;
+    border-radius: var(--radius-md);
 }
 
 .popup.active {
     display: block;
-    background-color: rgb(10, 10, 13);
 }
 
 .popup-header {
     align-items: center;
     justify-content: space-between;
     display: flex;
-    margin-bottom: 10px;
-    background-color: rgb(10, 10, 13);
-}
-
-.right-aligned {
-    float: right;
+    margin-bottom: var(--space-sm);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-divider);
+    /* Added separator */
 }
 
 .popup-header h2 {
     margin: 0;
     font-size: 18px;
-    background-color: rgb(10, 10, 13);
+}
+
+.popup-content {
+    border-bottom: none;
+}
+
+.popup-actions {
+    display: flex;
+    gap: var(--space-sm);
 }
 
 .download-btn,
 .cancel-btn {
     display: inline-block;
-    margin-top: 10px;
+    margin-top: var(--space-sm);
     padding: 10px 20px;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    color: white;
+    color: var(--color-text);
 }
 
 .download-btn {
-    background-color: #4CAF50;
+    background-color: var(--color-primary);
+}
+
+.download-btn:hover {
+    background-color: var(--color-primary-hover);
 }
 
 .cancel-btn {
-    background-color: #f44336;
+    background-color: var(--color-error);
 }
 
 .overlay {
@@ -296,176 +633,38 @@ button {
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 15;
+    backdrop-filter: blur(2px);
 }
 
 .overlay.active {
     display: block;
 }
 
-.contact-form {
-    padding: 40px 0;
-    margin: 0 10px;
-}
-
-.form-container {
-    max-width: 40%;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: rgb(10, 10, 13);
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    position: relative;
-    z-index: 5;
-    /* Higher than cursor blob */
-}
-
-.contact-form h2 {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-container label {
-    display: block;
-    font-weight: bold;
-}
-
-.form-container input,
-textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-bottom: 1rem;
-    resize: vertical;
-    background-color: rgb(10, 10, 13);
-    color: white;
-}
-
-.submit-button {
-    padding: 10px 20px;
-    background-color: #0dac30;
-    border: none;
-    color: white;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-}
-
-.release {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 4px;
-}
-
-/* Program Banner common style */
-.program-banner {
-    background: transparent;
-    color: #fff;
-    padding: 20px;
-    text-align: center;
-    font-size: 2rem;
-    font-weight: bold;
-    display: none;
-    /* hide by default */
-}
-
-/* Banner container (optional spacing) */
-#banner-container {
-    margin-bottom: 20px;
-}
-
-/* Temporary popup for mobile dropdown hint */
-.temp-popup {
-    position: fixed;
-    top: 50px;
-    /* Top center */
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: #fff;
-    padding: 10px 15px;
-    border-radius: 4px;
-    font-size: 1rem;
-    z-index: 1000;
-}
-
-/* Custom Scrollbar Styles */
-
-/* Firefox */
-html {
-    scrollbar-width: thin;
-    scrollbar-color: #555 #2a2a2a;
-}
-
-/* WebKit browsers (Chrome, Edge, Safari) */
-::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
-}
-
-::-webkit-scrollbar-track {
-    background: #2a2a2a;
-}
-
-::-webkit-scrollbar-thumb {
-    background-color: #555;
-    border-radius: 6px;
-    border: 3px solid #2a2a2a;
-}
-
-/* Glowing purple text */
-.glow {
-    color: #bb00ff;
-    font-family: 'Chakra Petch', sans-serif;
-    color: white;
-    text-shadow: 0 0 10px #bb00ff;
-}
-
-/* Link styling */
-a.glow {
-    text-decoration: none;
-}
-
-/* Blob cursor styles */
+/***************************************
+ * VISUAL EFFECTS
+ ***************************************/
+/* Cursor blob - with z-index fix for contact form */
 #cursor-blob {
-    background: linear-gradient(to right, aquamarine, mediumpurple);
+    background: linear-gradient(135deg, rgba(127, 255, 212, 0.7), rgba(147, 112, 219, 0.7));
     height: 250px;
     width: 250px;
-    /* Explicitly set width equal to height for roundness */
     position: fixed;
     left: 0;
     top: 0;
     border-radius: 50%;
     animation: blob-spin 20s infinite;
     filter: blur(80px);
-    opacity: 0.7;
+    opacity: 0.5;
+    /* Further reduced opacity to avoid blending with forms */
     z-index: 1;
-    /* Lower than all content */
+    /* Lower than content */
     pointer-events: none;
     transform-origin: center center;
     will-change: transform;
-    /* Optimize for animations */
 }
 
-/* Optional blur overlay - Not used right now. */
-#cursor-blur-overlay {
-    height: 100%;
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    z-index: -2;
-}
-
-/* Animation for blob rotation and morphing */
 @keyframes blob-spin {
     from {
         rotate: 0deg;
@@ -474,17 +673,14 @@ a.glow {
 
     25% {
         scale: 1.1 1.1;
-        /* More equal scaling */
     }
 
     50% {
         scale: 1.2 1.2;
-        /* Keep it round */
     }
 
     75% {
         scale: 1.1 1.1;
-        /* More equal scaling */
     }
 
     to {
@@ -493,79 +689,269 @@ a.glow {
     }
 }
 
-/* Hide default cursor when over the page | DISABLED */
-body.has-custom-cursor {
-    cursor: none;
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    #cursor-blob {
+        display: none;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
-/* But show pointer cursor when over interactive elements */
-body.has-custom-cursor a,
-body.has-custom-cursor button,
-body.has-custom-cursor input,
-body.has-custom-cursor select,
-body.has-custom-cursor [role="button"],
-body.has-custom-cursor label {
-    cursor: pointer;
+/* Glowing text effect */
+.glow {
+    font-family: 'Chakra Petch', sans-serif;
+    color: var(--color-text);
+    text-shadow: 0 0 10px var(--color-partner-highlight);
 }
 
-/* Navbar glow effect styles */
-#navbar a,
-.dropdown-content a {
-    transition: text-shadow 0.3s ease, color 0.3s ease;
-    position: relative;
-    z-index: 2;
+/***************************************
+ * RESPONSIVENESS
+ ***************************************/
+/* Base mobile styles first */
+@media (max-width: 768px) {
+    body {
+        padding: 0 var(--space-sm);
+        /* Smaller padding on mobile */
+    }
+
+    .dropdown-content {
+        pointer-events: none;
+    }
+
+    .dropdown-content a {
+        pointer-events: auto;
+    }
+
+    nav>menu {
+        display: flex;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    nav li.dropdown .dropdown-content {
+        position: absolute;
+        min-width: 160px;
+        padding: 8px 0;
+        background-color: var(--color-nav-bg);
+        z-index: 100;
+    }
+
+    nav li:last-child>a {
+        border-left: none;
+        border-right: 1px solid var(--color-border);
+    }
+
+    .form-container {
+        max-width: 95%;
+        padding: var(--space-md);
+    }
 }
 
-/* Optional: Add a subtle initial glow to navbar items */
-#navbar a:hover,
-.dropdown-content a:hover {
-    text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+@media (min-width: 769px) {
+    .form-container {
+        max-width: 60%;
+    }
 }
 
-#navbar {
-    transition: box-shadow 0.3s ease, background-color 0.3s ease;
+@media (min-width: 1200px) {
+    .form-container {
+        max-width: 50%;
+    }
 }
 
-/* Animated transitions for all text elements*/
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-span,
-label,
-a,
-li {
-    transition: color 0.3s ease, text-shadow 0.3s ease;
+/***************************************
+ * ACCESSIBILITY
+ ***************************************/
+/* Improved focus states */
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 
-.roadmap-container {
-    margin: 20px 0;
-    padding: 15px;
-    border: 1px solid #444;
-    border-radius: 8px;
-    background-color: rgb(20, 20, 25);
+:focus:not(:focus-visible) {
+    outline: none;
 }
 
-.roadmap-link {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 10px 15px;
-    background-color: #4CAF50;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: background-color 0.3s;
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 
-.roadmap-link:hover {
-    background-color: #3e8e41;
+/***************************************
+ * UTILITIES
+ ***************************************/
+.right-aligned {
+    float: right;
 }
 
-.wiki-features-section {
-    margin-top: 40px;
-    padding: 20px;
-    border-top: 1px solid #444;
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    backdrop-filter: blur(10px);
+    color: var(--color-text);
+    text-align: center;
+    padding: var(--space-sm);
+    z-index: 5;
+}
+
+/***************************************
+ * CHANGELOG STYLES
+ ***************************************/
+.changelog-section {
+    padding: var(--space-md) 0;
+    margin-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--color-divider);
+}
+
+.changelog-section:last-child {
+    border-bottom: none;
+}
+
+.changelog-header {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: var(--space-md);
+}
+
+/* Add styles for motor grid layout */
+.motor-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.motor-column {
+    background-color: var(--color-surface-raised);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    border: 1px solid var(--color-border);
+}
+
+.motor-column h4 {
+    text-align: center;
+    margin-top: 0;
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-divider);
+}
+
+.motor-group,
+.sensor-group {
+    margin-bottom: var(--space-md);
+    padding: var(--space-sm);
+    background-color: var(--color-surface);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--color-primary);
+}
+
+.motor-group h5 {
+    margin-top: 0;
+    margin-bottom: var(--space-sm);
+}
+
+/* Make form layout more compact for side-by-side view */
+.motor-group .form-group,
+.sensor-group .form-group {
+    margin-bottom: var(--space-sm);
+    padding-bottom: 0;
+}
+
+/* Responsive behavior for smaller screens */
+@media (max-width: 768px) {
+    .motor-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Add these styles for the Settings Grid */
+.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+    margin-top: var(--space-md);
+    /* Add top margin to match motor grid */
+}
+
+.settings-column {
+    background-color: var(--color-surface-raised);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    border: 1px solid var(--color-border);
+}
+
+.settings-column h4 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: var(--space-md);
+    /* Add consistent bottom margin */
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-divider);
+}
+
+.settings-group {
+    margin-bottom: var(--space-md);
+    padding: var(--space-sm);
+    background-color: var(--color-surface);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--color-secondary);
+}
+
+/* Make form groups consistent between motor and settings sections */
+.settings-group .form-group {
+    margin-bottom: var(--space-sm);
+    padding-bottom: 0;
+}
+
+/* Add consistent spacing between settings sections */
+.settings-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Add consistent section spacing */
+form h2 {
+    margin-top: var(--space-xl);
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-divider);
+}
+
+form h3 {
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-md);
+}
+
+/* Make the submit button consistent with section spacing */
+button[type="submit"] {
+    margin-top: var(--space-lg);
+    background-color: var(--color-primary);
+    color: var(--color-text);
+    font-weight: bold;
+    padding: var(--space-sm) var(--space-lg);
+}
+
+button[type="submit"]:hover {
+    background-color: var(--color-primary-hover);
+}
+
+/* Responsive behavior for smaller screens */
+@media (max-width: 1024px) {
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
 }
