@@ -747,10 +747,17 @@ function getLatestVersion(project) {
 }
 
 // Add this to the end of your file, outside any function
-// Better service worker registration
+// Better service worker registration with path adjustment based on environment
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
+        // Check if running on localhost
+        const isLocalhost = window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1';
+
+        // Set the appropriate service worker path
+        const swPath = isLocalhost ? '/service-worker.js' : '/Comp-V3/service-worker.js';
+
+        navigator.serviceWorker.register(swPath)
             .then(registration => {
                 console.log('ServiceWorker registered with scope:', registration.scope);
             })
