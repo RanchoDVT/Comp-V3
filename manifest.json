@@ -1,0 +1,21 @@
+{
+    "name": "Voidless Projects",
+    "short_name": "Voidless",
+    "description": "Software projects by Voidless including Comp-V3 and tools for robotics",
+    "start_url": "index.html",
+    "display": "standalone",
+    "background_color": "#0f0f14",
+    "theme_color": "#1e1e23",
+    "icons": [
+        {
+            "src": "images/Logo.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "images/Logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

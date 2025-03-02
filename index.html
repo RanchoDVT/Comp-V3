@@ -3,15 +3,67 @@
 
 <head>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Voidless software projects including Comp-V3, a VEX robotics configuration utility, and other tools like Lockdown Browser in partnership with Vortex.">
     <title>Voidless - Home</title>
+
+    <!-- PWA support -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e1e23">
+    <meta meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="images/Logo.png">
+
+    <!-- Other head content -->
     <link rel="shortcut icon" href="images/Logo.png">
     <link rel="dns-prefetch" href="navbar.html">
     <link rel="stylesheet" href="style.css">
     <script rel="async" src="main.js"></script>
-    <link rel="prefetch" href="projects.html">
-    <link rel="prefetch" href="features.html">
-    <link rel="prefetch" href="contact.html">
-    <link rel="prefetch" href="about.html">
+
+    <!-- Inline critical CSS -->
+    <style>
+        /* Only include the most essential styles needed for initial render */
+        :root {
+            --color-background: rgb(15, 15, 20);
+            --color-surface: rgb(25, 25, 30);
+            --color-text: rgb(230, 230, 230);
+            --color-partner-highlight: #bb00ff;
+        }
+
+        html,
+        body {
+            background-color: var(--color-background);
+            color: var(--color-text);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0;
+            padding: 0 16px;
+        }
+
+        .glow {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
+            color: var(--color-partner-highlight);
+            animation: pulse 2s infinite alternate;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid var(--color-partner-highlight);
+        }
+
+        @keyframes pulse {
+            from {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
+            }
+
+            to {
+                text-shadow: 0 0 15px rgba(255, 255, 255, 0.6), 0 0 25px rgba(255, 255, 255, 0.4), 0 0 35px rgba(187, 0, 255, 0.3);
+            }
+        }
+    </style>
+
+    <!-- Load full CSS with defer -->
+    <link rel="preload" href="style.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="style.min.css">
+    </noscript>
 </head>
 
 <body>
@@ -20,8 +72,8 @@
         I wanted to say a special thanks to Vortex for being partners with me and with the Lockdown Browser repo (in
         projects dropdown).
         <br>
-        Check them out at <a href="https://discord.gg/kFmWWsJdzg" target="_blank" style="color: white;">Discord</a>
-        and <a href="https://dashboard.fluxus.org" target="_blank" style="color: white;">Their site!</a>.
+        Check them out at <a href="https://discord.gg/kFmWWsJdzg" target="_blank">Discord</a>
+        and <a href="https://dashboard.fluxus.org" target="_blank">Their site!</a>.
     </h3>
     <div rel="dns-prefetch" id="readme-content"></div>
     <button onclick="clearSiteData()" class="clear-data-button">

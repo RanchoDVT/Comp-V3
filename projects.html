@@ -3,17 +3,39 @@
 
 <head>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voidless - Projects (Comp V3)</title>
+    <meta name="description"
+        content="Voidless software projects including Comp-V3, a VEX robotics configuration utility, and other tools like Lockdown Browser in partnership with Vortex.">
+    <title>Voidless - Home</title>
+
+    <!-- PWA support -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e1e23">
+    <meta meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="images/Logo.png">
+
+    <!-- Other head content -->
     <link rel="shortcut icon" href="images/Logo.png">
     <link rel="dns-prefetch" href="navbar.html">
     <link rel="stylesheet" href="style.css">
-    <script rel="async" src="main.js"></script>
-    <script async="true" src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="prefetch" href="index.html">
-    <link rel="prefetch" href="features.html">
-    <link rel="prefetch" href="contact.html">
-    <link rel="prefetch" href="about.html">
+    <script src="main.js"></script>
+    <script>
+        // Lazy load the marked library only when needed
+        function loadMarked(callback) {
+            if (window.marked) {
+                callback();
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = "https://cdn.jsdelivr.net/npm/marked/marked.min.js";
+            script.async = true;
+            script.onload = callback;
+            document.head.appendChild(script);
+        }
+    </script>
 </head>
+
 
 <body>
     <div id="navbar"></div>
@@ -50,9 +72,9 @@
             <h3>Motor Configuration</h3>
             <div class="motor-grid">
                 <div class="motor-column">
-                    <h4>Left Motors</h4>
+                    <h3>Left Motors</h3>
                     <div class="motor-group">
-                        <h5>Front Left</h5>
+                        <h4>Front Left</h4>
                         <div class="form-group">
                             <label for="front-left-port">Port:</label>
                             <input type="number" id="front-left-port" name="front_left_port" min="0" max="20" value="1"
@@ -73,7 +95,7 @@
                     </div>
 
                     <div class="motor-group">
-                        <h5>Rear Left</h5>
+                        <h4>Rear Left</h4>
                         <div class="form-group">
                             <label for="rear-left-port">Port:</label>
                             <input type="number" id="rear-left-port" name="rear_left_port" min="0" max="20" value="11"
@@ -95,9 +117,9 @@
                 </div>
 
                 <div class="motor-column">
-                    <h4>Right Motors</h4>
+                    <h3>Right Motors</h3>
                     <div class="motor-group">
-                        <h5>Front Right</h5>
+                        <h4>Front Right</h4>
                         <div class="form-group">
                             <label for="front-right-port">Port:</label>
                             <input type="number" id="front-right-port" name="front_right_port" min="0" max="20"
@@ -118,7 +140,7 @@
                     </div>
 
                     <div class="motor-group">
-                        <h5>Rear Right</h5>
+                        <h4>Rear Right</h4>
                         <div class="form-group">
                             <label for="rear-right-port">Port:</label>
                             <input type="number" id="rear-right-port" name="rear_right_port" min="0" max="20" value="20"
@@ -140,7 +162,7 @@
                 </div>
 
                 <div class="motor-column">
-                    <h4>Sensors</h4>
+                    <h3>Sensors</h3>
                     <div class="sensor-group">
                         <div class="form-group">
                             <label for="inertial-port">Inertial Sensor Port:</label>
@@ -162,11 +184,10 @@
                     </div>
                 </div>
             </div>
-            <br>
             <h2>Other Settings</h2>
             <div class="settings-grid">
                 <div class="settings-column">
-                    <h4>Display Settings</h4>
+                    <h3>Display Settings</h3>
                     <div class="settings-group">
                         <div class="form-group">
                             <label for="print-logo">Print Logo:</label>

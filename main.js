@@ -101,48 +101,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function loadChangelog() {
         const changelogElem = document.getElementById("changelog-content");
         if (!changelogElem) return;
-        let outputHTML = "";
 
-        // Fetch releases from GitHub API
-        try {
-            const releasesResponse = await fetch("https://api.github.com/repos/Voidless7125/Comp-V3/releases", { cache: "force-cache" });
-            const releasesData = await releasesResponse.json();
-            if (!releasesResponse.ok) {
-                throw new Error("Failed to load releases");
+        loadMarked(async () => {
+            let outputHTML = "";
+
+            // Fetch releases from GitHub API
+            try {
+                const releasesResponse = await fetch("https://api.github.com/repos/Voidless7125/Comp-V3/releases", { cache: "force-cache" });
+                const releasesData = await releasesResponse.json();
+                if (!releasesResponse.ok) {
+                    throw new Error("Failed to load releases");
+                }
+                outputHTML += `<section><h2>Releases</h2>`;
+                releasesData.forEach(release => {
+                    outputHTML += `<div class="release">
+                        <h3>${release.name || release.tag_name}</h3>
+                        ${release.body ? window.marked.parse(release.body) : "<p>No release notes.</p>"}
+                    </div>`;
+                });
+                outputHTML += `</section>`;
+            } catch (err) {
+                console.error(err);
+                outputHTML += `<section><h2>Releases</h2><p>Unable to load releases.</p></section>`;
             }
-            outputHTML += `<section><h2>Releases</h2>`;
-            releasesData.forEach(release => {
-                outputHTML += `<div class="release">
-                    <h3>${release.name || release.tag_name}</h3>
-                    ${release.body ? marked.parse(release.body) : "<p>No release notes.</p>"}
-                </div>`;
-            });
-            outputHTML += `</section>`;
-        } catch (err) {
-            console.error(err);
-            outputHTML += `<section><h2>Releases</h2><p>Unable to load releases.</p></section>`;
-        }
 
-        // Fetch legacy changelog content
-        try {
-            const legacyResponse = await fetch("https://raw.githubusercontent.com/Voidless7125/Comp-V3/dev/legacy_changelog.md");
-            if (!legacyResponse.ok) {
-                throw new Error("Failed to load legacy changelog");
-            }
-            const legacyText = await legacyResponse.text();
-            outputHTML += `<section>
-      <h2>Legacy Changelog</h2>
-      ${marked.parse(legacyText)}
-    </section>`;
-        } catch (err) {
-            console.error(err);
-            outputHTML += `<section>
-      <h2>Legacy Changelog</h2>
-      <p>Unable to load legacy changelog.</p>
-    </section>`;
-        }
-
-        changelogElem.innerHTML = outputHTML;
+            changelogElem.innerHTML = outputHTML;
+        });
     }
 
     if (document.getElementById("readme-content")) {
@@ -467,163 +451,6 @@ VERSION=${await getLatestRelease("Voidless7125/Comp-V3")}`;
     if (document.getElementById("project")) {
         window.updateProjectView();
     }
-
-    function initGlowCursor() {
-        const blob = document.createElement('div');
-        blob.id = 'cursor-blob';
-        document.body.appendChild(blob);
-
-        // Position the blob initially at center of screen
-        const initialX = window.innerWidth / 2;
-        const initialY = window.innerHeight / 2;
-        blob.style.left = `${initialX}px`;
-        blob.style.top = `${initialY}px`;
-        blob.style.opacity = '1';
-        blob.style.display = 'block';
-
-        // Performance optimization: Store DOM elements and track animation state
-        let isAnimating = false;
-        let pendingCursorX = initialX;
-        let pendingCursorY = initialY;
-
-        // Cache DOM elements for better performance
-        let navbar = null;
-        let navbarItems = [];
-
-        // Initial element caching
-        function refreshElementCache() {
-            navbar = document.querySelector('#navbar');
-            if (navbar) {
-                // Modified selector to better capture ALL dropdown items
-                navbarItems = Array.from(document.querySelectorAll('nav a, nav .nav-link, .dropdown-content a'));
-            }
-
-            // Only track elements currently visible in viewport (big performance win)
-            visibleTextElements = Array.from(document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, label, li')).filter(el => {
-                const rect = el.getBoundingClientRect();
-                return !(rect.bottom < 0 || rect.top > window.innerHeight ||
-                    rect.right < 0 || rect.left > window.innerWidth);
-            });
-        }
-
-        // Initial cache population
-        refreshElementCache();
-
-        // Refresh element cache occasionally and on key events
-        window.addEventListener('resize', debounce(refreshElementCache, 200));
-        window.addEventListener('scroll', debounce(refreshElementCache, 200));
-        setInterval(refreshElementCache, 5000); // Refresh every 5 seconds
-
-        // Performance-optimized pointer move handler with popup check
-        document.addEventListener('pointermove', event => {
-            // Check if popup is open
-            const popupIsOpen = document.getElementById('popup').classList.contains('active');
-
-            // Only update cursor position if popup is not open
-            if (!popupIsOpen) {
-                pendingCursorX = event.clientX;
-                pendingCursorY = event.clientY;
-                window.currentMouseX = pendingCursorX;
-                window.currentMouseY = pendingCursorY;
-                window.lastMouseMoveTime = Date.now();
-
-                if (!isAnimating) {
-                    isAnimating = true;
-                    requestAnimationFrame(updateCursor);
-                }
-            }
-        });
-
-        // Counter to reduce frequency of effect updates
-
-        function updateCursor() {
-            // Get the blob's dimensions
-            const blobWidth = blob.offsetWidth;
-            const blobHeight = blob.offsetHeight;
-
-            // Animate the blob position, centering it on the cursor
-            blob.animate({
-                left: `${pendingCursorX - (blobWidth / 2)}px`,
-                top: `${pendingCursorY - (blobHeight / 2)}px`
-            }, {
-                duration: 3000,
-                fill: "forwards"
-            });
-
-            checkNavbarGlow(pendingCursorX, pendingCursorY);
-
-            // Allow next animation frame
-            isAnimating = false;
-        }
-
-        function checkNavbarGlow(cursorX, cursorY) {
-            if (!navbar) return;
-
-            // For background glow effect
-            const navbarRect = navbar.getBoundingClientRect();
-            const navbarCenterX = navbarRect.left + navbarRect.width / 2;
-            const navbarCenterY = navbarRect.top + navbarRect.height / 2;
-
-            const navDistance = Math.sqrt(
-                Math.pow(cursorX - navbarCenterX, 2) +
-                Math.pow(cursorY - navbarCenterY, 2)
-            );
-
-            const backgroundGlowThreshold = 300;
-
-            if (navDistance < backgroundGlowThreshold) {
-                const bgIntensity = 1 - (navDistance / backgroundGlowThreshold);
-                const glowColor = `rgba(60, 100, 255, ${bgIntensity * 0.15})`;
-                navbar.style.boxShadow = `0 0 ${Math.floor(40 * bgIntensity)}px ${glowColor}`;
-                navbar.style.backgroundColor = `rgba(30, 40, 60, ${0.7 + (bgIntensity * 0.3)})`;
-            } else {
-                navbar.style.boxShadow = '';
-                navbar.style.backgroundColor = '';
-            }
-
-            // Apply text glow effect to navbar items
-            const textGlowThreshold = 200;
-
-            for (let i = 0; i < navbarItems.length; i++) {
-                const item = navbarItems[i];
-                const rect = item.getBoundingClientRect();
-
-                // Skip if not in viewport
-                if (rect.bottom < 0 || rect.top > window.innerHeight ||
-                    rect.right < 0 || rect.left > window.innerWidth) {
-                    continue;
-                }
-
-                const itemCenterX = rect.left + rect.width / 2;
-                const itemCenterY = rect.top + rect.height / 2;
-
-                const distance = Math.sqrt(
-                    Math.pow(cursorX - itemCenterX, 2) +
-                    Math.pow(cursorY - itemCenterY, 2)
-                );
-
-                if (distance < textGlowThreshold) {
-                    const intensity = 1 - (distance / textGlowThreshold);
-                    const glowColor = `rgba(255, 255, 255, ${intensity * 0.8})`;
-                    const glowSize = Math.max(5, Math.floor(20 * intensity));
-
-                    item.style.textShadow = `0 0 ${glowSize}px ${glowColor}`;
-
-                    const colorBoost = Math.floor(intensity * 50);
-                    item.style.color = `rgb(${255 - colorBoost}, ${255 - colorBoost}, 255)`;
-                } else {
-                    // Only reset if previously set
-                    if (item.style.textShadow || item.style.color) {
-                        item.style.textShadow = '';
-                        item.style.color = '';
-                    }
-                }
-            }
-        };
-    }
-
-    initGlowCursor();
-
 
     // Add this to your DOMContentLoaded event handler
     if (document.getElementById("wiki-features")) {
@@ -958,4 +785,18 @@ function getLatestVersion(project) {
     }
 
     return "Checking...";
+}
+
+// Add this to the end of your file, outside any function
+// Better service worker registration
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+                console.log('ServiceWorker registered with scope:', registration.scope);
+            })
+            .catch(error => {
+                console.error('ServiceWorker registration failed:', error);
+            });
+    });
 }
